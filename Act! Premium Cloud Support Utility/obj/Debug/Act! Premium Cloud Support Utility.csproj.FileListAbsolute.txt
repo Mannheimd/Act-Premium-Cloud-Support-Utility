@@ -12,3 +12,5 @@ G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csproj.GenerateResource.Cache
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.exe
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\JenkinsLogin.g.cs
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\JenkinsLogin.baml
