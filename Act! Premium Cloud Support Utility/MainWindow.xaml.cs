@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Xml;
 
 namespace Act__Premium_Cloud_Support_Utility
@@ -29,7 +27,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (textBox_LookupValue.Text != "")
             {
                 // Creating base URL
-                string URL = @"https://cloudops-jenkins-ust1.hostedtest.act.com:8443/job/CloudOps1-LookupCustomer/buildWithParameters";
+                string URL = @"https://cloudops-jenkins-ust1.hostedtest.act.com:8443/job/CloudOps1-LookupCustomer";
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(URL);
 
@@ -42,24 +40,89 @@ namespace Act__Premium_Cloud_Support_Utility
                 // Post a request to build LookupCustomer and wait for a response
                 HttpResponseMessage response = await client.PostAsync(@"https://cloudops-jenkins-ust1.hostedtest.act.com:8443/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy=" + comboBox_LookupBy.SelectedValue.ToString() + "&LookupValue=" + textBox_LookupValue.Text, new StringContent(""));
 
+                string newBuildUrl = "";
+
                 if (response.IsSuccessStatusCode)
                 {
-                    bool buildComplete = false;
+                    bool queuedBuildComplete = false;
+                    int failCount = 0;
 
-                    while (!buildComplete)
+                    // Keep checking for the completed job
+                    while (!queuedBuildComplete)
+                    {
+                        if (failCount > 30)
+                        {
+                            MessageBox.Show("Looks like a problem occurred. Please try running your lookup again. If the problem persists, please report it through your usual channels.");
+                            break;
+                        }
+
+                        await Delay(1000); // Checking status every 1 second
+
+                        // Use the URL returned in the Location header from the above POST response to GET the build status
+                        string queuedBuildURL = response.Headers.Location.AbsoluteUri;
+                        HttpResponseMessage queuedBuildOutput = await client.GetAsync(queuedBuildURL + @"\api\xml");
+
+                        // Throw the build status output into an XML document
+                        XmlDocument queuedBuildXml = new XmlDocument();
+                        queuedBuildXml.LoadXml(await queuedBuildOutput.Content.ReadAsStringAsync());
+
+                        // Try getting the completed build URL from the output
+                        try
+                        {
+                            XmlNode buildURLNode = queuedBuildXml.SelectSingleNode("leftItem/executable/url");
+                            newBuildUrl = buildURLNode.InnerXml;
+                            queuedBuildComplete = true;
+                        }
+                        catch
+                        {
+                            // Expecting this to fail for a couple of attempts while the build is queued, no need to do special stuff with the catch. It throws an Object Reference error until the correct output is seen, but this should never surface for the user.
+                            failCount++;
+                        }
+                    }
+
+                    // Now that we have the new build URL, let's start checking the output and looking for completion.
+                    bool newBuildComplete = false;
+                    while (!newBuildComplete)
                     {
                         await Delay(1000);
 
-                        HttpClient newBuild = new HttpClient();
-                        newBuild.BaseAddress = response.Headers.Location;
-                        string newBuildURL = response.Headers.Location.AbsoluteUri;
-                        HttpResponseMessage newBuildOutput = await client.GetAsync(newBuildURL + @"\api\xml");
-                        MessageBox.Show(await newBuildOutput.Content.ReadAsStringAsync());
+                        HttpResponseMessage newBuildOutput = await client.GetAsync(newBuildUrl + @"\api\xml");
+
+                        // Throw the output into an XML document
+                        XmlDocument newBuildXml = new XmlDocument();
+                        newBuildXml.LoadXml(await newBuildOutput.Content.ReadAsStringAsync());
+
+                        // Try getting the completed build URL from the output
+                        try
+                        {
+                            XmlNode building = newBuildXml.SelectSingleNode("freeStyleBuild/building");
+                            XmlNode result = newBuildXml.SelectSingleNode("freeStyleBuild/result");
+                            if (building.InnerXml == "false" & result.InnerXml == "SUCCESS")
+                            {
+                                newBuildComplete = true;
+                            }
+                            else if (building.InnerXml == "false" & result.InnerXml != "SUCCESS")
+                            {
+                                MessageBox.Show("Looks like a problem occurred. Please try running your lookup again. If the problem persists, please report it through your usual channels.");
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // Expecting this to fail for a couple of attempts while the build is queued, no need to do special stuff with the catch. It throws an Object Reference error until the correct output is seen, but this should never surface for the user.
+                        }
+                    }
+
+                    if (newBuildComplete)
+                    {
+                        HttpResponseMessage finalBuildOutput = await client.GetAsync(newBuildUrl + @"logText/progressiveText?start=0");
+
+                        MessageBox.Show(await finalBuildOutput.Content.ReadAsStringAsync());
                     }
                 }
                 else
                 {
-                    MessageBox.Show(response.ReasonPhrase);
+                    MessageBox.Show("Build creation failed with reason: " + response.ReasonPhrase);
                 }
             }
         }
