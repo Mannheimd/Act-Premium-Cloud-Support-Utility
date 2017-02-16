@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Button x:Name="button_RunLookupCustomer" Content="Go" Margin="364,47,0,0" HorizontalAlignment="Left" Width="75" Height="20" VerticalAlignment="Top" Click="button_RunLookupCustomer_Click"/>
+        <Label Content="Lookup Account" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Content="Where" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
+        <ComboBox x:Name="comboBox_LookupBy" HorizontalAlignment="Left" Margin="55,45,0,0" VerticalAlignment="Top" Width="140" SelectedIndex="0"/>
+        <Label Content="Equals" HorizontalAlignment="Left" Margin="195,41,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBox_LookupValue" HorizontalAlignment="Left" Height="23" Margin="239,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+
     </Grid>
 </Window>
