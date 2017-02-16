@@ -1,1 +1,14 @@
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe.config
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.pdb
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csprojResolveAssemblyReference.cache
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\MainWindow.g.cs
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\App.g.cs
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility_MarkupCompile.cache
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility_MarkupCompile.lref
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\MainWindow.baml
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.g.resources
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act__Premium_Cloud_Support_Utility.Properties.Resources.resources
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csproj.GenerateResource.Cache
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.exe
+G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb
