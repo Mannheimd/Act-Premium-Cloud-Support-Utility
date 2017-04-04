@@ -14,3 +14,22 @@ G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\JenkinsLogin.g.cs
 G:\Users\Chris\Dropbox\C# Things\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\JenkinsLogin.baml
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe.config
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.exe
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe.config
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.pdb
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csprojResolveAssemblyReference.cache
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\MainWindow.g.cs
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\JenkinsLogin.g.cs
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\App.g.cs
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility_MarkupCompile.cache
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility_MarkupCompile.lref
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\MainWindow.baml
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\JenkinsLogin.baml
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.g.resources
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act__Premium_Cloud_Support_Utility.Properties.Resources.resources
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csproj.GenerateResource.Cache
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.exe
+C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb

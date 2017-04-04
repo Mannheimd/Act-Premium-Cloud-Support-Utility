@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
@@ -10,8 +11,6 @@ namespace Act__Premium_Cloud_Support_Utility
 {
     public partial class MainWindow : Window
     {
-        public static string encodedCreds = null; // Encoded version of the user's username and password
-
         public MainWindow()
         {
             InitializeComponent();
@@ -35,7 +34,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
 
                 // Adding authentication details
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedCreds);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(JenkinsEncryption.UnsecureJenkinsCreds("UST1")));
 
                 // Post a request to build LookupCustomer and wait for a response
                 HttpResponseMessage response = await client.PostAsync(@"https://cloudops-jenkins-ust1.hostedtest.act.com:8443/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy=" + comboBox_LookupBy.SelectedValue.ToString() + "&LookupValue=" + textBox_LookupValue.Text, new StringContent(""));

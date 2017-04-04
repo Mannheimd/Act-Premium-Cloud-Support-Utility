@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -14,7 +17,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void loginWindowOK_Click(object sender, RoutedEventArgs e)
         {
-            GetUserPass();
+            JenkinsEncryption.SecureJenkinsCreds(loginWindowUName.Text, loginWindowPWord.SecurePassword, "UST1");
 
             Close();
         }
@@ -25,12 +28,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 loginWindowOK_Click(sender, e);
             }
-        }
-
-        private void GetUserPass()
-        {
-            byte[] creds = UTF8Encoding.UTF8.GetBytes(loginWindowUName.Text + ":" + loginWindowPWord.Password);
-            MainWindow.encodedCreds = Convert.ToBase64String(creds);
         }
     }
 }
