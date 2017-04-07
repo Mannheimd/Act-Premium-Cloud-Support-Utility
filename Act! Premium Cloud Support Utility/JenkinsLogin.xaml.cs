@@ -1,9 +1,4 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Security;
-using System.Security.Cryptography;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 
 namespace Act__Premium_Cloud_Support_Utility
@@ -17,7 +12,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void loginWindowOK_Click(object sender, RoutedEventArgs e)
         {
-            JenkinsEncryption.SecureJenkinsCreds(loginWindowUName.Text, loginWindowPWord.SecurePassword, "UST1");
+            JenkinsTasks.SecureJenkinsCreds(loginWindowUName.Text, loginWindowPWord.Password, "UST1");
 
             Close();
         }
