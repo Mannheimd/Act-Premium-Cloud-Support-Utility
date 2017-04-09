@@ -5,14 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         mc:Ignorable="d"
-        Title="Jenkins Login" Height="263" Width="472"
-        ResizeMode="NoResize" Topmost="True">
-    <Grid>
-        <TextBox x:Name="loginWindowUName" HorizontalAlignment="Left" Height="23" Margin="81,44,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="182"/>
-        <PasswordBox x:Name="loginWindowPWord" HorizontalAlignment="Left" Height="23" Margin="81,75,0,0" VerticalAlignment="Top" Width="182" KeyDown="loginWindowPWord_KeyDown"/>
-        <Label x:Name="loginTitleLabel" Content="Please enter your Jenkins login credentials." HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="loginUNameLabel" Content="Username:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="loginPWordLabel" Content="Password:" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="loginWindowOK" Content="OK" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" Click="loginWindowOK_Click"/>
+        Title="Jenkins Login" ResizeMode="NoResize" Topmost="True" SizeToContent="WidthAndHeight">
+    <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Height="auto" Width="auto">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="jenkinsLogin_JenkinsServerSelect_Grid" Grid.Row="0">
+            <Label Content="Select a server:" Margin="10,5,0,0" HorizontalAlignment="Left" VerticalAlignment="top"/>
+            <ComboBox x:Name="jenkinsLogin_JenkinsServerSelect_ComboBox" Margin="103,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" SelectionChanged="jenkinsLogin_JenkinsServerSelect_ComboBox_SelectionChanged"/>
+        </Grid>
+
+        <Grid x:Name="jenkinsLogin_Instructions_Grid" Grid.Row="1" Visibility="Hidden">
+            <TextBlock Margin="15,0,10,0">
+                <Run Text="1. Click "/><Hyperlink x:Name="jenkinsLogin_Configure_Hyperlink" NavigateUri="http://www.invalid.com" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink><LineBreak/>
+                <Run Text="2. Log in using your normal Jenkins login credentials"/><LineBreak/>
+                <Run Text="3. Click on &quot;Show API Token&quot;"/><LineBreak/>
+                <Run Text="4. Copy the User ID and API Token into the boxes below"/>
+            </TextBlock>
+        </Grid>
+
+        <Grid x:Name="jenkinsLogin_Credentials_Grid" Grid.Row="2" Visibility="Hidden">
+            <Label Content="User ID:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="loginWindowUName" HorizontalAlignment="Left" Height="23" Margin="81,2,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="182"/>
+            <Label Content="API Token:" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top"/>
+            <PasswordBox x:Name="loginWindowPWord" HorizontalAlignment="Left" Height="23" Margin="81,28,0,0" VerticalAlignment="Top" Width="182" KeyDown="loginWindowPWord_KeyDown"/>
+        </Grid>
+
+        <Grid x:Name="jenkinsLogin_Buttons_Grid" Grid.Row="3">
+            <Button Content="Cancel" Margin="10,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="loginWindowOK_Click"/>
+            <Button x:Name="loginWindowOK" Content="Save" HorizontalAlignment="Right" Margin="0,5,10,5" VerticalAlignment="Bottom" Width="75" Click="loginWindowOK_Click"/>
+        </Grid>
     </Grid>
 </Window>

@@ -9,12 +9,14 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="66"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <Grid x:Name="jenkinsServerSelect_Grid" Grid.Row="0">
-            <Label Content="Select a server:" Margin="10,5,0,0" HorizontalAlignment="Left" VerticalAlignment="top"/>
-            <ComboBox x:Name="jenkinsServerSelect_ComboBox" Margin="103,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157"/>
+            <Label Content="Select a server:" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="top"/>
+            <ComboBox x:Name="jenkinsServerSelect_ComboBox" Margin="103,2,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" SelectionChanged="jenkinsServerSelect_ComboBox_SelectionChanged"/>
+            <Label x:Name="jenkinsServerSelect_LoginStatus_Label" Content="No server selected." Margin="265,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Button x:Name="jenkinsServerSelect_Configure_Button" Content="Configure" Margin="0,2,10,0" Height="23" Width="75" HorizontalAlignment="Right" VerticalAlignment="Top" Click="jenkinsServerSelect_Configure_Button_Click"/>
         </Grid>
 
         <Grid x:Name="lookupAccount_Grid" Grid.Row="1">
@@ -23,7 +25,7 @@
             <ComboBox x:Name="comboBox_LookupBy" HorizontalAlignment="Left" Margin="55,36,0,0" VerticalAlignment="Top" Width="140" SelectedIndex="0"/>
             <Label Content="Equals" HorizontalAlignment="Left" Margin="195,34,0,0" VerticalAlignment="Top"/>
             <TextBox x:Name="textBox_LookupValue" HorizontalAlignment="Left" Height="23" Margin="239,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="211"/>
-            <Button x:Name="button_RunLookupCustomer" Content="Go" Margin="455,36,0,0" HorizontalAlignment="Left" Width="75" VerticalAlignment="Top" Click="button_RunLookupCustomer_Click"/>
+            <Button x:Name="button_RunLookupCustomer" Content="Go" Margin="455,36,0,0" HorizontalAlignment="Left" Height="23"  Width="75" VerticalAlignment="Top" Click="button_RunLookupCustomer_Click"/>
         </Grid>
     </Grid>
 </Window>

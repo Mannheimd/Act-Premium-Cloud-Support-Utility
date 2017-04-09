@@ -1,9 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Security;
 using System.Security.Cryptography;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -68,7 +65,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 catch(Exception error)
                 {
-                    MessageBox.Show("Unable to get stored Jenkins credentials for selected server:\n\n" + error.Message);
+                    MessageBox.Show("Unable to get stored Jenkins credentials for selected server: " + server + "\n\n" + error.Message);
                 }
 
                 return utf8Creds;
@@ -123,22 +120,40 @@ namespace Act__Premium_Cloud_Support_Utility
             // Adding accept header for XML format
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
 
-            // Adding authentication details
+            // Getting the encrypted authentication details
             byte[] creds = UnsecureJenkinsCreds(server); // Update to use server, when server passes correct string
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(creds));
 
-            // Run a Get request with the provided request path
-            HttpResponseMessage response = new HttpResponseMessage();
-            try
+            // If no authentication details, return blank message with Unauthorized status code
+            if (creds == null)
             {
-                response = await client.PostAsync(request, new StringContent(""));
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("POST request failed in 'jenkinsPostRequest(" + server + "," + request + ")'.\n\n" + error);
-            }
+                HttpResponseMessage blankResponse = new HttpResponseMessage();
+                blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
 
-            return response;
+                return blankResponse;
+            }
+            else
+            {
+                // Add authentication details to HTTP request
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(creds));
+
+                // Run a Get request with the provided request path
+                HttpResponseMessage response = new HttpResponseMessage();
+                try
+                {
+                    response = await client.PostAsync(request, new StringContent(""));
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show("POST request failed in 'jenkinsPostRequest(" + server + "," + request + ")'.\n\n" + error);
+
+                    HttpResponseMessage blankResponse = new HttpResponseMessage();
+                    blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+
+                    return blankResponse;
+                }
+
+                return response;
+            }
         }
 
         public static async Task<HttpResponseMessage> jenkinsGetRequest(string server, string request)
@@ -150,27 +165,54 @@ namespace Act__Premium_Cloud_Support_Utility
             // Adding accept header for XML format
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
 
-            // Adding authentication details
+            // Getting the encrypted authentication details
             byte[] creds = UnsecureJenkinsCreds(server); // Update to use server, when server passes correct string
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(creds));
 
-            // Run a Get request with the provided request path
-            HttpResponseMessage response = new HttpResponseMessage();
-            try
+            // If no authentication details, return blank message with Unauthorized status code
+            if (creds == null)
             {
-                response = await client.GetAsync(request);
-            }
-            catch(Exception error)
-            {
-                MessageBox.Show("GET request failed in 'jenkinsGetRequest(" + server + "," + request + ")'.\n\n" + error);
-            }
+                HttpResponseMessage blankResponse = new HttpResponseMessage();
+                blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
 
-            return response;
+                return blankResponse;
+            }
+            else
+            {
+                // Add authentication details to HTTP request
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(creds));
+
+                // Run a Get request with the provided request path
+                HttpResponseMessage response = new HttpResponseMessage();
+                try
+                {
+                    response = await client.GetAsync(request);
+                }
+                catch (Exception error)
+                {
+                    MessageBox.Show("GET request failed in 'jenkinsGetRequest(" + server + "," + request + ")'.\n\n" + error);
+
+                    HttpResponseMessage blankResponse = new HttpResponseMessage();
+                    blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+
+                    return blankResponse;
+                }
+
+                return response;
+            }
+        }
+
+        public static async Task<bool> checkServerLogin(string server)
+        {
+            HttpResponseMessage response = await jenkinsGetRequest(server, "/me/api/xml");
+            if (response != null & response.IsSuccessStatusCode)
+                return true;
+            else
+                return false;
         }
 
         public static async Task<string> runJenkinsBuild(string server, string request)
         {
-            // Post a request to build LookupCustomer and wait for a response
+            // Post a request to build job and wait for a response
             HttpResponseMessage postBuildRequest = await JenkinsTasks.jenkinsPostRequest(server, request);
 
             string finalBuildUrl = "";
@@ -260,6 +302,14 @@ namespace Act__Premium_Cloud_Support_Utility
 
                 return null;
             }
+        }
+
+        public static async Task<string> runJenkinsGet(string server, string request)
+        {
+            // Post a GET request to build LookupCustomer and wait for a response
+            HttpResponseMessage getRequest = await JenkinsTasks.jenkinsGetRequest("UST1", request);
+
+            return await getRequest.Content.ReadAsStringAsync();
         }
 
         public static async Task Delay(int time)

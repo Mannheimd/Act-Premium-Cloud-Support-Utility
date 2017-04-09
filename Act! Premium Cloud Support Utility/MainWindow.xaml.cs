@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Xml;
 
 namespace Act__Premium_Cloud_Support_Utility
 {
     public partial class MainWindow : Window
     {
-        XmlDocument jenkinsServerXml = new XmlDocument();
+        public static XmlDocument jenkinsServerXml = new XmlDocument();
 
         public MainWindow()
         {
@@ -26,7 +26,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (textBox_LookupValue.Text != "" & jenkinsServerSelect_ComboBox.Text != "")
             {
                 // Get the server ID of the selected server
-                string server = getValuesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']")[0];
+                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
 
                 // Post a request to build LookupCustomer and wait for a response
                 if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
@@ -81,13 +81,13 @@ namespace Act__Premium_Cloud_Support_Utility
             comboBox_LookupBy.SelectedIndex = 0;
         }
 
-        private bool loadJenkinsServersXml()
+        public bool loadJenkinsServersXml()
         {
             // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
             try
             {
                 string xmlString = null;
-                
+
                 // Open the XML file from embedded resources
                 using (Stream stream = this.GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
                 {
@@ -96,7 +96,7 @@ namespace Act__Premium_Cloud_Support_Utility
                         xmlString = sr.ReadToEnd();
                     }
                 }
-                
+
                 // Add the text to the Jenkins Servers XmlDocument
                 jenkinsServerXml.LoadXml(xmlString);
             }
@@ -109,7 +109,7 @@ namespace Act__Premium_Cloud_Support_Utility
             return true;
         }
 
-        private List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
+        public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
         {
             XmlNodeList xmlNodes = xmlDoc.SelectNodes(path);
 
@@ -123,7 +123,7 @@ namespace Act__Premium_Cloud_Support_Utility
             return resultList;
         }
 
-        private List<string> getAttributesFromXml(XmlDocument xmlDoc, string path, string attribute)
+        public static List<string> getAttributesFromXml(XmlDocument xmlDoc, string path, string attribute)
         {
             XmlNodeList xmlNodes = xmlDoc.SelectNodes(path);
 
@@ -183,13 +183,38 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             await Task.Delay(time);
         }
-    }
 
-    public class JenkinsServer
-    {
-        public string name { get; set; }
-        public string id { get; set; }
-        public string url { get; set; }
+        private async void jenkinsServerSelect_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                // Get server ID of selected server from jenkinsServerXml
+                string selectedItem = e.AddedItems[0].ToString();
+                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + selectedItem + "']", "id")[0];
+
+                // Trigger update on UI with login status
+                jenkinsServerSelect_LoginStatus_Label.Content = "Checking login...";
+                jenkinsServerSelect_Grid.ClearValue(BackgroundProperty);
+
+                // Run a GET request to retrieve the user's login data
+                bool status = await JenkinsTasks.checkServerLogin(server);
+                if (status)
+                {
+                    jenkinsServerSelect_LoginStatus_Label.Content = "Login succeeded.";
+                }
+                else
+                {
+                    jenkinsServerSelect_LoginStatus_Label.Content = "Login failed.";
+                    jenkinsServerSelect_Grid.SetValue(BackgroundProperty, new SolidColorBrush(Color.FromRgb(254, 80, 0)));
+                }
+            }
+        }
+
+        private void jenkinsServerSelect_Configure_Button_Click(object sender, RoutedEventArgs e)
+        {
+            JenkinsLogin jenkinsLogin = new JenkinsLogin();
+            jenkinsLogin.Show();
+        }
     }
 
     public class Database
