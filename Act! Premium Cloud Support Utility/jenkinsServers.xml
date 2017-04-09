@@ -1,0 +1,3 @@
+<servers>
+  <server name="North America Test" id="UST1">https://cloudops-jenkins-ust1.hostedtest.act.com:8443</server>
+</servers>

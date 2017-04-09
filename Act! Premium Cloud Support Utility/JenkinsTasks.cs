@@ -68,7 +68,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 catch(Exception error)
                 {
-                    MessageBox.Show("Unable to get stored Jenkins credentials:\n\n" + error.Message);
+                    MessageBox.Show("Unable to get stored Jenkins credentials for selected server:\n\n" + error.Message);
                 }
 
                 return utf8Creds;

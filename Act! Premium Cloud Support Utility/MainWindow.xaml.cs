@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security;
@@ -11,6 +12,8 @@ namespace Act__Premium_Cloud_Support_Utility
 {
     public partial class MainWindow : Window
     {
+        XmlDocument jenkinsServerXml = new XmlDocument();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -18,43 +21,55 @@ namespace Act__Premium_Cloud_Support_Utility
             PopulateDropDowns();
         }
 
-        private async void RunLookupCustomer()
+        private async void runLookupCustomer()
         {
-            if (textBox_LookupValue.Text != "")
+            if (textBox_LookupValue.Text != "" & jenkinsServerSelect_ComboBox.Text != "")
             {
+                // Get the server ID of the selected server
+                string server = getValuesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']")[0];
+
                 // Post a request to build LookupCustomer and wait for a response
-                string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild("UST1", @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
-                    + comboBox_LookupBy.SelectedValue.ToString()
-                    + "&LookupValue="
-                    + textBox_LookupValue.Text);
+                if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+                {
+                    string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
+                        + comboBox_LookupBy.SelectedValue.ToString()
+                        + "&LookupValue="
+                        + textBox_LookupValue.Text);
 
-                string iitid = SearchString(lookupCustomerOutput, "IITID: ");
-                string accountName = SearchString(lookupCustomerOutput, "Account Name: ");
-                string email = SearchString(lookupCustomerOutput, "Email: ");
-                string createDate = SearchString(lookupCustomerOutput, "Create Date: ");
-                string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ");
-                string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ");
-                string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ");
-                string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ");
-                string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ");
-                string siteName = SearchString(lookupCustomerOutput, "Site Name: ");
-                string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ");
-                string loginUrl = SearchString(lookupCustomerOutput, "URL: ");
-                string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ");
+                    string iitid = SearchString(lookupCustomerOutput, "IITID: ");
+                    string accountName = SearchString(lookupCustomerOutput, "Account Name: ");
+                    string email = SearchString(lookupCustomerOutput, "Email: ");
+                    string createDate = SearchString(lookupCustomerOutput, "Create Date: ");
+                    string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ");
+                    string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ");
+                    string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ");
+                    string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ");
+                    string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ");
+                    string siteName = SearchString(lookupCustomerOutput, "Site Name: ");
+                    string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ");
+                    string loginUrl = SearchString(lookupCustomerOutput, "URL: ");
+                    string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ");
 
-                List<Database> databaseList = SearchForDatabases(lookupCustomerOutput);
+                    List<Database> databaseList = SearchForDatabases(lookupCustomerOutput);
 
-                MessageBox.Show(siteName);
+                    MessageBox.Show(siteName);
+                }
             }
         }
 
         private void button_RunLookupCustomer_Click(object sender, RoutedEventArgs e)
         {
-            RunLookupCustomer();
+            runLookupCustomer();
         }
 
         private void PopulateDropDowns()
         {
+            // Load the Jenkins servers
+            if (loadJenkinsServersXml())
+            {
+                jenkinsServerSelect_ComboBox.ItemsSource = getAttributesFromXml(jenkinsServerXml, "servers/server", "name");
+            }
+
             // Populating LookupCustomer drop-downs with Key/Value pairs, then setting the selected index to 0
             comboBox_LookupBy.DisplayMemberPath = "Key";
             comboBox_LookupBy.SelectedValuePath = "Value";
@@ -64,6 +79,62 @@ namespace Act__Premium_Cloud_Support_Utility
             comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Subscription Number", "ZuoraSubscription"));
             comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("IIT ID", "IITID"));
             comboBox_LookupBy.SelectedIndex = 0;
+        }
+
+        private bool loadJenkinsServersXml()
+        {
+            // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
+            try
+            {
+                string xmlString = null;
+                
+                // Open the XML file from embedded resources
+                using (Stream stream = this.GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
+                {
+                    using (StreamReader sr = new StreamReader(stream))
+                    {
+                        xmlString = sr.ReadToEnd();
+                    }
+                }
+                
+                // Add the text to the Jenkins Servers XmlDocument
+                jenkinsServerXml.LoadXml(xmlString);
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Unable to load Jenkins servers - failure in loadJenkinsServersXml().\n\n" + error.Message);
+
+                return false;
+            }
+            return true;
+        }
+
+        private List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
+        {
+            XmlNodeList xmlNodes = xmlDoc.SelectNodes(path);
+
+            List<string> resultList = new List<string>();
+
+            foreach (XmlNode node in xmlNodes)
+            {
+                resultList.Add(node.InnerXml);
+            }
+
+            return resultList;
+        }
+
+        private List<string> getAttributesFromXml(XmlDocument xmlDoc, string path, string attribute)
+        {
+            XmlNodeList xmlNodes = xmlDoc.SelectNodes(path);
+
+            List<string> resultList = new List<string>();
+
+            foreach (XmlNode node in xmlNodes)
+            {
+                resultList.Add(node.Attributes[attribute].Value);
+            }
+
+            return resultList;
         }
 
         private string SearchString(string mainText, string searchFor)
@@ -112,6 +183,13 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             await Task.Delay(time);
         }
+    }
+
+    public class JenkinsServer
+    {
+        public string name { get; set; }
+        public string id { get; set; }
+        public string url { get; set; }
     }
 
     public class Database

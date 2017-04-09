@@ -1,8 +1,0 @@
-<environments>
-  <environment>
-    <name>North America Test</name>
-    <id>UST1</id>
-    <isProduction>false</isProduction>
-    <url>https://cloudops-jenkins-ust1.hostedtest.act.com:8443</url>
-  </environment>
-</environments>
