@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 
 namespace Act__Premium_Cloud_Support_Utility
@@ -14,7 +12,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void loginWindowOK_Click(object sender, RoutedEventArgs e)
         {
-            GetUserPass();
+            JenkinsTasks.SecureJenkinsCreds(loginWindowUName.Text, loginWindowPWord.Password, "UST1");
 
             Close();
         }
@@ -25,12 +23,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 loginWindowOK_Click(sender, e);
             }
-        }
-
-        private void GetUserPass()
-        {
-            byte[] creds = UTF8Encoding.UTF8.GetBytes(loginWindowUName.Text + ":" + loginWindowPWord.Password);
-            MainWindow.encodedCreds = Convert.ToBase64String(creds);
         }
     }
 }

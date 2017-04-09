@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         mc:Ignorable="d"
-        Title="Jenkins Login" Height="176" Width="289"
+        Title="Jenkins Login" Height="263" Width="472"
         ResizeMode="NoResize" Topmost="True">
     <Grid>
         <TextBox x:Name="loginWindowUName" HorizontalAlignment="Left" Height="23" Margin="81,44,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="182"/>
