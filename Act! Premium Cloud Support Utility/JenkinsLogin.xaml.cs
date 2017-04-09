@@ -31,6 +31,11 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
+        private void jenkinsLogin_Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private void loginWindowPWord_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -44,7 +49,7 @@ namespace Act__Premium_Cloud_Support_Utility
             string selectedItem = e.AddedItems[0].ToString();
             string url = MainWindow.getValuesFromXml(MainWindow.jenkinsServerXml, "servers/server[@name='" + selectedItem + "']")[0];
 
-            jenkinsLogin_Configure_Hyperlink.NavigateUri = new System.Uri(url);
+            jenkinsLogin_Configure_Hyperlink.NavigateUri = new System.Uri(url + "/me/configure");
 
             jenkinsLogin_Instructions_Grid.Visibility = Visibility.Visible;
             jenkinsLogin_Credentials_Grid.Visibility = Visibility.Visible;
