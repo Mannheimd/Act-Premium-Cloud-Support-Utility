@@ -33,3 +33,6 @@ C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premiu
 C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csproj.GenerateResource.Cache
 C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.exe
 C:\Users\christopher.manders\Dropbox (Personal)\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb
+G:\Development\Github\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe.config
+G:\Development\Github\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.exe
+G:\Development\Github\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.pdb

@@ -5,16 +5,4 @@
     <isProduction>false</isProduction>
     <url>https://cloudops-jenkins-ust1.hostedtest.act.com:8443</url>
   </environment>
-  <environment>
-    <name>Test1</name>
-    <id>T1</id>
-    <isProduction>false</isProduction>
-    <url>https://cloudops-jenkins-ust1.hostedtest.act.com:8443</url>
-  </environment>
-  <environment>
-    <name>Test2</name>
-    <id>T2</id>
-    <isProduction>false</isProduction>
-    <url>https://cloudops-jenkins-ust1.hostedtest.act.com:8443</url>
-  </environment>
 </environments>
