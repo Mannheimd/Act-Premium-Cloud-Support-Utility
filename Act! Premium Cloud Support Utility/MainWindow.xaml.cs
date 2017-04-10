@@ -25,6 +25,8 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             if (textBox_LookupValue.Text != "" & jenkinsServerSelect_ComboBox.Text != "")
             {
+                lookupAccount_LookupStatus_TextBox.Content = "Lookup running...";
+
                 // Get the server ID of the selected server
                 string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
 
@@ -36,24 +38,75 @@ namespace Act__Premium_Cloud_Support_Utility
                         + "&LookupValue="
                         + textBox_LookupValue.Text);
 
-                    string iitid = SearchString(lookupCustomerOutput, "IITID: ");
-                    string accountName = SearchString(lookupCustomerOutput, "Account Name: ");
-                    string email = SearchString(lookupCustomerOutput, "Email: ");
-                    string createDate = SearchString(lookupCustomerOutput, "Create Date: ");
-                    string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ");
-                    string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ");
-                    string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ");
-                    string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ");
-                    string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ");
-                    string siteName = SearchString(lookupCustomerOutput, "Site Name: ");
-                    string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ");
-                    string loginUrl = SearchString(lookupCustomerOutput, "URL: ");
-                    string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ");
+                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                    string iitid = SearchString(lookupCustomerOutput, "IITID: ", @"
+");
+                    string accountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
+");
+                    string email = SearchString(lookupCustomerOutput, "Email: ", @"
+");
+                    string createDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
+");
+                    string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
+");
+                    string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
+");
+                    string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
+");
+                    string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
+");
+                    string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
+");
+                    string siteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
+");
+                    string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
+");
+                    string loginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
+");
+                    string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
+");
+                    string zuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
+");
+                    string deleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
+");
 
+                    // Get a list of databases from the output
                     List<Database> databaseList = SearchForDatabases(lookupCustomerOutput);
 
-                    MessageBox.Show(siteName);
+                    // Fill in the UI with data
+                    lookupResults_AccountName_TextBox.Text = accountName;
+                    lookupResults_SiteName_TextBox.Text = siteName;
+                    lookupResults_AccountNumber_TextBox.Text = zuoraAccount;
+                    lookupResults_LoginUrl_TextBox.Text = loginUrl;
+                    lookupResults_UploadUrl_TextBox.Text = uploadUrl;
+                    lookupResults_CreateDate_TextBox.Text = createDate;
+                    lookupResults_PrimaryEmail_TextBox.Text = email;
+                    lookupResults_TrialPaid_TextBox.Text = trialOrPaid;
+                    lookupResults_SeatCount_TextBox.Text = seatCount;
+                    lookupResults_SerialNumber_TextBox.Text = serialNumber;
+                    lookupResults_SuspendStatus_TextBox.Text = suspendStatus;
+                    lookupResults_ArchiveStatus_TextBox.Text = archiveStatus;
+                    lookupResults_DeleteStatus_TextBox.Text = deleteStatus;
+                    lookupResults_IISServer_TextBox.Text = iisServer;
+                    lookupResults_IITID_TextBox.Text = iitid;
+
+                    // Populate the Database list
+                    lookupResults_Databases_ListView.Items.Clear();
+                    foreach (Database database in databaseList)
+                    {
+                        lookupResults_Databases_ListView.Items.Add("Database: " + database.name + " | Server: " + database.server);
+                    }
+
+                    lookupAccount_LookupStatus_TextBox.Content = "Lookup complete";
                 }
+                else
+                {
+                    lookupAccount_LookupStatus_TextBox.Content = "Required information missing";
+                }
+            }
+            else
+            {
+                lookupAccount_LookupStatus_TextBox.Content = "Required information missing";
             }
         }
 
@@ -137,12 +190,12 @@ namespace Act__Premium_Cloud_Support_Utility
             return resultList;
         }
 
-        private string SearchString(string mainText, string searchFor)
+        private string SearchString(string mainText, string startString, string endString)
         {
             try
             {
-                string split1 = mainText.Split(new string[] { searchFor }, StringSplitOptions.None)[1];
-                return split1.Split(null)[0];
+                string split1 = mainText.Split(new string[] { startString }, StringSplitOptions.None)[1];
+                return split1.Split( new string[] { endString }, StringSplitOptions.None)[0];
             }
             catch
             {
@@ -161,18 +214,30 @@ namespace Act__Premium_Cloud_Support_Utility
                 {
                     Database database = new Database();
 
-                    string split1 = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None)[1];
-                    database.name = split1.Split(null)[0];
-                    string split2 = workingText.Split(new string[] { "| Server: " }, StringSplitOptions.None)[1];
-                    database.server = split2.Split(null)[0];
+                    // Cut off everything before database name
+                    workingText = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None)[1];
+                    MessageBox.Show(workingText);
 
+                    // Database name is everything before the next null character
+                    database.name = workingText.Split(null)[0];
+
+                    // Cut off everything before server name
+                    workingText = workingText.Split(new string[] { "| Server: " }, StringSplitOptions.None)[1];
+                    MessageBox.Show(workingText);
+
+                    // Server name  is everything before the next null character
+                    database.server = workingText.Split(null)[0];
+                    
                     list.Add(database);
 
-                    workingText = split2.Split(null)[1];
+                    if (!workingText.Contains("Database: "))
+                    {
+                        stillGoing = false;
+                    }
                 }
                 catch
                 {
-                    stillGoing = false;
+                    // stillGoing = false;
                 }
             }
 
