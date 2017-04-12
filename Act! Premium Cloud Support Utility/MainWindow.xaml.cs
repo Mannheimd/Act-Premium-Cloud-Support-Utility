@@ -205,41 +205,31 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private List<Database> SearchForDatabases(string mainText)
         {
-            bool stillGoing = true;
             string workingText = mainText;
             List<Database> list = new List<Database>();
-            while(stillGoing)
+            try
             {
-                try
+                // Get lines with databases on
+                string[] lines = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None);
+
+                // For each line, separate the name and server
+                // Loop starts at line 1 rather than 0
+                for (int i = 1; i < lines.Length; i++)
                 {
                     Database database = new Database();
 
-                    // Cut off everything before database name
-                    workingText = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None)[1];
-                    MessageBox.Show(workingText);
+                    database.name = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[0]).Split(null)[0];
+                    database.server = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[1]).Split(null)[0];
 
-                    // Database name is everything before the next null character
-                    database.name = workingText.Split(null)[0];
-
-                    // Cut off everything before server name
-                    workingText = workingText.Split(new string[] { "| Server: " }, StringSplitOptions.None)[1];
-                    MessageBox.Show(workingText);
-
-                    // Server name  is everything before the next null character
-                    database.server = workingText.Split(null)[0];
-                    
                     list.Add(database);
-
-                    if (!workingText.Contains("Database: "))
-                    {
-                        stillGoing = false;
-                    }
-                }
-                catch
-                {
-                    // stillGoing = false;
                 }
             }
+            catch (Exception error)
+            {
+                MessageBox.Show("Error occurred whilst getting database list:\n\n" + error.Message);
+            }
+
+            MessageBox.Show(list.Count.ToString());
 
             return list;
         }
