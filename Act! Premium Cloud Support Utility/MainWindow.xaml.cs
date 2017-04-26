@@ -21,6 +21,44 @@ namespace Act__Premium_Cloud_Support_Utility
             PopulateDropDowns();
         }
 
+        private void button_RunLookupCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            runLookupCustomer();
+        }
+
+        private void button_Unlock_Click(object sender, RoutedEventArgs e)
+        {
+            if (lookupResults_Databases_ListView.SelectedIndex > -1)
+            {
+                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
+
+                UnlockDatabase(database.name, database.server);
+            }
+        }
+
+        private void button_GetUsers_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void button_GetTimeout_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void button_UpdateTimeout_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void button_WelcomeEmail_Click(object sender, RoutedEventArgs e)
+        {
+            if (lookupResults_PrimaryEmail_TextBox.Text != "" && lookupResults_IITID_TextBox.Text != "")
+            {
+                resendWelcomeEmail(lookupResults_IITID_TextBox.Text, lookupResults_PrimaryEmail_TextBox.Text);
+            }
+        }
+
         private async void runLookupCustomer()
         {
             if (textBox_LookupValue.Text != "" & jenkinsServerSelect_ComboBox.Text != "")
@@ -91,28 +129,118 @@ namespace Act__Premium_Cloud_Support_Utility
                     lookupResults_IITID_TextBox.Text = iitid;
 
                     // Populate the Database list
-                    lookupResults_Databases_ListView.Items.Clear();
-                    foreach (Database database in databaseList)
-                    {
-                        lookupResults_Databases_ListView.Items.Add("Database: " + database.name + " | Server: " + database.server);
-                    }
+                    lookupResults_Databases_ListView.ItemsSource = databaseList;
 
                     lookupAccount_LookupStatus_TextBox.Content = "Lookup complete";
                 }
                 else
                 {
-                    lookupAccount_LookupStatus_TextBox.Content = "Required information missing";
+                    lookupAccount_LookupStatus_TextBox.Content = "Select a server";
                 }
             }
             else
             {
-                lookupAccount_LookupStatus_TextBox.Content = "Required information missing";
+                lookupAccount_LookupStatus_TextBox.Content = "Enter search criteria";
             }
         }
 
-        private void button_RunLookupCustomer_Click(object sender, RoutedEventArgs e)
+        private async void UnlockDatabase(string databaseName, string sqlServer)
         {
-            runLookupCustomer();
+            databaseTasks_UnlockStatus_Label.Content = "Unlocking...";
+
+            // Get the server ID of the selected server
+            string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+
+            // Post a request to build LookupCustomer and wait for a response
+            if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+            {
+                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
+                    + sqlServer
+                    + "&DatabaseName="
+                    + databaseName);
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputSqlServer = SearchString(output, "Found SQL Server: ", @"
+");
+                string outputDatabaseName = SearchString(output, "Unlocking database: ", @"
+");
+
+                if (outputSqlServer == sqlServer && outputDatabaseName == databaseName)
+                {
+                    databaseTasks_UnlockStatus_Label.Content = "Database unlocked";
+                }
+                else
+                {
+                    databaseTasks_UnlockStatus_Label.Content = "Unlock failed";
+                }
+            }
+            else
+            {
+                databaseTasks_UnlockStatus_Label.Content = "Select a server";
+            }
+        }
+
+        private async void resendWelcomeEmail(string accountIITID, string accountEmail)
+        {
+            bool sendType = false; // true is alt email, false is default email
+            string sendTo = null; // alt email address
+            bool send = false; // output from send or cancel
+
+            ResendWelcomeEmail resendWelcomeEmail = new ResendWelcomeEmail(accountEmail);
+            resendWelcomeEmail.resultBool += value => sendType = value;
+            resendWelcomeEmail.resultString += value => sendTo = value;
+            resendWelcomeEmail.resultSend += value => send = value;
+            resendWelcomeEmail.ShowDialog();
+
+            if (send)
+            {
+                accountTasks_WelcomeEmailStatus_Label.Content = "Sending...";
+
+                // set accountEmail to null if not needed, else set it to specified address
+                if (sendType)
+                {
+                    accountEmail = sendTo;
+                }
+                else
+                {
+                    accountEmail = null;
+                }
+
+                // Get the server ID of the selected server
+                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+
+                // Post a request to build LookupCustomer and wait for a response
+                if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+                {
+                    string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
+                        + accountIITID
+                        + "&AltEmailAddress="
+                        + accountEmail);
+
+                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                    string outputIITID = SearchString(output, "IITID: ", @"
+");
+                    string outputEmail = SearchString(output, "Email Address: ", @"
+");
+
+                    if (outputIITID == accountIITID && outputEmail == accountEmail)
+                    {
+                        accountTasks_WelcomeEmailStatus_Label.Content = "Send complete";
+                    }
+                    else if (outputIITID == accountIITID && !sendType)
+                    {
+                        accountTasks_WelcomeEmailStatus_Label.Content = "Send complete";
+                    }
+                    else
+                    {
+                        accountTasks_WelcomeEmailStatus_Label.Content = "Send failed";
+                    }
+                }
+                else
+                {
+                    accountTasks_WelcomeEmailStatus_Label.Content = "Select a server";
+                }
+            }
         }
 
         private void PopulateDropDowns()
@@ -228,8 +356,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 MessageBox.Show("Error occurred whilst getting database list:\n\n" + error.Message);
             }
-
-            MessageBox.Show(list.Count.ToString());
 
             return list;
         }
