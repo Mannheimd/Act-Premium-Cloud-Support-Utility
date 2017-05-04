@@ -43,12 +43,18 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void button_GetTimeout_Click(object sender, RoutedEventArgs e)
         {
-
+            if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
+            {
+                getTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
+            }
         }
 
         private void button_UpdateTimeout_Click(object sender, RoutedEventArgs e)
         {
-
+            if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
+            {
+                updateTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
+            }
         }
 
         private void button_WelcomeEmail_Click(object sender, RoutedEventArgs e)
@@ -135,7 +141,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 else
                 {
-                    lookupAccount_LookupStatus_TextBox.Content = "Select a server";
+                    lookupAccount_LookupStatus_TextBox.Content = "Login error";
                 }
             }
             else
@@ -176,7 +182,7 @@ namespace Act__Premium_Cloud_Support_Utility
             }
             else
             {
-                databaseTasks_UnlockStatus_Label.Content = "Select a server";
+                databaseTasks_UnlockStatus_Label.Content = "Login error";
             }
         }
 
@@ -238,7 +244,94 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 else
                 {
-                    accountTasks_WelcomeEmailStatus_Label.Content = "Select a server";
+                    accountTasks_WelcomeEmailStatus_Label.Content = "Login error";
+                }
+            }
+        }
+
+        private async void getTimeout(string siteName, string iisServer)
+        {
+            accountTasks_GetTimeoutStatus_Label.Content = "Working...";
+
+            // Get the server ID of the selected server
+            string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+
+            // Post a request to build LookupCustomer and wait for a response
+            if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+            {
+                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
+                    + siteName
+                    + "&IISServer="
+                    + iisServer);
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputSiteName = SearchString(output, "Site ", " on server");
+                string outputIISServer = SearchString(output, "on server ", @"
+");
+                string outputCurrentTimeout = SearchString(output, "Current Timeout: ", @"
+");
+
+                if (outputSiteName == siteName && outputIISServer == iisServer)
+                {
+                    accountTasks_GetTimeoutStatus_Label.Content = outputCurrentTimeout + " minutes(s)";
+                }
+                else
+                {
+                    accountTasks_GetTimeoutStatus_Label.Content = "Query error";
+                }
+            }
+            else
+            {
+                accountTasks_GetTimeoutStatus_Label.Content = "Login error";
+            }
+        }
+
+        private async void updateTimeout(string siteName, string iisServer)
+        {
+            string newValue = null; // new timeout value to set
+            bool proceed = false; // output from send or cancel
+
+            UpdateTimeoutValue updateTimeoutValue = new UpdateTimeoutValue();
+            updateTimeoutValue.resultValue += value => newValue = value;
+            updateTimeoutValue.resultProceed += value => proceed = value;
+            updateTimeoutValue.ShowDialog();
+
+            if (proceed)
+            {
+                accountTasks_UpdateTimeoutStatus_Label.Content = "Updating...";
+
+                // Get the server ID of the selected server
+                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+
+                // Post a request to build LookupCustomer and wait for a response
+                if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+                {
+                    string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
+                        + siteName
+                        + "&IISServer="
+                        + iisServer
+                        + "&Timeout="
+                        + newValue);
+
+                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                    string outputSiteName = SearchString(output, "Updating customer ", " on server");
+                    string outputIISServer = SearchString(output, "on server ", @"
+");
+                    string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
+ ");
+
+                    if (outputSiteName == siteName && outputIISServer == iisServer && outputTimeout == newValue)
+                    {
+                        accountTasks_UpdateTimeoutStatus_Label.Content = "Updated";
+                    }
+                    else
+                    {
+                        accountTasks_UpdateTimeoutStatus_Label.Content = "Query error";
+                    }
+                }
+                else
+                {
+                    accountTasks_UpdateTimeoutStatus_Label.Content = "Login error";
                 }
             }
         }

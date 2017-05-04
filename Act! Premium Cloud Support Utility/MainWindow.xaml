@@ -107,10 +107,10 @@
             <!-- == Account Tasks == -->
             <Label Content="Account Tasks:" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,182,0,0"/>
 
-            <Button Content="Get Timeout" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,208,0,0" Width="110" Height="23"/>
+            <Button Content="Get Timeout" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,208,0,0" Width="110" Height="23" Click="button_GetTimeout_Click"/>
             <Label x:Name="accountTasks_GetTimeoutStatus_Label" Grid.Column="2" Content="" Margin="115,206,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 
-            <Button Content="Update Timeout" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,234,0,0" Width="110" Height="23"/>
+            <Button Content="Update Timeout" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,234,0,0" Width="110" Height="23" Click="button_UpdateTimeout_Click"/>
             <Label x:Name="accountTasks_UpdateTimeoutStatus_Label" Grid.Column="2" Content="" Margin="115,232,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 
             <Button Content="Welcome Email" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,260,0,0" Width="110" Height="23" Click="button_WelcomeEmail_Click"/>
