@@ -5,8 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         mc:Ignorable="d"
-        Title="MainWindow" Height="526" Width="797">
+        Title="MainWindow" Height="736" Width="797">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -85,23 +88,36 @@
             <Label Grid.Column="1" Content="IIT ID:" Margin="0,156,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <TextBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="lookupResults_IITID_TextBox" Margin="110,158,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
 
+            <!-- == Database List == -->
             <Label Grid.Column="0" Content="Databases:" Margin="0,182,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <ListView Grid.Column="0" x:Name="lookupResults_Databases_ListView" SelectionMode="Single" Height="100" Margin="0,208,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+            <ListView Grid.Column="0" x:Name="lookupResults_Databases_ListView" SelectionMode="Single" Height="100" Margin="0,208,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" SelectionChanged="lookupResults_Databases_ListView_SelectionChanged">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Name" Width="Auto" DisplayMemberBinding="{Binding name}"/>
-                        <GridViewColumn Header="Server" Width="Auto" DisplayMemberBinding="{Binding server}"/>
+                        <GridViewColumn Header="Name" Width="100" DisplayMemberBinding="{Binding name}"/>
+                        <GridViewColumn Header="Server" Width="100" DisplayMemberBinding="{Binding server}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
-            
+
+            <!-- == User List == -->
+            <Label Grid.Column="0" Content="Database users:" Margin="0,313,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <ListView Grid.Column="0" Grid.ColumnSpan="2" x:Name="lookupResults_DatabaseUsers_ListView" SelectionMode="Single" Height="200" Margin="0,339,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Login Name" Width="200" DisplayMemberBinding="{Binding loginName}"/>
+                        <GridViewColumn Header="Role" Width="100" DisplayMemberBinding="{Binding role}"/>
+                        <GridViewColumn Header="Last Login" Width="100" DisplayMemberBinding="{Binding lastLogin}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
             <!-- == Database Tasks == -->
             <Label Content="Database Tasks:" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,182,0,0"/>
 
             <Button Content="Unlock" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,208,0,0" Width="110" Height="23" Click="button_Unlock_Click"/>
             <Label x:Name="databaseTasks_UnlockStatus_Label" Grid.Column="1" Content="" Margin="115,206,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 
-            <Button Content="Get Users" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,234,0,0" Width="110" Height="23"/>
+            <Button Content="Get Users" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,234,0,0" Width="110" Height="23" Click="button_GetUsers_Click"/>
             <Label x:Name="databaseTasks_GetUsersStatus_Label" Grid.Column="1" Content="" Margin="115,232,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
 
             <!-- == Account Tasks == -->

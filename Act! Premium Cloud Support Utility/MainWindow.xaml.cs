@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -32,13 +33,18 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 Database database = lookupResults_Databases_ListView.SelectedItem as Database;
 
-                UnlockDatabase(database.name, database.server);
+                unlockDatabase(database.name, database.server);
             }
         }
 
         private void button_GetUsers_Click(object sender, RoutedEventArgs e)
         {
+            if (lookupResults_Databases_ListView.SelectedIndex > -1)
+            {
+                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
 
+                getDatabaseUsers(database);
+            }
         }
 
         private void button_GetTimeout_Click(object sender, RoutedEventArgs e)
@@ -150,7 +156,7 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
-        private async void UnlockDatabase(string databaseName, string sqlServer)
+        private async void unlockDatabase(string databaseName, string sqlServer)
         {
             databaseTasks_UnlockStatus_Label.Content = "Unlocking...";
 
@@ -183,6 +189,49 @@ namespace Act__Premium_Cloud_Support_Utility
             else
             {
                 databaseTasks_UnlockStatus_Label.Content = "Login error";
+            }
+        }
+
+        private async void getDatabaseUsers(Database database)
+        {
+            databaseTasks_GetUsersStatus_Label.Content = "Working...";
+
+            // Clear the current database user list
+            database.users.Clear();
+
+            // Get the server ID of the selected server
+            string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+
+            // Post a request to build LookupCustomer and wait for a response
+            if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+            {
+                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers/buildWithParameters?&SQLServer="
+                    + database.server
+                    + "&DatabaseName="
+                    + database.name);
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
+
+                // Temp user creation test
+                DatabaseUser user = new DatabaseUser();
+                user.loginName = database.name;
+                database.users.Add(user);
+
+                if (outputDatabaseName == database.name)
+                {
+                    lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
+
+                    databaseTasks_GetUsersStatus_Label.Content = "Done Stuff";
+                }
+                else
+                {
+                    databaseTasks_GetUsersStatus_Label.Content = "Query failed";
+                }
+            }
+            else
+            {
+                databaseTasks_GetUsersStatus_Label.Content = "Login error";
             }
         }
 
@@ -314,11 +363,13 @@ namespace Act__Premium_Cloud_Support_Utility
                         + newValue);
 
                     // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                    string outputSiteName = SearchString(output, "Updating customer ", " on server");
-                    string outputIISServer = SearchString(output, "on server ", @"
+                    string outputSiteName = SearchString(output, "Updating customer ", " on server ");
+                    string outputIISServer = SearchString(output, "on server ", @" 
 ");
                     string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
  ");
+
+                    MessageBox.Show(outputSiteName + " | " + outputIISServer + " | " + outputTimeout);
 
                     if (outputSiteName == siteName && outputIISServer == iisServer && outputTimeout == newValue)
                     {
@@ -489,11 +540,29 @@ namespace Act__Premium_Cloud_Support_Utility
             JenkinsLogin jenkinsLogin = new JenkinsLogin();
             jenkinsLogin.Show();
         }
+
+        private void lookupResults_Databases_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 1)
+            {
+                Database database = e.AddedItems[0] as Database;
+
+                lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
+            }
+        }
     }
 
     public class Database
     {
         public string name { get; set; }
         public string server { get; set; }
+        public List<DatabaseUser> users = new List<DatabaseUser>();
+    }
+
+    public class DatabaseUser
+    {
+        public string loginName { get; set; }
+        public string role { get; set; }
+        public string lastLogin { get; set; }
     }
 }
