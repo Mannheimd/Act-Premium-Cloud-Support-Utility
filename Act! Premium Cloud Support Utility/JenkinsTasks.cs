@@ -65,7 +65,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 catch(Exception error)
                 {
-                    MessageBox.Show("Unable to get stored Jenkins credentials for selected server: " + server + "\n\n" + error.Message);
+                    
                 }
 
                 return utf8Creds;
@@ -111,17 +111,17 @@ namespace Act__Premium_Cloud_Support_Utility
             return true;
         }
 
-        public static async Task<HttpResponseMessage> jenkinsPostRequest(string server, string request)
+        public static async Task<HttpResponseMessage> jenkinsPostRequest(JenkinsServer server, string request)
         {
             // Create HttpClient with base URL
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(@"https://cloudops-jenkins-ust1.hostedtest.act.com:8443"); // Update to get the URL from selected server
+            client.BaseAddress = new Uri(server.url); // Update to get the URL from selected server
 
             // Adding accept header for XML format
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
 
             // Getting the encrypted authentication details
-            byte[] creds = UnsecureJenkinsCreds(server); // Update to use server, when server passes correct string
+            byte[] creds = UnsecureJenkinsCreds(server.id); // Update to use server, when server passes correct string
 
             // If no authentication details, return blank message with Unauthorized status code
             if (creds == null)
@@ -144,7 +144,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 catch (Exception error)
                 {
-                    MessageBox.Show("POST request failed in 'jenkinsPostRequest(" + server + "," + request + ")'.\n\n" + error);
+                    MessageBox.Show("POST request failed in 'jenkinsPostRequest(" + server.url + request + ")'.\n\n" + error);
 
                     HttpResponseMessage blankResponse = new HttpResponseMessage();
                     blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
@@ -156,7 +156,7 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
-        public static async Task<HttpResponseMessage> jenkinsGetRequest(string server, string request)
+        public static async Task<HttpResponseMessage> jenkinsGetRequest(JenkinsServer server, string request)
         {
             // Create HttpClient with base URL
             HttpClient client = new HttpClient();
@@ -166,7 +166,7 @@ namespace Act__Premium_Cloud_Support_Utility
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
 
             // Getting the encrypted authentication details
-            byte[] creds = UnsecureJenkinsCreds(server); // Update to use server, when server passes correct string
+            byte[] creds = UnsecureJenkinsCreds(server.id); // Update to use server, when server passes correct string
 
             // If no authentication details, return blank message with Unauthorized status code
             if (creds == null)
@@ -189,7 +189,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
                 catch (Exception error)
                 {
-                    MessageBox.Show("GET request failed in 'jenkinsGetRequest(" + server + "," + request + ")'.\n\n" + error);
+                    MessageBox.Show("GET request failed in 'jenkinsGetRequest(" + server.url + request + ")'.\n\n" + error);
 
                     HttpResponseMessage blankResponse = new HttpResponseMessage();
                     blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
@@ -201,7 +201,7 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
-        public static async Task<bool> checkServerLogin(string server)
+        public static async Task<bool> checkServerLogin(JenkinsServer server)
         {
             HttpResponseMessage response = await jenkinsGetRequest(server, "/me/api/xml");
             if (response != null & response.IsSuccessStatusCode)
@@ -210,10 +210,10 @@ namespace Act__Premium_Cloud_Support_Utility
                 return false;
         }
 
-        public static async Task<string> runJenkinsBuild(string server, string request)
+        public static async Task<string> runJenkinsBuild(JenkinsServer server, string request)
         {
             // Post a request to build job and wait for a response
-            HttpResponseMessage postBuildRequest = await JenkinsTasks.jenkinsPostRequest(server, request);
+            HttpResponseMessage postBuildRequest = await jenkinsPostRequest(server, request);
 
             string finalBuildUrl = "";
 
@@ -235,7 +235,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
                     // Use the URL returned in the Location header from the above POST response to GET the build status
                     string queuedBuildURL = postBuildRequest.Headers.Location.AbsoluteUri;
-                    HttpResponseMessage getQueuedBuild = await JenkinsTasks.jenkinsGetRequest("UST1", queuedBuildURL + @"\api\xml");
+                    HttpResponseMessage getQueuedBuild = await jenkinsGetRequest(server, queuedBuildURL + @"\api\xml");
 
                     // Throw the build status output into an XML document
                     XmlDocument queuedBuildXml = new XmlDocument();
@@ -261,7 +261,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 {
                     await Delay(1000);
 
-                    HttpResponseMessage getFinalBuildOutput = await JenkinsTasks.jenkinsGetRequest("UST1", finalBuildUrl + @"\api\xml");
+                    HttpResponseMessage getFinalBuildOutput = await jenkinsGetRequest(server, finalBuildUrl + @"\api\xml");
 
                     // Throw the output into an XML document
                     XmlDocument finalBuildXml = new XmlDocument();
@@ -290,7 +290,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
                 if (newBuildComplete)
                 {
-                    HttpResponseMessage finalBuildOutput = await JenkinsTasks.jenkinsGetRequest("UST1", finalBuildUrl + @"logText/progressiveText?start=0");
+                    HttpResponseMessage finalBuildOutput = await jenkinsGetRequest(server, finalBuildUrl + @"logText/progressiveText?start=0");
 
                     return await finalBuildOutput.Content.ReadAsStringAsync();
                 }
@@ -304,10 +304,10 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
-        public static async Task<string> runJenkinsGet(string server, string request)
+        public static async Task<string> runJenkinsGet(JenkinsServer server, string request)
         {
             // Post a GET request to build LookupCustomer and wait for a response
-            HttpResponseMessage getRequest = await JenkinsTasks.jenkinsGetRequest("UST1", request);
+            HttpResponseMessage getRequest = await jenkinsGetRequest(server, request);
 
             return await getRequest.Content.ReadAsStringAsync();
         }
@@ -315,6 +315,6 @@ namespace Act__Premium_Cloud_Support_Utility
         public static async Task Delay(int time)
         {
             await Task.Delay(time);
-        }
+        } //Redundant, remove this and use 'await Task.Delay(int)' instead
     }
 }

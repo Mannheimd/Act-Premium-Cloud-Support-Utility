@@ -77,11 +77,11 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 lookupAccount_LookupStatus_TextBox.Content = "Lookup running...";
 
-                // Get the server ID of the selected server
-                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+                // Get the currently selected server
+                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
 
                 // Post a request to build LookupCustomer and wait for a response
-                if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+                if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
                 {
                     string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
                         + comboBox_LookupBy.SelectedValue.ToString()
@@ -160,11 +160,11 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             databaseTasks_UnlockStatus_Label.Content = "Unlocking...";
 
-            // Get the server ID of the selected server
-            string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+            // Get the currently selected server
+            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
 
             // Post a request to build LookupCustomer and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
             {
                 string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
                     + sqlServer
@@ -199,11 +199,11 @@ namespace Act__Premium_Cloud_Support_Utility
             // Clear the current database user list
             database.users.Clear();
 
-            // Get the server ID of the selected server
-            string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+            // Get the currently selected server
+            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
 
             // Post a request to build LookupCustomer and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
             {
                 string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers/buildWithParameters?&SQLServer="
                     + database.server
@@ -261,11 +261,11 @@ namespace Act__Premium_Cloud_Support_Utility
                     accountEmail = null;
                 }
 
-                // Get the server ID of the selected server
-                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+                // Get the currently selected server
+                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
 
                 // Post a request to build LookupCustomer and wait for a response
-                if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+                if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
                 {
                     string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
                         + accountIITID
@@ -302,11 +302,11 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             accountTasks_GetTimeoutStatus_Label.Content = "Working...";
 
-            // Get the server ID of the selected server
-            string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+            // Get the currently selected server
+            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
 
             // Post a request to build LookupCustomer and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
             {
                 string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
                     + siteName
@@ -349,11 +349,11 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 accountTasks_UpdateTimeoutStatus_Label.Content = "Updating...";
 
-                // Get the server ID of the selected server
-                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + jenkinsServerSelect_ComboBox.Text + "']", "id")[0];
+                // Get the currently selected server
+                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
 
                 // Post a request to build LookupCustomer and wait for a response
-                if (JenkinsTasks.UnsecureJenkinsCreds(server) != null)
+                if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
                 {
                     string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
                         + siteName
@@ -392,7 +392,19 @@ namespace Act__Premium_Cloud_Support_Utility
             // Load the Jenkins servers
             if (loadJenkinsServersXml())
             {
-                jenkinsServerSelect_ComboBox.ItemsSource = getAttributesFromXml(jenkinsServerXml, "servers/server", "name");
+                List<JenkinsServer> serverList = new List<JenkinsServer>();
+                XmlNodeList serverNodeList = jenkinsServerXml.SelectNodes("servers/server");
+                foreach (XmlNode serverNode in serverNodeList)
+                {
+                    JenkinsServer mew = new JenkinsServer(); //JenkinsServer server = mew JenkinsServer();
+                    mew.id = serverNode.Attributes["id"].Value;
+                    mew.name = serverNode.Attributes["name"].Value;
+                    mew.url = serverNode.InnerText;
+
+                    serverList.Add(mew);
+                }
+
+                jenkinsServerSelect_ComboBox.ItemsSource = serverList;
             }
 
             // Populating LookupCustomer drop-downs with Key/Value pairs, then setting the selected index to 0
@@ -414,7 +426,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 string xmlString = null;
 
                 // Open the XML file from embedded resources
-                using (Stream stream = this.GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
+                using (Stream stream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
                 {
                     using (StreamReader sr = new StreamReader(stream))
                     {
@@ -514,8 +526,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (e.AddedItems.Count > 0)
             {
                 // Get server ID of selected server from jenkinsServerXml
-                string selectedItem = e.AddedItems[0].ToString();
-                string server = getAttributesFromXml(jenkinsServerXml, "servers/server[@name='" + selectedItem + "']", "id")[0];
+                JenkinsServer server = e.AddedItems[0] as JenkinsServer;
 
                 // Trigger update on UI with login status
                 jenkinsServerSelect_LoginStatus_Label.Content = "Checking login...";
@@ -564,5 +575,12 @@ namespace Act__Premium_Cloud_Support_Utility
         public string loginName { get; set; }
         public string role { get; set; }
         public string lastLogin { get; set; }
+    }
+
+    public class JenkinsServer
+    {
+        public string id { get; set; }
+        public string url { get; set; }
+        public string name { get; set; }
     }
 }

@@ -18,7 +18,9 @@
 
         <Grid x:Name="jenkinsServerSelect_Grid" Grid.Row="0">
             <Label Content="Select a server:" Margin="10,10,0,5" HorizontalAlignment="Left" VerticalAlignment="top"/>
-            <ComboBox x:Name="jenkinsServerSelect_ComboBox" Margin="103,12,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" SelectionChanged="jenkinsServerSelect_ComboBox_SelectionChanged"/>
+            <ComboBox x:Name="jenkinsServerSelect_ComboBox" Margin="103,12,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157"
+                      SelectionChanged="jenkinsServerSelect_ComboBox_SelectionChanged"
+                      DisplayMemberPath="name"/>
             <Label x:Name="jenkinsServerSelect_LoginStatus_Label" Content="No server selected." Margin="265,10,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <Button x:Name="jenkinsServerSelect_Configure_Button" Content="Configure" Margin="0,12,10,5" Height="23" Width="75" HorizontalAlignment="Right" VerticalAlignment="Top" Click="jenkinsServerSelect_Configure_Button_Click"/>
             <Rectangle VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="1" Fill="#FFFE5000"/>

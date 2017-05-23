@@ -5,9 +5,6 @@ using System.Windows.Input;
 
 namespace Act__Premium_Cloud_Support_Utility
 {
-    /// <summary>
-    /// Interaction logic for UpdateTimeoutValue.xaml
-    /// </summary>
     public partial class UpdateTimeoutValue : Window
     {
         public UpdateTimeoutValue()

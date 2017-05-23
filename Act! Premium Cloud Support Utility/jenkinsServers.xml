@@ -1,5 +1,5 @@
 <servers>
   <server name="North America Test" id="UST1">https://cloudops-jenkins-ust1.hostedtest.act.com:8443</server>
-  <server name="North America Test2" id="UST2">https://cloudops-jenkins-ust1.hostedtest.act.com:8443</server>
-  <server name="North America Test3" id="UST3">https://cloudops-jenkins-ust1.hostedtest.act.com:8443</server>
+  <server name="North America Production" id="USP1">https://cloudops-jenkins-usp1.hosted1.act.com:8443</server>
+  <server name="Europe Production" id="EUP1">https://cloudops-jenkins-eup1.eu.hosted.act.com:8443</server>
 </servers>

@@ -14,12 +14,12 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="jenkinsLogin_JenkinsServerSelect_Grid" Grid.Row="0">
+        <Grid x:Name="jenkinsLogin_JenkinsServerSelect_Grid" Grid.Row="0" Margin="0,0,0,10">
             <Label Content="Select a server:" Margin="10,5,0,0" HorizontalAlignment="Left" VerticalAlignment="top"/>
             <ComboBox x:Name="jenkinsLogin_JenkinsServerSelect_ComboBox" Margin="103,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" SelectionChanged="jenkinsLogin_JenkinsServerSelect_ComboBox_SelectionChanged"/>
         </Grid>
 
-        <Grid x:Name="jenkinsLogin_Instructions_Grid" Grid.Row="1" Visibility="Hidden">
+        <Grid x:Name="jenkinsLogin_Instructions_Grid" Grid.Row="1" Visibility="Collapsed" Margin="0,0,0,10">
             <TextBlock Margin="15,0,10,0">
                 <Run Text="1. Click "/><Hyperlink x:Name="jenkinsLogin_Configure_Hyperlink" NavigateUri="http://www.invalid.com" RequestNavigate="Hyperlink_RequestNavigate">here</Hyperlink><LineBreak/>
                 <Run Text="2. Log in using your normal Jenkins login credentials"/><LineBreak/>
@@ -28,16 +28,16 @@
             </TextBlock>
         </Grid>
 
-        <Grid x:Name="jenkinsLogin_Credentials_Grid" Grid.Row="2" Visibility="Hidden">
+        <Grid x:Name="jenkinsLogin_Credentials_Grid" Grid.Row="2" Visibility="Collapsed" Margin="0,0,0,10">
             <Label Content="User ID:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top"/>
             <TextBox x:Name="loginWindowUName" HorizontalAlignment="Left" Height="23" Margin="81,2,0,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="182"/>
             <Label Content="API Token:" HorizontalAlignment="Left" Margin="10,26,0,0" VerticalAlignment="Top"/>
             <PasswordBox x:Name="loginWindowPWord" HorizontalAlignment="Left" Height="23" Margin="81,28,0,0" VerticalAlignment="Top" Width="182" KeyDown="loginWindowPWord_KeyDown"/>
         </Grid>
 
-        <Grid x:Name="jenkinsLogin_Buttons_Grid" Grid.Row="3">
-            <Button x:Name="jenkinsLogin_Cancel_Button" Content="Cancel" Margin="10,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="jenkinsLogin_Cancel_Button_Click"/>
-            <Button x:Name="loginWindowOK" Content="Save" HorizontalAlignment="Right" Margin="0,5,10,5" VerticalAlignment="Bottom" Width="75" Click="loginWindowOK_Click"/>
+        <Grid x:Name="jenkinsLogin_Buttons_Grid" Grid.Row="3" Margin="0,0,0,10">
+            <Button x:Name="jenkinsLogin_Cancel_Button" Content="Cancel" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="jenkinsLogin_Cancel_Button_Click"/>
+            <Button x:Name="loginWindowOK" Content="Save" HorizontalAlignment="Right" Margin="0,0,10,0" VerticalAlignment="Bottom" Width="75" Click="loginWindowOK_Click"/>
         </Grid>
     </Grid>
 </Window>
