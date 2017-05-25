@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +22,10 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void button_RunLookupCustomer_Click(object sender, RoutedEventArgs e)
         {
+            setServerSelectEnabledState(false);
+            setLookupAccountEnabledState(false);
+            setLookupResultsEnabledState(false);
+
             runLookupCustomer();
         }
 
@@ -31,6 +33,10 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             if (lookupResults_Databases_ListView.SelectedIndex > -1)
             {
+                setServerSelectEnabledState(false);
+                setLookupAccountEnabledState(false);
+                setLookupResultsEnabledState(false);
+
                 Database database = lookupResults_Databases_ListView.SelectedItem as Database;
 
                 unlockDatabase(database.name, database.server);
@@ -41,6 +47,10 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             if (lookupResults_Databases_ListView.SelectedIndex > -1)
             {
+                setServerSelectEnabledState(false);
+                setLookupAccountEnabledState(false);
+                setLookupResultsEnabledState(false);
+
                 Database database = lookupResults_Databases_ListView.SelectedItem as Database;
 
                 getDatabaseUsers(database);
@@ -51,6 +61,10 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
             {
+                setServerSelectEnabledState(false);
+                setLookupAccountEnabledState(false);
+                setLookupResultsEnabledState(false);
+
                 getTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
             }
         }
@@ -73,91 +87,135 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void runLookupCustomer()
         {
-            if (textBox_LookupValue.Text != "" & jenkinsServerSelect_ComboBox.Text != "")
-            {
-                lookupAccount_LookupStatus_TextBox.Content = "Lookup running...";
+            // Disable the server select, search and lookup results sections
+            setServerSelectEnabledState(false);
+            setLookupAccountEnabledState(false);
+            setLookupResultsEnabledState(false);
 
-                // Get the currently selected server
-                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
+            string searchString = textBox_LookupValue.Text.Trim();
 
-                // Post a request to build LookupCustomer and wait for a response
-                if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-                {
-                    string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
-                        + comboBox_LookupBy.SelectedValue.ToString()
-                        + "&LookupValue="
-                        + textBox_LookupValue.Text);
-
-                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                    string iitid = SearchString(lookupCustomerOutput, "IITID: ", @"
-");
-                    string accountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
-");
-                    string email = SearchString(lookupCustomerOutput, "Email: ", @"
-");
-                    string createDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
-");
-                    string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
-");
-                    string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
-");
-                    string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
-");
-                    string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
-");
-                    string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
-");
-                    string siteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
-");
-                    string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
-");
-                    string loginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
-");
-                    string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
-");
-                    string zuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
-");
-                    string deleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
-");
-
-                    // Get a list of databases from the output
-                    List<Database> databaseList = SearchForDatabases(lookupCustomerOutput);
-
-                    // Fill in the UI with data
-                    lookupResults_AccountName_TextBox.Text = accountName;
-                    lookupResults_SiteName_TextBox.Text = siteName;
-                    lookupResults_AccountNumber_TextBox.Text = zuoraAccount;
-                    lookupResults_LoginUrl_TextBox.Text = loginUrl;
-                    lookupResults_UploadUrl_TextBox.Text = uploadUrl;
-                    lookupResults_CreateDate_TextBox.Text = createDate;
-                    lookupResults_PrimaryEmail_TextBox.Text = email;
-                    lookupResults_TrialPaid_TextBox.Text = trialOrPaid;
-                    lookupResults_SeatCount_TextBox.Text = seatCount;
-                    lookupResults_SerialNumber_TextBox.Text = serialNumber;
-                    lookupResults_SuspendStatus_TextBox.Text = suspendStatus;
-                    lookupResults_ArchiveStatus_TextBox.Text = archiveStatus;
-                    lookupResults_DeleteStatus_TextBox.Text = deleteStatus;
-                    lookupResults_IISServer_TextBox.Text = iisServer;
-                    lookupResults_IITID_TextBox.Text = iitid;
-
-                    // Populate the Database list
-                    lookupResults_Databases_ListView.ItemsSource = databaseList;
-
-                    lookupAccount_LookupStatus_TextBox.Content = "Lookup complete";
-                }
-                else
-                {
-                    lookupAccount_LookupStatus_TextBox.Content = "Login error";
-                }
-            }
-            else
+            // Check that search criteria have been entered
+            if (searchString == "" || jenkinsServerSelect_ComboBox.Text == "")
             {
                 lookupAccount_LookupStatus_TextBox.Content = "Enter search criteria";
+
+                setServerSelectEnabledState(true);
+                setLookupAccountEnabledState(true);
+
+                return;
             }
+
+            // Get the currently selected server and confirm there are some stored credentials
+            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
+
+            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) == null)
+            {
+                lookupAccount_LookupStatus_TextBox.Content = "Login error";
+
+                setServerSelectEnabledState(true);
+                setLookupAccountEnabledState(true);
+
+                return;
+            }
+
+            lookupAccount_LookupStatus_TextBox.Content = "Lookup running...";
+
+            // Post a request to build LookupCustomer and wait for a response
+            string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
+                + comboBox_LookupBy.SelectedValue.ToString()
+                + "&LookupValue="
+                + searchString);
+
+            // Check that the output is valid
+            if (SearchString(lookupCustomerOutput, "Searching " + comboBox_LookupBy.SelectedValue.ToString() + " for ", "...") != searchString)
+            {
+                lookupAccount_LookupStatus_TextBox.Content = "Invalid results, try again";
+
+                setServerSelectEnabledState(true);
+                setLookupAccountEnabledState(true);
+
+                return;
+            }
+
+            // Check if customer couldn't be found
+            if (lookupCustomerOutput.Contains("Unable to find customer by"))
+            {
+                lookupAccount_LookupStatus_TextBox.Content = "Unable to locate account";
+
+                setServerSelectEnabledState(true);
+                setLookupAccountEnabledState(true);
+
+                return;
+            }
+
+            // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+            string iitid = SearchString(lookupCustomerOutput, "IITID: ", @"
+");
+            string accountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
+");
+            string email = SearchString(lookupCustomerOutput, "Email: ", @"
+");
+            string createDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
+");
+            string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
+");
+            string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
+");
+            string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
+");
+            string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
+");
+            string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
+");
+            string siteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
+");
+            string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
+");
+            string loginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
+");
+            string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
+");
+            string zuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
+");
+            string deleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
+");
+
+            // Get a list of databases from the output
+            List<Database> databaseList = ParseForDatabases(lookupCustomerOutput);
+
+            // Fill in the UI with data
+            lookupResults_AccountName_TextBox.Text = accountName;
+            lookupResults_SiteName_TextBox.Text = siteName;
+            lookupResults_AccountNumber_TextBox.Text = zuoraAccount;
+            lookupResults_LoginUrl_TextBox.Text = loginUrl;
+            lookupResults_UploadUrl_TextBox.Text = uploadUrl;
+            lookupResults_CreateDate_TextBox.Text = createDate;
+            lookupResults_PrimaryEmail_TextBox.Text = email;
+            lookupResults_TrialPaid_TextBox.Text = trialOrPaid;
+            lookupResults_SeatCount_TextBox.Text = seatCount;
+            lookupResults_SerialNumber_TextBox.Text = serialNumber;
+            lookupResults_SuspendStatus_TextBox.Text = suspendStatus;
+            lookupResults_ArchiveStatus_TextBox.Text = archiveStatus;
+            lookupResults_DeleteStatus_TextBox.Text = deleteStatus;
+            lookupResults_IISServer_TextBox.Text = iisServer;
+            lookupResults_IITID_TextBox.Text = iitid;
+
+            // Populate the Database list
+            lookupResults_Databases_ListView.ItemsSource = databaseList;
+
+            lookupAccount_LookupStatus_TextBox.Content = "Lookup complete";
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
         }
 
         private async void unlockDatabase(string databaseName, string sqlServer)
         {
+            setServerSelectEnabledState(false);
+            setLookupAccountEnabledState(false);
+            setLookupResultsEnabledState(false);
+
             databaseTasks_UnlockStatus_Label.Content = "Unlocking...";
 
             // Get the currently selected server
@@ -190,10 +248,18 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 databaseTasks_UnlockStatus_Label.Content = "Login error";
             }
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
         }
 
         private async void getDatabaseUsers(Database database)
         {
+            setServerSelectEnabledState(false);
+            setLookupAccountEnabledState(false);
+            setLookupResultsEnabledState(false);
+
             databaseTasks_GetUsersStatus_Label.Content = "Working...";
 
             // Clear the current database user list
@@ -205,7 +271,7 @@ namespace Act__Premium_Cloud_Support_Utility
             // Post a request to build LookupCustomer and wait for a response
             if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
             {
-                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers/buildWithParameters?&SQLServer="
+                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
                     + database.server
                     + "&DatabaseName="
                     + database.name);
@@ -213,26 +279,27 @@ namespace Act__Premium_Cloud_Support_Utility
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
 
-                // Temp user creation test
-                DatabaseUser user = new DatabaseUser();
-                user.loginName = database.name;
-                database.users.Add(user);
-
-                if (outputDatabaseName == database.name)
+                if (outputDatabaseName.ToLower() == database.name.ToLower())
                 {
+                    database.users = ParseForDatabaseUsers(output);
+
                     lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
 
                     databaseTasks_GetUsersStatus_Label.Content = "Done Stuff";
                 }
                 else
                 {
-                    databaseTasks_GetUsersStatus_Label.Content = "Query failed";
+                    databaseTasks_GetUsersStatus_Label.Content = "Request failed";
                 }
             }
             else
             {
                 databaseTasks_GetUsersStatus_Label.Content = "Login error";
             }
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
         }
 
         private async void resendWelcomeEmail(string accountIITID, string accountEmail)
@@ -249,6 +316,10 @@ namespace Act__Premium_Cloud_Support_Utility
 
             if (send)
             {
+                setServerSelectEnabledState(false);
+                setLookupAccountEnabledState(false);
+                setLookupResultsEnabledState(false);
+
                 accountTasks_WelcomeEmailStatus_Label.Content = "Sending...";
 
                 // set accountEmail to null if not needed, else set it to specified address
@@ -296,10 +367,18 @@ namespace Act__Premium_Cloud_Support_Utility
                     accountTasks_WelcomeEmailStatus_Label.Content = "Login error";
                 }
             }
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
         }
 
         private async void getTimeout(string siteName, string iisServer)
         {
+            setServerSelectEnabledState(false);
+            setLookupAccountEnabledState(false);
+            setLookupResultsEnabledState(false);
+
             accountTasks_GetTimeoutStatus_Label.Content = "Working...";
 
             // Get the currently selected server
@@ -333,6 +412,10 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 accountTasks_GetTimeoutStatus_Label.Content = "Login error";
             }
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
         }
 
         private async void updateTimeout(string siteName, string iisServer)
@@ -347,6 +430,10 @@ namespace Act__Premium_Cloud_Support_Utility
 
             if (proceed)
             {
+                setServerSelectEnabledState(false);
+                setLookupAccountEnabledState(false);
+                setLookupResultsEnabledState(false);
+
                 accountTasks_UpdateTimeoutStatus_Label.Content = "Updating...";
 
                 // Get the currently selected server
@@ -369,8 +456,6 @@ namespace Act__Premium_Cloud_Support_Utility
                     string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
  ");
 
-                    MessageBox.Show(outputSiteName + " | " + outputIISServer + " | " + outputTimeout);
-
                     if (outputSiteName == siteName && outputIISServer == iisServer && outputTimeout == newValue)
                     {
                         accountTasks_UpdateTimeoutStatus_Label.Content = "Updated";
@@ -385,6 +470,10 @@ namespace Act__Premium_Cloud_Support_Utility
                     accountTasks_UpdateTimeoutStatus_Label.Content = "Login error";
                 }
             }
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
         }
 
         private void PopulateDropDowns()
@@ -487,7 +576,7 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
-        private List<Database> SearchForDatabases(string mainText)
+        private List<Database> ParseForDatabases(string mainText)
         {
             string workingText = mainText;
             List<Database> list = new List<Database>();
@@ -516,6 +605,50 @@ namespace Act__Premium_Cloud_Support_Utility
             return list;
         }
 
+        private List<DatabaseUser> ParseForDatabaseUsers(string mainText)
+        {
+            string workingText = mainText;
+            List<DatabaseUser> list = new List<DatabaseUser>();
+            try
+            {
+                // Cut data to after the line of ----¦----¦----¦---- nonsense
+                workingText = workingText.Split(new string[] { @"----------¦----------¦----------¦-------------¦-------------¦----------------¦---------¦----------------¦-----------¦--------------¦---------------
+" }, StringSplitOptions.None)[1];
+
+                // Cut data to before "<linebreak><linebreak>(1 rows affected)"
+                workingText = workingText.Split(new string[] { @"
+
+(1 rows affected)" }, StringSplitOptions.None)[0];
+
+                // Get all lines
+                string[] lines = workingText.Split(new string[] { @"
+" }, StringSplitOptions.None);
+
+                // For each line, get the user information
+                // Loop starts at line 2 rather than 0
+                foreach (string line in lines)
+                {
+                    DatabaseUser user = new DatabaseUser();
+
+                    // Split the line up into individual values
+                    string[] lineSplit = line.Split('¦');
+
+                    // Grab the needed information
+                    user.loginName = lineSplit[0];
+                    user.lastLogin = lineSplit[9];
+                    user.role = lineSplit[6];
+
+                    list.Add(user);
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Error occurred whilst getting database users:\n\n" + error.Message);
+            }
+
+            return list;
+        }
+
         async Task Delay(int time)
         {
             await Task.Delay(time);
@@ -525,6 +658,9 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             if (e.AddedItems.Count > 0)
             {
+                setServerSelectEnabledState(false);
+                setLookupResultsEnabledState(false);
+
                 // Get server ID of selected server from jenkinsServerXml
                 JenkinsServer server = e.AddedItems[0] as JenkinsServer;
 
@@ -533,16 +669,22 @@ namespace Act__Premium_Cloud_Support_Utility
                 jenkinsServerSelect_Grid.ClearValue(BackgroundProperty);
 
                 // Run a GET request to retrieve the user's login data
-                bool status = await JenkinsTasks.checkServerLogin(server);
-                if (status)
+                bool loginStatus = await JenkinsTasks.checkServerLogin(server);
+                if (loginStatus)
                 {
                     jenkinsServerSelect_LoginStatus_Label.Content = "Login succeeded.";
+                    
+                    setLookupAccountEnabledState(true);
                 }
                 else
                 {
                     jenkinsServerSelect_LoginStatus_Label.Content = "Login failed.";
                     jenkinsServerSelect_Grid.SetValue(BackgroundProperty, new SolidColorBrush(Color.FromRgb(254, 80, 0)));
+                    
+                    setLookupAccountEnabledState(false);
                 }
+
+                setServerSelectEnabledState(true);
             }
         }
 
@@ -560,6 +702,21 @@ namespace Act__Premium_Cloud_Support_Utility
 
                 lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
             }
+        }
+
+        private void setServerSelectEnabledState(bool state)
+        {
+            jenkinsServerSelect_Grid.IsEnabled = state;
+        }
+
+        private void setLookupAccountEnabledState(bool state)
+        {
+            lookupAccount_Grid.IsEnabled = state;
+        }
+
+        private void setLookupResultsEnabledState(bool state)
+        {
+            lookupResults_Grid.IsEnabled = state;
         }
     }
 

@@ -16,7 +16,7 @@
 
         <Grid x:Name="jenkinsLogin_JenkinsServerSelect_Grid" Grid.Row="0" Margin="0,0,0,10">
             <Label Content="Select a server:" Margin="10,5,0,0" HorizontalAlignment="Left" VerticalAlignment="top"/>
-            <ComboBox x:Name="jenkinsLogin_JenkinsServerSelect_ComboBox" Margin="103,7,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" SelectionChanged="jenkinsLogin_JenkinsServerSelect_ComboBox_SelectionChanged"/>
+            <ComboBox x:Name="jenkinsLogin_JenkinsServerSelect_ComboBox" Margin="103,7,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157" SelectionChanged="jenkinsLogin_JenkinsServerSelect_ComboBox_SelectionChanged"/>
         </Grid>
 
         <Grid x:Name="jenkinsLogin_Instructions_Grid" Grid.Row="1" Visibility="Collapsed" Margin="0,0,0,10">
