@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         mc:Ignorable="d"
-        Title="MainWindow" Height="736" Width="797">
+        Title="APC Support Utility - Beta" Height="736" Width="850" MinHeight="250" MinWidth="810">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -108,7 +108,7 @@
                     <GridView>
                         <GridViewColumn Header="Login Name" Width="200" DisplayMemberBinding="{Binding loginName}"/>
                         <GridViewColumn Header="Role" Width="100" DisplayMemberBinding="{Binding role}"/>
-                        <GridViewColumn Header="Last Login" Width="100" DisplayMemberBinding="{Binding lastLogin}"/>
+                        <GridViewColumn Header="Last Login (UTC)" Width="150" DisplayMemberBinding="{Binding lastLogin}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -133,6 +133,12 @@
 
             <Button Content="Welcome Email" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,260,0,0" Width="110" Height="23" Click="button_WelcomeEmail_Click"/>
             <Label x:Name="accountTasks_WelcomeEmailStatus_Label" Grid.Column="2" Content="" Margin="115,258,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+            
+            <!-- == User Tasks == -->
+            <Label Content="User Tasks" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,313,0,0"/>
+
+            <Button Content="Reset Password" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,339,0,0" Width="110" Height="23" Click="button_ResetPassword_Click"/>
+            <Label x:Name="userTasks_ResetPasswordStatus_Label" Grid.Column="2" Content="" Margin="115,337,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
         </Grid>
     </Grid>
 </Window>

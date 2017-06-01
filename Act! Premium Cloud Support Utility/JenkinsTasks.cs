@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
@@ -127,7 +128,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (creds == null)
             {
                 HttpResponseMessage blankResponse = new HttpResponseMessage();
-                blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+                blankResponse.StatusCode = HttpStatusCode.Unauthorized;
 
                 return blankResponse;
             }
@@ -147,7 +148,7 @@ namespace Act__Premium_Cloud_Support_Utility
                     MessageBox.Show("POST request failed in 'jenkinsPostRequest(" + server.url + request + ")'.\n\n" + error);
 
                     HttpResponseMessage blankResponse = new HttpResponseMessage();
-                    blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+                    blankResponse.StatusCode = HttpStatusCode.Unauthorized;
 
                     return blankResponse;
                 }
@@ -172,7 +173,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (creds == null)
             {
                 HttpResponseMessage blankResponse = new HttpResponseMessage();
-                blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+                blankResponse.StatusCode = HttpStatusCode.Unauthorized;
 
                 return blankResponse;
             }
@@ -192,7 +193,7 @@ namespace Act__Premium_Cloud_Support_Utility
                     MessageBox.Show("GET request failed in 'jenkinsGetRequest(" + server.url + request + ")'.\n\n" + error);
 
                     HttpResponseMessage blankResponse = new HttpResponseMessage();
-                    blankResponse.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+                    blankResponse.StatusCode = HttpStatusCode.Unauthorized;
 
                     return blankResponse;
                 }

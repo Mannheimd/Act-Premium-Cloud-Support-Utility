@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,6 +83,24 @@ namespace Act__Premium_Cloud_Support_Utility
             if (lookupResults_PrimaryEmail_TextBox.Text != "" && lookupResults_IITID_TextBox.Text != "")
             {
                 resendWelcomeEmail(lookupResults_IITID_TextBox.Text, lookupResults_PrimaryEmail_TextBox.Text);
+            }
+        }
+
+        private void button_ResetPassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (lookupResults_Databases_ListView.SelectedIndex > -1
+                && lookupResults_DatabaseUsers_ListView.SelectedIndex > -1
+                && jenkinsServerSelect_ComboBox.SelectedIndex > -1)
+            {
+                setServerSelectEnabledState(false);
+                setLookupAccountEnabledState(false);
+                setLookupResultsEnabledState(false);
+
+                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
+                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
+                DatabaseUser user = lookupResults_DatabaseUsers_ListView.SelectedItem as DatabaseUser;
+
+                resetUserPassword(database.name, database.server, user.loginName, server);
             }
         }
 
@@ -285,7 +304,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
                     lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
 
-                    databaseTasks_GetUsersStatus_Label.Content = "Done Stuff";
+                    databaseTasks_GetUsersStatus_Label.Content = "Loaded users";
                 }
                 else
                 {
@@ -476,6 +495,46 @@ namespace Act__Premium_Cloud_Support_Utility
             setLookupResultsEnabledState(true);
         }
 
+        private async void resetUserPassword(string databaseName, string databaseServer, string userName, JenkinsServer server)
+        {
+            setServerSelectEnabledState(false);
+            setLookupAccountEnabledState(false);
+            setLookupResultsEnabledState(false);
+
+            userTasks_ResetPasswordStatus_Label.Content = "Resetting...";
+
+            // Post a request to build ResetPassword and wait for a response
+            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
+            {
+                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ResetCustomerLoginPassword/buildWithParameters?&SQLServer="
+                    + databaseServer
+                    + "&DatabaseName="
+                    + databaseName
+                    + "&UserName="
+                    + userName);
+
+                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
+                bool oneRowAffected = output.Contains("(1 rows affected)");
+
+                if (outputDatabaseName == databaseName && oneRowAffected == true)
+                {
+                    userTasks_ResetPasswordStatus_Label.Content = "Reset to 'Actsoftware'";
+                }
+                else
+                {
+                    userTasks_ResetPasswordStatus_Label.Content = "Error resetting password";
+                }
+            }
+            else
+            {
+                userTasks_ResetPasswordStatus_Label.Content = "Login error";
+            }
+
+            setServerSelectEnabledState(true);
+            setLookupAccountEnabledState(true);
+            setLookupResultsEnabledState(true);
+        }
+
         private void PopulateDropDowns()
         {
             // Load the Jenkins servers
@@ -499,10 +558,10 @@ namespace Act__Premium_Cloud_Support_Utility
             // Populating LookupCustomer drop-downs with Key/Value pairs, then setting the selected index to 0
             comboBox_LookupBy.DisplayMemberPath = "Key";
             comboBox_LookupBy.SelectedValuePath = "Value";
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Site Name", "SiteName"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Email Address", "EmailAddress"));
             comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Account Number", "ZuoraAccount"));
+            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Email Address", "EmailAddress"));
             comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Subscription Number", "ZuoraSubscription"));
+            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Site Name", "SiteName"));
             comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("IIT ID", "IITID"));
             comboBox_LookupBy.SelectedIndex = 0;
         }
