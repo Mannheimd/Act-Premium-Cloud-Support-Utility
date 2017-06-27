@@ -143,7 +143,8 @@ namespace Act__Premium_Cloud_Support_Utility
             string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
                 + comboBox_LookupBy.SelectedValue.ToString()
                 + "&LookupValue="
-                + searchString);
+                + searchString
+                + "&delay=0sec");
 
             // Check that the output is valid
             if (SearchString(lookupCustomerOutput, "Searching " + comboBox_LookupBy.SelectedValue.ToString() + " for ", "...") != searchString)
@@ -246,7 +247,8 @@ namespace Act__Premium_Cloud_Support_Utility
                 string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
                     + sqlServer
                     + "&DatabaseName="
-                    + databaseName);
+                    + databaseName
+                    + "&delay=0sec");
 
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                 string outputSqlServer = SearchString(output, "Found SQL Server: ", @"
@@ -293,7 +295,8 @@ namespace Act__Premium_Cloud_Support_Utility
                 string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
                     + database.server
                     + "&DatabaseName="
-                    + database.name);
+                    + database.name
+                    + "&delay=0sec");
 
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
@@ -360,7 +363,8 @@ namespace Act__Premium_Cloud_Support_Utility
                     string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
                         + accountIITID
                         + "&AltEmailAddress="
-                        + accountEmail);
+                        + accountEmail
+                        + "&delay=0sec");
 
                     // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                     string outputIITID = SearchString(output, "IITID: ", @"
@@ -409,7 +413,8 @@ namespace Act__Premium_Cloud_Support_Utility
                 string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
                     + siteName
                     + "&IISServer="
-                    + iisServer);
+                    + iisServer
+                    + "&delay=0sec");
 
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                 string outputSiteName = SearchString(output, "Site ", " on server");
@@ -466,7 +471,8 @@ namespace Act__Premium_Cloud_Support_Utility
                         + "&IISServer="
                         + iisServer
                         + "&Timeout="
-                        + newValue);
+                        + newValue
+                        + "&delay=0sec");
 
                     // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                     string outputSiteName = SearchString(output, "Updating customer ", " on server ");
@@ -511,7 +517,8 @@ namespace Act__Premium_Cloud_Support_Utility
                     + "&DatabaseName="
                     + databaseName
                     + "&UserName="
-                    + userName);
+                    + userName
+                    + "&delay=0sec");
 
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
                 bool oneRowAffected = output.Contains("(1 rows affected)");

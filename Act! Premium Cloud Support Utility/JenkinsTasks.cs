@@ -161,7 +161,7 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             // Create HttpClient with base URL
             HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(@"https://cloudops-jenkins-ust1.hostedtest.act.com:8443"); // Update to get the URL from selected server
+            client.BaseAddress = new Uri(server.url);
 
             // Adding accept header for XML format
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
@@ -279,7 +279,7 @@ namespace Act__Premium_Cloud_Support_Utility
                         }
                         else if (building.InnerXml == "false" & result.InnerXml != "SUCCESS")
                         {
-                            MessageBox.Show("Looks like a problem occurred. Please try running your lookup again. If the problem persists, please report it through your usual channels.");
+                            MessageBox.Show("Looks like a problem occurred. Please try running your lookup again. If the problem persists, please report it through your usual channels."); //Update with better error handling
                             break;
                         }
                     }
