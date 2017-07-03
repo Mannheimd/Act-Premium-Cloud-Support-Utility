@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         mc:Ignorable="d"
-        Title="APC Support Utility - Beta" Height="736" Width="850" MinHeight="250" MinWidth="810">
+        Title="APC Support Utility - Beta v0.1.2" Height="736" Width="850" MinHeight="250" MinWidth="810">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
