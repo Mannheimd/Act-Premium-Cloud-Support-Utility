@@ -4,141 +4,43 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         Title="APC Support Utility - Beta v0.1.2" Height="736" Width="850" MinHeight="250" MinWidth="810">
+    <Window.Resources>
+        <!-- Fonts -->
+        <Style TargetType="{x:Type Control}" x:Key="smallFont">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="10"/>
+        </Style>
+        <Style TargetType="{x:Type Control}" x:Key="normalFont">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+        <Style TargetType="{x:Type Control}" x:Key="largeFont">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource normalFont}"/>
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource normalFont}"/>
+        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource normalFont}"/>
+        <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource normalFont}"/>
+    </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
+        <Grid x:Name="LookupListPane" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="250" Background="#4C2F8CC6">
+            <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+            <Button x:Name="LookupListPane_NewLookup_Button"
+                    Content="{iconPacks:PackIconMaterialLight Plus, Height=20, Width=20}"
+                    Height="22" Width="22"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    VerticalAlignment="Top" HorizontalAlignment="Right"
+                    Margin="0,16,16,0"/>
+            <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListView Opacity="0" Margin="0,55,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-        <Grid x:Name="jenkinsServerSelect_Grid" Grid.Row="0">
-            <Label Content="Select a server:" Margin="10,10,0,5" HorizontalAlignment="Left" VerticalAlignment="top"/>
-            <ComboBox x:Name="jenkinsServerSelect_ComboBox" Margin="103,12,0,5" HorizontalAlignment="Left" VerticalAlignment="Top" Width="157"
-                      SelectionChanged="jenkinsServerSelect_ComboBox_SelectionChanged"
-                      DisplayMemberPath="name"/>
-            <Label x:Name="jenkinsServerSelect_LoginStatus_Label" Content="No server selected." Margin="265,10,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Button x:Name="jenkinsServerSelect_Configure_Button" Content="Configure Login" Margin="0,12,10,5" Height="23" Width="95" HorizontalAlignment="Right" VerticalAlignment="Top" Click="jenkinsServerSelect_Configure_Button_Click"/>
-            <Rectangle VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="1" Fill="#FFFE5000"/>
-        </Grid>
-
-        <Grid x:Name="lookupAccount_Grid" Grid.Row="1" IsEnabled="False">
-            <Label Content="Lookup Account" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
-            <Label Content="Where" HorizontalAlignment="Left" Margin="10,34,0,5" VerticalAlignment="Top"/>
-            <ComboBox x:Name="comboBox_LookupBy" HorizontalAlignment="Left" Margin="55,36,0,5" VerticalAlignment="Top" Width="140" SelectedIndex="0"/>
-            <Label Content="Equals" HorizontalAlignment="Left" Margin="195,34,0,5" VerticalAlignment="Top"/>
-            <TextBox x:Name="textBox_LookupValue" HorizontalAlignment="Left" Height="23" Margin="239,36,0,5" TextWrapping="Wrap" VerticalAlignment="Top" Width="211"/>
-            <Button x:Name="button_RunLookupCustomer" Content="Go" Margin="455,36,0,5" HorizontalAlignment="Left" Height="23"  Width="75" VerticalAlignment="Top" Click="button_RunLookupCustomer_Click"/>
-            <Label x:Name="lookupAccount_LookupStatus_TextBox" Content="No lookup started" Margin="535,34,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Rectangle VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="1" Fill="#FFFE5000"/>
-        </Grid>
-
-        <Grid x:Name="lookupResults_Grid" Grid.Row="2" Margin="10,5,0,0" IsEnabled="False">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" MinWidth="250"/>
-                <ColumnDefinition Width="*" MinWidth="250"/>
-                <ColumnDefinition Width="*" MinWidth="250"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- == Lookup Output == -->
-            <Label Grid.Column="0" Content="Account Name:" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" x:Name="lookupResults_AccountName_TextBox" Margin="110,2,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="1" Content="Site Name:" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="1" x:Name="lookupResults_SiteName_TextBox" Margin="110,2,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="2" Content="Account Number:" Margin="0,0,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="2" x:Name="lookupResults_AccountNumber_TextBox" Margin="110,2,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="0" Content="Login URL:" Margin="0,26,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" Grid.ColumnSpan="3" x:Name="lookupResults_LoginUrl_TextBox" Margin="110,28,5,0" IsReadOnly="True" VerticalAlignment="Top" HorizontalAlignment="Stretch" BorderThickness="1" Height="23"/>
-
-            <Label Grid.Column="0" Content="Upload URL:" Margin="0,52,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" Grid.ColumnSpan="3" x:Name="lookupResults_UploadUrl_TextBox" Margin="110,54,5,0" IsReadOnly="True" VerticalAlignment="Top" HorizontalAlignment="Stretch" BorderThickness="1" Height="23"/>
-
-            <Label Grid.Column="0" Content="Create Date:" Margin="0,78,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" x:Name="lookupResults_CreateDate_TextBox" Margin="110,80,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="1" Content="Primary Email:" Margin="0,78,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="lookupResults_PrimaryEmail_TextBox" Margin="110,80,5,0" IsReadOnly="True" VerticalAlignment="Top" HorizontalAlignment="Stretch" BorderThickness="1" Height="23"/>
-
-            <Label Grid.Column="0" Content="Trial or Paid:" Margin="0,104,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" x:Name="lookupResults_TrialPaid_TextBox" Margin="110,106,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="1" Content="Seat Count:" Margin="0,104,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="1" x:Name="lookupResults_SeatCount_TextBox" Margin="110,106,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="2" Content="Serial Number:" Margin="0,104,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="2" x:Name="lookupResults_SerialNumber_TextBox" Margin="110,106,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="0" Content="Suspend Status:" Margin="0,130,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" x:Name="lookupResults_SuspendStatus_TextBox" Margin="110,132,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="1" Content="Archive Status:" Margin="0,130,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="1" x:Name="lookupResults_ArchiveStatus_TextBox" Margin="110,132,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="2" Content="Delete Status:" Margin="0,130,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="2" x:Name="lookupResults_DeleteStatus_TextBox" Margin="110,132,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="0" Content="IIS Server:" Margin="0,156,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="0" x:Name="lookupResults_IISServer_TextBox" Margin="110,158,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <Label Grid.Column="1" Content="IIT ID:" Margin="0,156,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Grid.Column="1" Grid.ColumnSpan="2" x:Name="lookupResults_IITID_TextBox" Margin="110,158,5,0" IsReadOnly="True" BorderThickness="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="23"/>
-
-            <!-- == Database List == -->
-            <Label Grid.Column="0" Content="Databases:" Margin="0,182,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <ListView Grid.Column="0" x:Name="lookupResults_Databases_ListView" SelectionMode="Single" Height="100" Margin="0,208,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" SelectionChanged="lookupResults_Databases_ListView_SelectionChanged">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Name" Width="100" DisplayMemberBinding="{Binding name}"/>
-                        <GridViewColumn Header="Server" Width="100" DisplayMemberBinding="{Binding server}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-
-            <!-- == User List == -->
-            <Label Grid.Column="0" Content="Database users:" Margin="0,313,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <ListView Grid.Column="0" Grid.ColumnSpan="2" x:Name="lookupResults_DatabaseUsers_ListView" SelectionMode="Single" Height="200" Margin="0,339,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Login Name" Width="200" DisplayMemberBinding="{Binding loginName}"/>
-                        <GridViewColumn Header="Role" Width="100" DisplayMemberBinding="{Binding role}"/>
-                        <GridViewColumn Header="Last Login (UTC)" Width="150" DisplayMemberBinding="{Binding lastLogin}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-
-            <!-- == Database Tasks == -->
-            <Label Content="Database Tasks:" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,182,0,0"/>
-
-            <Button Content="Unlock" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,208,0,0" Width="110" Height="23" Click="button_Unlock_Click"/>
-            <Label x:Name="databaseTasks_UnlockStatus_Label" Grid.Column="1" Content="" Margin="115,206,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-
-            <Button Content="Get Users" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,234,0,0" Width="110" Height="23" Click="button_GetUsers_Click"/>
-            <Label x:Name="databaseTasks_GetUsersStatus_Label" Grid.Column="1" Content="" Margin="115,232,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-
-            <!-- == Account Tasks == -->
-            <Label Content="Account Tasks:" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,182,0,0"/>
-
-            <Button Content="Get Timeout" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,208,0,0" Width="110" Height="23" Click="button_GetTimeout_Click"/>
-            <Label x:Name="accountTasks_GetTimeoutStatus_Label" Grid.Column="2" Content="" Margin="115,206,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-
-            <Button Content="Update Timeout" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,234,0,0" Width="110" Height="23" Click="button_UpdateTimeout_Click"/>
-            <Label x:Name="accountTasks_UpdateTimeoutStatus_Label" Grid.Column="2" Content="" Margin="115,232,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-
-            <Button Content="Welcome Email" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,260,0,0" Width="110" Height="23" Click="button_WelcomeEmail_Click"/>
-            <Label x:Name="accountTasks_WelcomeEmailStatus_Label" Grid.Column="2" Content="" Margin="115,258,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-            
-            <!-- == User Tasks == -->
-            <Label Content="User Tasks" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,313,0,0"/>
-
-            <Button Content="Reset Password" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,339,0,0" Width="110" Height="23" Click="button_ResetPassword_Click"/>
-            <Label x:Name="userTasks_ResetPasswordStatus_Label" Grid.Column="2" Content="" Margin="115,337,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                </ListView>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Window>

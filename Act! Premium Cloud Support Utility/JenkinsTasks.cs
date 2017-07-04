@@ -8,11 +8,15 @@ using System.Xml;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.IO;
+using System.Collections.Generic;
 
-namespace Act__Premium_Cloud_Support_Utility
+namespace Jenkins_Tasks
 {
     class JenkinsTasks
     {
+        public static List<JenkinsServer> jenkinsServerList;
+
         public static byte[] additionalEntropy = { 5, 8, 3, 4, 7 }; // Used to further encrypt Jenkins authentication information
 
         public static void SecureJenkinsCreds(string username, string apiToken, string server)
@@ -317,5 +321,53 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             await Task.Delay(time);
         } //Redundant, remove this and use 'await Task.Delay(int)' instead
+
+        public static bool loadJenkinsServers()
+        {
+            // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
+            XmlDocument jenkinsServerXml = new XmlDocument();
+            try
+            {
+                string xmlString = null;
+
+                // Open the XML file from embedded resources
+                using (Stream stream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
+                {
+                    using (StreamReader sr = new StreamReader(stream))
+                    {
+                        xmlString = sr.ReadToEnd();
+                    }
+                }
+
+                // Add the text to the Jenkins Servers XmlDocument
+                jenkinsServerXml.LoadXml(xmlString);
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Unable to load Jenkins servers - failure in loadJenkinsServersXml().\n\n" + error.Message);
+
+                return false;
+            }
+
+            // Load the Jenkins servers
+            XmlNodeList serverNodeList = jenkinsServerXml.SelectNodes("servers/server");
+            foreach (XmlNode serverNode in serverNodeList)
+            {
+                JenkinsServer mew = new JenkinsServer(); //JenkinsServer server = mew JenkinsServer();
+                mew.id = serverNode.Attributes["id"].Value;
+                mew.name = serverNode.Attributes["name"].Value;
+                mew.url = serverNode.InnerText;
+
+                jenkinsServerList.Add(mew);
+            }
+            return true;
+        }
+    }
+
+    public class JenkinsServer
+    {
+        public string id { get; set; }
+        public string url { get; set; }
+        public string name { get; set; }
     }
 }

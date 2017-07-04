@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jenkins_Tasks;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,96 +12,11 @@ namespace Act__Premium_Cloud_Support_Utility
 {
     public partial class MainWindow : Window
     {
-        public static XmlDocument jenkinsServerXml = new XmlDocument();
-
         public MainWindow()
         {
             InitializeComponent();
 
-            PopulateDropDowns();
-        }
-
-        private void button_RunLookupCustomer_Click(object sender, RoutedEventArgs e)
-        {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
-            runLookupCustomer();
-        }
-
-        private void button_Unlock_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_Databases_ListView.SelectedIndex > -1)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
-
-                unlockDatabase(database.name, database.server);
-            }
-        }
-
-        private void button_GetUsers_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_Databases_ListView.SelectedIndex > -1)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
-
-                getDatabaseUsers(database);
-            }
-        }
-
-        private void button_GetTimeout_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                getTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
-            }
-        }
-
-        private void button_UpdateTimeout_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
-            {
-                updateTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
-            }
-        }
-
-        private void button_WelcomeEmail_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_PrimaryEmail_TextBox.Text != "" && lookupResults_IITID_TextBox.Text != "")
-            {
-                resendWelcomeEmail(lookupResults_IITID_TextBox.Text, lookupResults_PrimaryEmail_TextBox.Text);
-            }
-        }
-
-        private void button_ResetPassword_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_Databases_ListView.SelectedIndex > -1
-                && lookupResults_DatabaseUsers_ListView.SelectedIndex > -1
-                && jenkinsServerSelect_ComboBox.SelectedIndex > -1)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
-                DatabaseUser user = lookupResults_DatabaseUsers_ListView.SelectedItem as DatabaseUser;
-
-                resetUserPassword(database.name, database.server, user.loginName, server);
-            }
+            JenkinsTasks.loadJenkinsServers();
         }
 
         private async void runLookupCustomer()
@@ -541,65 +457,6 @@ namespace Act__Premium_Cloud_Support_Utility
             setLookupResultsEnabledState(true);
         }
 
-        private void PopulateDropDowns()
-        {
-            // Load the Jenkins servers
-            if (loadJenkinsServersXml())
-            {
-                List<JenkinsServer> serverList = new List<JenkinsServer>();
-                XmlNodeList serverNodeList = jenkinsServerXml.SelectNodes("servers/server");
-                foreach (XmlNode serverNode in serverNodeList)
-                {
-                    JenkinsServer mew = new JenkinsServer(); //JenkinsServer server = mew JenkinsServer();
-                    mew.id = serverNode.Attributes["id"].Value;
-                    mew.name = serverNode.Attributes["name"].Value;
-                    mew.url = serverNode.InnerText;
-
-                    serverList.Add(mew);
-                }
-
-                jenkinsServerSelect_ComboBox.ItemsSource = serverList;
-            }
-
-            // Populating LookupCustomer drop-downs with Key/Value pairs, then setting the selected index to 0
-            comboBox_LookupBy.DisplayMemberPath = "Key";
-            comboBox_LookupBy.SelectedValuePath = "Value";
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Account Number", "ZuoraAccount"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Email Address", "EmailAddress"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Subscription Number", "ZuoraSubscription"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Site Name", "SiteName"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("IIT ID", "IITID"));
-            comboBox_LookupBy.SelectedIndex = 0;
-        }
-
-        public bool loadJenkinsServersXml()
-        {
-            // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
-            try
-            {
-                string xmlString = null;
-
-                // Open the XML file from embedded resources
-                using (Stream stream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
-                {
-                    using (StreamReader sr = new StreamReader(stream))
-                    {
-                        xmlString = sr.ReadToEnd();
-                    }
-                }
-
-                // Add the text to the Jenkins Servers XmlDocument
-                jenkinsServerXml.LoadXml(xmlString);
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("Unable to load Jenkins servers - failure in loadJenkinsServersXml().\n\n" + error.Message);
-
-                return false;
-            }
-            return true;
-        }
-
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
         {
             XmlNodeList xmlNodes = xmlDoc.SelectNodes(path);
@@ -797,12 +654,5 @@ namespace Act__Premium_Cloud_Support_Utility
         public string loginName { get; set; }
         public string role { get; set; }
         public string lastLogin { get; set; }
-    }
-
-    public class JenkinsServer
-    {
-        public string id { get; set; }
-        public string url { get; set; }
-        public string name { get; set; }
     }
 }
