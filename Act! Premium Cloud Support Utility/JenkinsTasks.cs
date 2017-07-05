@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Message_Handler;
+using Microsoft.Win32;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -9,16 +10,23 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO;
+using Act__Premium_Cloud_Support_Utility;
 using System.Collections.Generic;
 
 namespace Jenkins_Tasks
 {
     class JenkinsTasks
     {
-        public static List<JenkinsServer> jenkinsServerList;
-
         public static byte[] additionalEntropy = { 5, 8, 3, 4, 7 }; // Used to further encrypt Jenkins authentication information
 
+        public static List<JenkinsServer> jenkinsServerList = new List<JenkinsServer>();
+
+        /// <summary>
+        /// Secures the user's Jenkins credentials against the Windows user profile and stores them in the registry under HKCU
+        /// </summary>
+        /// <param name="username">Username entered in login window</param>
+        /// <param name="apiToken">API token entered in login window</param>
+        /// <param name="server">Short name for server, e.g. "USP1"</param>
         public static void SecureJenkinsCreds(string username, string apiToken, string server)
         {
             byte[] utf8Creds = UTF8Encoding.UTF8.GetBytes(username + ":" + apiToken);
@@ -38,12 +46,17 @@ namespace Jenkins_Tasks
                     jenkinsCredsKey.SetValue(server, securedCreds);
                 }
             }
-            catch (CryptographicException e)
+            catch (CryptographicException error)
             {
-                MessageBox.Show("Unable to encrypt Jenkins login credentials:\n\n" + e.ToString());
+                MessageHandler.handleMessage(false, 3, error, "Encrypting Jenkins login credentials");
             }
         }
 
+        /// <summary>
+        /// Pulls stored Jenkins credentials from registry and decrypts them
+        /// </summary>
+        /// <param name="server">Short name for Jenkins server (e.g. USP1)</param>
+        /// <returns>Returns unsecured utf8-encrypted byte array representing username:password</returns>
         public static byte[] UnsecureJenkinsCreds(string server)
         {
             // Check if registry path exists
@@ -63,14 +76,14 @@ namespace Jenkins_Tasks
                     {
                         utf8Creds = ProtectedData.Unprotect(securedCreds, additionalEntropy, DataProtectionScope.CurrentUser);
                     }
-                    catch (CryptographicException e)
+                    catch (CryptographicException error)
                     {
-                        MessageBox.Show("Unable to unencrypt Jenkins login credentials:\n\n" + e.ToString());
+                        MessageHandler.handleMessage(false, 3, error, "Decrypting stored Jenkins login credentials"); ;
                     }
                 }
                 catch(Exception error)
                 {
-                    
+                    MessageHandler.handleMessage(false, 3, error, "Locating reg key to get Jenkins credentials");
                 }
 
                 return utf8Creds;
@@ -78,42 +91,63 @@ namespace Jenkins_Tasks
             return null;
         }
 
+        /// <summary>
+        /// Verifies that the registry key to store Jenkins credentials exists, and creates it if not
+        /// </summary>
+        /// <returns>true if key is now created and valid, false if not</returns>
         public static bool CheckOrCreateJenkinsRegPath()
         {
-            // Check if SubKey HKCU\Software\Swiftpage Support\JenkinsLogins exists
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support\Jenkins Logins", false);
+            MessageHandler.handleMessage(false, 6, null, "Verifying Jenkins Login registry key path");
+            RegistryKey key = null;
+
+            // Check if subkey "HKCU\Software\Swiftpage Support" exists
+            key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support", false);
             if (key == null)
             {
-                // Doesn't exist, let's see if HKCU\Software\Swiftpage Support exists
-                key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support", false);
-                if (key == null)
-                {
-                    // Doesn't exist, try to create 'Swiftpage Support' SubKey
-                    key = Registry.CurrentUser.OpenSubKey(@"Software", true);
-                    try
-                    {
-                        key.CreateSubKey("Swiftpage Support");
-                    }
-                    catch(Exception error)
-                    {
-                        MessageBox.Show(@"Unable to create SubKey HKCU\Software\Swiftpage Support:\n\n" + error.Message);
-                        return false;
-                    }
-                }
-
-                // 'Swiftpage Support' subkey exists (or has just been created), try creating 'Jenkins Logins'
-                key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support", true);
+                MessageHandler.handleMessage(false, 5, null, @"Creating registry key 'HKCU\Software\Swiftpage Support'");
+                
                 try
                 {
-                    key.CreateSubKey("Jenkins Logins");
+                    key = Registry.CurrentUser.OpenSubKey(@"Software", true);
+                    key.CreateSubKey("Swiftpage Support");
                 }
-                catch(Exception error)
+                catch (Exception error)
                 {
-                    MessageBox.Show(@"Unable to create SubKey HKCU\Software\Swiftpage Support\Jenkins Logins:\n\n" + error.Message);
+                    MessageHandler.handleMessage(false, 3, error, @"Attempting to create registry key 'HKCU\Software\Swiftpage Support'");
                     return false;
                 }
             }
-            return true;
+
+            // Check if subkey HKCU\Software\Swiftpage Support\JenkinsLogins exists
+            key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support\Jenkins Logins", false);
+            if (key == null)
+            {
+                MessageHandler.handleMessage(false, 5, null, @"Creating registry key 'HKCU\Software\Swiftpage Support'");
+
+                try
+                {
+                    key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support", true);
+                    key.CreateSubKey("Jenkins Logins");
+                }
+                catch (Exception error)
+                {
+                    MessageHandler.handleMessage(false, 3, error, @"Attempting to create registry key 'HKCU\Software\Swiftpage Support\Jenkins Logins'");
+                    return false;
+                }
+            }
+
+            // Confirm that full subkey exists
+            key = Registry.CurrentUser.OpenSubKey(@"Software\Swiftpage Support\Jenkins Logins", false);
+            if (key != null)
+            {
+                MessageHandler.handleMessage(false, 6, null, "Jenkins Login reg key exists");
+                return true;
+            }
+            else
+            {
+                MessageHandler.handleMessage(false, 3, null, @"Testing access to key HKCU\Swiftpage Support\Jenkins Logins");
+                return false;
+            }
         }
 
         public static async Task<HttpResponseMessage> jenkinsPostRequest(JenkinsServer server, string request)
@@ -331,9 +365,9 @@ namespace Jenkins_Tasks
                 string xmlString = null;
 
                 // Open the XML file from embedded resources
-                using (Stream stream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
+                using (MainWindow.jenkinsServersXmlStream)
                 {
-                    using (StreamReader sr = new StreamReader(stream))
+                    using (StreamReader sr = new StreamReader(MainWindow.jenkinsServersXmlStream))
                     {
                         xmlString = sr.ReadToEnd();
                     }

@@ -58,9 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="JenkinsLogin.xaml.cs">
-      <DependentUpon>JenkinsLogin.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Message Handler.cs" />
     <Compile Include="ResendWelcomeEmail.xaml.cs">
       <DependentUpon>ResendWelcomeEmail.xaml</DependentUpon>
     </Compile>
@@ -80,10 +78,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="JenkinsLogin.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ResendWelcomeEmail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -12,29 +12,38 @@ namespace Act__Premium_Cloud_Support_Utility
 {
     public partial class MainWindow : Window
     {
+        public static Stream jenkinsServersXmlStream = null;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            JenkinsTasks.loadJenkinsServers();
-        }
+            jenkinsServersXmlStream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml");
 
+            TestClass testItem = new TestClass();
+            testItem.accountName = "Account name";
+            testItem.lookupTime = "Lookup time";
+
+            List<TestClass> testList = new List<TestClass>();
+            testList.Add(testItem);
+            testList.Add(testItem);
+            testList.Add(testItem);
+            testList.Add(testItem);
+            testList.Add(testItem);
+
+            LookupListPane_Lookups_ListBox.ItemsSource = testList;
+
+            //JenkinsTasks.loadJenkinsServers();
+        }
+        /*
         private async void runLookupCustomer()
         {
-            // Disable the server select, search and lookup results sections
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
             string searchString = textBox_LookupValue.Text.Trim();
 
             // Check that search criteria have been entered
             if (searchString == "" || jenkinsServerSelect_ComboBox.Text == "")
             {
                 lookupAccount_LookupStatus_TextBox.Content = "Enter search criteria";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
 
                 return;
             }
@@ -45,9 +54,6 @@ namespace Act__Premium_Cloud_Support_Utility
             if (JenkinsTasks.UnsecureJenkinsCreds(server.id) == null)
             {
                 lookupAccount_LookupStatus_TextBox.Content = "Login error";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
 
                 return;
             }
@@ -66,9 +72,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 lookupAccount_LookupStatus_TextBox.Content = "Invalid results, try again";
 
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
-
                 return;
             }
 
@@ -76,9 +79,6 @@ namespace Act__Premium_Cloud_Support_Utility
             if (lookupCustomerOutput.Contains("Unable to find customer by"))
             {
                 lookupAccount_LookupStatus_TextBox.Content = "Unable to locate account";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
 
                 return;
             }
@@ -147,9 +147,6 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void unlockDatabase(string databaseName, string sqlServer)
         {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
 
             databaseTasks_UnlockStatus_Label.Content = "Unlocking...";
 
@@ -184,18 +181,10 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 databaseTasks_UnlockStatus_Label.Content = "Login error";
             }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
         }
 
         private async void getDatabaseUsers(Database database)
         {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
             databaseTasks_GetUsersStatus_Label.Content = "Working...";
 
             // Clear the current database user list
@@ -233,10 +222,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 databaseTasks_GetUsersStatus_Label.Content = "Login error";
             }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
         }
 
         private async void resendWelcomeEmail(string accountIITID, string accountEmail)
@@ -253,10 +238,6 @@ namespace Act__Premium_Cloud_Support_Utility
 
             if (send)
             {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
                 accountTasks_WelcomeEmailStatus_Label.Content = "Sending...";
 
                 // set accountEmail to null if not needed, else set it to specified address
@@ -305,18 +286,10 @@ namespace Act__Premium_Cloud_Support_Utility
                     accountTasks_WelcomeEmailStatus_Label.Content = "Login error";
                 }
             }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
         }
 
         private async void getTimeout(string siteName, string iisServer)
         {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
             accountTasks_GetTimeoutStatus_Label.Content = "Working...";
 
             // Get the currently selected server
@@ -351,10 +324,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 accountTasks_GetTimeoutStatus_Label.Content = "Login error";
             }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
         }
 
         private async void updateTimeout(string siteName, string iisServer)
@@ -369,10 +338,6 @@ namespace Act__Premium_Cloud_Support_Utility
 
             if (proceed)
             {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
                 accountTasks_UpdateTimeoutStatus_Label.Content = "Updating...";
 
                 // Get the currently selected server
@@ -410,18 +375,10 @@ namespace Act__Premium_Cloud_Support_Utility
                     accountTasks_UpdateTimeoutStatus_Label.Content = "Login error";
                 }
             }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
         }
 
         private async void resetUserPassword(string databaseName, string databaseServer, string userName, JenkinsServer server)
         {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
             userTasks_ResetPasswordStatus_Label.Content = "Resetting...";
 
             // Post a request to build ResetPassword and wait for a response
@@ -451,10 +408,6 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 userTasks_ResetPasswordStatus_Label.Content = "Login error";
             }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
         }
 
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
@@ -575,71 +528,7 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             await Task.Delay(time);
         }
-
-        private async void jenkinsServerSelect_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0)
-            {
-                setServerSelectEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                // Get server ID of selected server from jenkinsServerXml
-                JenkinsServer server = e.AddedItems[0] as JenkinsServer;
-
-                // Trigger update on UI with login status
-                jenkinsServerSelect_LoginStatus_Label.Content = "Checking login...";
-                jenkinsServerSelect_Grid.ClearValue(BackgroundProperty);
-
-                // Run a GET request to retrieve the user's login data
-                bool loginStatus = await JenkinsTasks.checkServerLogin(server);
-                if (loginStatus)
-                {
-                    jenkinsServerSelect_LoginStatus_Label.Content = "Login succeeded.";
-                    
-                    setLookupAccountEnabledState(true);
-                }
-                else
-                {
-                    jenkinsServerSelect_LoginStatus_Label.Content = "Login failed.";
-                    jenkinsServerSelect_Grid.SetValue(BackgroundProperty, new SolidColorBrush(Color.FromRgb(254, 80, 0)));
-                    
-                    setLookupAccountEnabledState(false);
-                }
-
-                setServerSelectEnabledState(true);
-            }
-        }
-
-        private void jenkinsServerSelect_Configure_Button_Click(object sender, RoutedEventArgs e)
-        {
-            JenkinsLogin jenkinsLogin = new JenkinsLogin();
-            jenkinsLogin.Show();
-        }
-
-        private void lookupResults_Databases_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count == 1)
-            {
-                Database database = e.AddedItems[0] as Database;
-
-                lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
-            }
-        }
-
-        private void setServerSelectEnabledState(bool state)
-        {
-            jenkinsServerSelect_Grid.IsEnabled = state;
-        }
-
-        private void setLookupAccountEnabledState(bool state)
-        {
-            lookupAccount_Grid.IsEnabled = state;
-        }
-
-        private void setLookupResultsEnabledState(bool state)
-        {
-            lookupResults_Grid.IsEnabled = state;
-        }
+        */
     }
 
     public class Database
@@ -654,5 +543,11 @@ namespace Act__Premium_Cloud_Support_Utility
         public string loginName { get; set; }
         public string role { get; set; }
         public string lastLogin { get; set; }
+    }
+
+    public class TestClass
+    {
+        public string accountName { get; set; }
+        public string lookupTime { get; set; }
     }
 }
