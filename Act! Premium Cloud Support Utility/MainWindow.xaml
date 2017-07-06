@@ -29,9 +29,48 @@
         <!-- ListBox -->
 
         <!-- ListBoxItem -->
-        <Style TargetType="{x:Type ListBoxItem}" x:Key="listBoxItem">
+        <Style TargetType="{x:Type Control}" x:Key="listBoxItem">
             <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Name="OuterBorder" BorderThickness="1" BorderBrush="Transparent" Background="White">
+                            <Border Name="InnerBorder" BorderThickness="0" BorderBrush="Transparent">
+                                <ContentPresenter />
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="InnerBorder" Property="Background" Value="#262F8CC6"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsSelected}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="InnerBorder" Property="Background" Value="White"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsMouseOver}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="InnerBorder" Property="Background" Value="#332F8CC6"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
+        <Style TargetType="ListBoxItem" BasedOn="{StaticResource listBoxItem}"/>
     </Window.Resources>
     <Grid>
         <Grid x:Name="LookupListPane" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="250" Background="#4C2F8CC6">
@@ -53,20 +92,6 @@
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      Padding="0"
                      SelectionMode="Single">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource listBoxItem}">
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="False">
-                                <Setter Property="Background" Value="White"/>
-                                <Setter Property="FontWeight" Value="Normal"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="White"/>
-                                <Setter Property="FontWeight" Value="DemiBold"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
