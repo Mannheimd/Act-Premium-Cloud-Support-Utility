@@ -1,10 +1,12 @@
 ﻿using Jenkins_Tasks;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Xml;
 
@@ -20,21 +22,40 @@ namespace Act__Premium_Cloud_Support_Utility
 
             jenkinsServersXmlStream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml");
 
-            TestClass testItem = new TestClass();
-            testItem.accountName = "Account name";
-            testItem.lookupTime = "Lookup time";
+            TestClass testItem1 = new TestClass();
+            testItem1.accountName = "small";
+            testItem1.lookupTime = "Lookup time";
+            testItem1.accountType = "ActPremiumCloudPlus";
+
+            TestClass testItem2 = new TestClass();
+            testItem2.accountName = "REALLYREALLYREALLYREALLYREALLYREALLYREALLYREALLYREALLYREALLYREALLYREALLYlong";
+            testItem2.lookupTime = "Lookup time";
+            testItem2.accountType = "ActPremiumCloud";
+
+            TestClass testItem3 = new TestClass();
+            testItem3.accountName = "Account name3";
+            testItem3.lookupTime = "Lookup time";
+
+            TestClass testItem4 = new TestClass();
+            testItem4.accountName = "Account name4";
+            testItem4.lookupTime = "Lookup time";
+
+            TestClass testItem5 = new TestClass();
+            testItem5.accountName = "Account name5";
+            testItem5.lookupTime = "Lookup time";
 
             List<TestClass> testList = new List<TestClass>();
-            testList.Add(testItem);
-            testList.Add(testItem);
-            testList.Add(testItem);
-            testList.Add(testItem);
-            testList.Add(testItem);
+            testList.Add(testItem1);
+            testList.Add(testItem2);
+            testList.Add(testItem3);
+            testList.Add(testItem4);
+            testList.Add(testItem5);
 
             LookupListPane_Lookups_ListBox.ItemsSource = testList;
 
             //JenkinsTasks.loadJenkinsServers();
         }
+
         /*
         private async void runLookupCustomer()
         {
@@ -549,5 +570,94 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public string accountName { get; set; }
         public string lookupTime { get; set; }
+        public string accountType { get; set; }
+    }
+
+    public class ListBoxSelectedState_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return Visibility.Hidden;
+            else
+                return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class AccountType_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string)
+            {
+                if (value as string == "ActPremiumCloudPlus")
+                    return "APC+";
+                if (value as string == "ActPremiumCloud")
+                    return "Act! Premium Cloud";
+                return value;
+            }
+            else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class AccountTrialOrPaid_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string)
+            {
+                if (value as string == "TRIAL")
+                    return "Trial";
+                if (value as string == "PAID")
+                    return "Paid";
+                return value;
+            }
+            else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class AccountStatus_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string & parameter is string)
+            {
+                string archiveStatus = (parameter as string).Split('|')[0];
+                string deleteStatus = (parameter as string).Split('|')[1];
+
+                // Assume account is active, then run through options from bad to worse. Don't need to display multiple; if account is Archived, knowing it's also Suspended is redundant.
+                string currentStatus = "Active";
+
+                if (value as string == "Suspended")
+                    currentStatus = "Suspended";
+                if (archiveStatus == "Archived")
+                    currentStatus = "Archived";
+                if (deleteStatus == "Deleted")
+                    currentStatus = "Deleted";
+
+                return currentStatus;
+            }
+            else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
     }
 }
