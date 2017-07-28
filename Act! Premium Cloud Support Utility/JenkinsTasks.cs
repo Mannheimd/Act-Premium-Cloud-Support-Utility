@@ -270,7 +270,7 @@ namespace Jenkins_Tasks
                         break;
                     }
 
-                    await Delay(1000); // Checking status every 1 second
+                    await Task.Delay(1000); // Checking status every 1 second
 
                     // Use the URL returned in the Location header from the above POST response to GET the build status
                     string queuedBuildURL = postBuildRequest.Headers.Location.AbsoluteUri;
@@ -298,7 +298,7 @@ namespace Jenkins_Tasks
                 bool newBuildComplete = false;
                 while (!newBuildComplete)
                 {
-                    await Delay(1000);
+                    await Task.Delay(1000);
 
                     HttpResponseMessage getFinalBuildOutput = await jenkinsGetRequest(server, finalBuildUrl + @"\api\xml");
 
@@ -351,11 +351,6 @@ namespace Jenkins_Tasks
             return await getRequest.Content.ReadAsStringAsync();
         }
 
-        public static async Task Delay(int time)
-        {
-            await Task.Delay(time);
-        } //Redundant, remove this and use 'await Task.Delay(int)' instead
-
         public static bool loadJenkinsServers()
         {
             // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
@@ -396,6 +391,404 @@ namespace Jenkins_Tasks
             }
             return true;
         }
+
+        public async Task<bool> FindAccount(string lookupType, string lookupValue, JenkinsServer server)
+        {
+            APCAccount lookupAccount = new APCAccount();
+
+            // Post a request to build LookupCustomer and wait for a response
+            string lookupCustomerOutput = await runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
+                + lookupType
+                + "&LookupValue="
+                + lookupValue
+                + "&delay=0sec");
+
+            // Check that the output is valid
+            if (SearchString(lookupCustomerOutput, "Searching " + lookupType + " for ", "...") != lookupValue)
+            {
+                lookupAccount.lookupStatus = "Failed";
+
+                return false; ;
+            }
+
+            // Check if customer couldn't be found
+            if (lookupCustomerOutput.Contains("Unable to find customer by"))
+            {
+                lookupAccount.lookupStatus = "Not Found";
+
+                return false; ;
+            }
+
+            // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+            lookupAccount.iitid = SearchString(lookupCustomerOutput, "IITID: ", @"
+");
+            lookupAccount.accountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
+");
+            lookupAccount.email = SearchString(lookupCustomerOutput, "Email: ", @"
+");
+            lookupAccount.createDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
+");
+            lookupAccount.trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
+");
+            lookupAccount.serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
+");
+            lookupAccount.seatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
+");
+            lookupAccount.suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
+");
+            lookupAccount.archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
+");
+            lookupAccount.siteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
+");
+            lookupAccount.iisServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
+");
+            lookupAccount.loginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
+");
+            lookupAccount.uploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
+");
+            lookupAccount.zuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
+");
+            lookupAccount.deleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
+");
+
+            // Get a list of databases from the output
+            lookupAccount.databases = ParseForDatabases(lookupCustomerOutput);
+
+            lookupAccount.lookupStatus = "Successful";
+
+            return true;
+        }
+
+        public async Task<bool> unlockDatabase(string databaseName, string sqlServer, JenkinsServer server)
+        {
+            // Post a request to build LookupCustomer and wait for a response
+            if (UnsecureJenkinsCreds(server.id) != null)
+            {
+                string output = await runJenkinsBuild(server, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
+                    + sqlServer
+                    + "&DatabaseName="
+                    + databaseName
+                    + "&delay=0sec");
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputSqlServer = SearchString(output, "Found SQL Server: ", @"
+");
+                string outputDatabaseName = SearchString(output, "Unlocking database: ", @"
+");
+
+                if (outputSqlServer == sqlServer && outputDatabaseName == databaseName)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> getDatabaseUsers(APCDatabase database, JenkinsServer server)
+        {
+            // Clear the current database user list
+            database.users.Clear();
+
+            // Post a request to build LookupCustomer and wait for a response
+            if (UnsecureJenkinsCreds(server.id) != null)
+            {
+                string output = await runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
+                    + database.server
+                    + "&DatabaseName="
+                    + database.name
+                    + "&delay=0sec");
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
+
+                if (outputDatabaseName.ToLower() == database.name.ToLower())
+                {
+                    database.users = ParseForDatabaseUsers(output);
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> resendWelcomeEmail(string accountIITID, string accountEmail, JenkinsServer server)
+        {
+            bool sendType = false; // true is alt email, false is default email
+            string sendTo = null; // alt email address
+            bool send = false; // output from send or cancel
+
+            ResendWelcomeEmail resendWelcomeEmail = new ResendWelcomeEmail(accountEmail);
+            resendWelcomeEmail.resultBool += value => sendType = value;
+            resendWelcomeEmail.resultString += value => sendTo = value;
+            resendWelcomeEmail.resultSend += value => send = value;
+            resendWelcomeEmail.ShowDialog();
+
+            if (send)
+            {
+                // set accountEmail to null if not needed, else set it to specified address
+                if (sendType)
+                {
+                    accountEmail = sendTo;
+                }
+                else
+                {
+                    accountEmail = null;
+                }
+
+                // Post a request to build LookupCustomer and wait for a response
+                if (UnsecureJenkinsCreds(server.id) != null)
+                {
+                    string output = await runJenkinsBuild(server, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
+                        + accountIITID
+                        + "&AltEmailAddress="
+                        + accountEmail
+                        + "&delay=0sec");
+
+                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                    string outputIITID = SearchString(output, "IITID: ", @"
+");
+                    string outputEmail = SearchString(output, "Email Address: ", @"
+");
+
+                    if (outputIITID == accountIITID && outputEmail == accountEmail)
+                    {
+                        return true;
+                    }
+                    else if (outputIITID == accountIITID && !sendType)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> getTimeout(APCAccount account, JenkinsServer server)
+        {
+            // Post a request to build LookupCustomer and wait for a response
+            if (UnsecureJenkinsCreds(server.id) != null)
+            {
+                string output = await runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
+                    + account.siteName
+                    + "&IISServer="
+                    + account.iisServer
+                    + "&delay=0sec");
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputSiteName = SearchString(output, "Site ", " on server");
+                string outputIISServer = SearchString(output, "on server ", @"
+");
+                string outputCurrentTimeout = SearchString(output, "Current Timeout: ", @"
+");
+
+                if (outputSiteName == account.siteName && outputIISServer == account.iisServer)
+                {
+                    account.timeoutValue = Convert.ToInt32(outputCurrentTimeout);
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> updateTimeout(APCAccount account, JenkinsServer server)
+        {
+            string newValue = null; // new timeout value to set
+            bool proceed = false; // output from send or cancel
+
+            UpdateTimeoutValue updateTimeoutValue = new UpdateTimeoutValue();
+            updateTimeoutValue.resultValue += value => newValue = value;
+            updateTimeoutValue.resultProceed += value => proceed = value;
+            updateTimeoutValue.ShowDialog();
+
+            if (proceed)
+            {
+                // Post a request to build LookupCustomer and wait for a response
+                if (UnsecureJenkinsCreds(server.id) != null)
+                {
+                    string output = await runJenkinsBuild(server, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
+                        + account.siteName
+                        + "&IISServer="
+                        + account.iisServer
+                        + "&Timeout="
+                        + newValue
+                        + "&delay=0sec");
+
+                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                    string outputSiteName = SearchString(output, "Updating customer ", " on server ");
+                    string outputIISServer = SearchString(output, "on server ", @" 
+");
+                    string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
+ ");
+
+                    if (outputSiteName == account.siteName && outputIISServer == account.iisServer && outputTimeout == newValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> resetUserPassword(APCDatabase database, APCDatabaseUser user, JenkinsServer server)
+        {
+            // Post a request to build ResetPassword and wait for a response
+            if (UnsecureJenkinsCreds(server.id) != null)
+            {
+                string output = await runJenkinsBuild(server, @"/job/CloudOps1-ResetCustomerLoginPassword/buildWithParameters?&SQLServer="
+                    + database.server
+                    + "&DatabaseName="
+                    + database.name
+                    + "&UserName="
+                    + user.loginName
+                    + "&delay=0sec");
+
+                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
+                bool oneRowAffected = output.Contains("(1 rows affected)");
+
+                if (outputDatabaseName == database.name && oneRowAffected == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private string SearchString(string mainText, string startString, string endString)
+        {
+            try
+            {
+                string split1 = mainText.Split(new string[] { startString }, StringSplitOptions.None)[1];
+                return split1.Split(new string[] { endString }, StringSplitOptions.None)[0];
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private List<APCDatabase> ParseForDatabases(string mainText)
+        {
+            string workingText = mainText;
+            List<APCDatabase> list = new List<APCDatabase>();
+            try
+            {
+                // Get lines with databases on
+                string[] lines = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None);
+
+                // For each line, separate the name and server
+                // Loop starts at line 1 rather than 0
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    APCDatabase database = new APCDatabase();
+
+                    database.name = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[0]).Split(null)[0];
+                    database.server = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[1]).Split(null)[0];
+
+                    list.Add(database);
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Error occurred whilst getting database list:\n\n" + error.Message);
+            }
+
+            return list;
+        }
+
+        private List<APCDatabaseUser> ParseForDatabaseUsers(string mainText)
+        {
+            string workingText = mainText;
+            List<APCDatabaseUser> list = new List<APCDatabaseUser>();
+            try
+            {
+                // Cut data to after the line of ----¦----¦----¦---- nonsense
+                workingText = workingText.Split(new string[] { @"----------¦----------¦----------¦-------------¦-------------¦----------------¦---------¦----------------¦-----------¦--------------¦---------------
+" }, StringSplitOptions.None)[1];
+
+                // Cut data to before "<linebreak><linebreak>(1 rows affected)"
+                workingText = workingText.Split(new string[] { @"
+
+(1 rows affected)" }, StringSplitOptions.None)[0];
+
+                // Get all lines
+                string[] lines = workingText.Split(new string[] { @"
+" }, StringSplitOptions.None);
+
+                // For each line, get the user information
+                // Loop starts at line 2 rather than 0
+                foreach (string line in lines)
+                {
+                    APCDatabaseUser user = new APCDatabaseUser();
+
+                    // Split the line up into individual values
+                    string[] lineSplit = line.Split('¦');
+
+                    // Grab the needed information
+                    user.loginName = lineSplit[0];
+                    user.lastLogin = lineSplit[9];
+                    user.role = lineSplit[6];
+
+                    list.Add(user);
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Error occurred whilst getting database users:\n\n" + error.Message);
+            }
+
+            return list;
+        }
     }
 
     public class JenkinsServer
@@ -403,5 +796,42 @@ namespace Jenkins_Tasks
         public string id { get; set; }
         public string url { get; set; }
         public string name { get; set; }
+    }
+
+    public class APCAccount
+    {
+        public string lookupStatus { get; set; }
+        public string iitid { get; set; }
+        public string accountName { get; set; }
+        public string email { get; set; }
+        public string createDate { get; set; }
+        public string trialOrPaid { get; set; }
+        public string serialNumber { get; set; }
+        public string seatCount { get; set; }
+        public string suspendStatus { get; set; }
+        public string archiveStatus { get; set; }
+        public string siteName { get; set; }
+        public string iisServer { get; set; }
+        public string loginUrl { get; set; }
+        public string uploadUrl { get; set; }
+        public string zuoraAccount { get; set; }
+        public string deleteStatus { get; set; }
+        public string accountType { get; set; }
+        public int timeoutValue { get; set; }
+        public List<APCDatabase> databases = new List<APCDatabase>();
+    }
+
+    public class APCDatabase
+    {
+        public string name { get; set; }
+        public string server { get; set; }
+        public List<APCDatabaseUser> users = new List<APCDatabaseUser>();
+    }
+
+    public class APCDatabaseUser
+    {
+        public string loginName { get; set; }
+        public string role { get; set; }
+        public string lastLogin { get; set; }
     }
 }

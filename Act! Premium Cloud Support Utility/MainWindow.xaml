@@ -133,43 +133,46 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Label Style="{StaticResource largeFont}"
-                        Grid.Column="0" Grid.Row="0"
-                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountName}"/>
+                       Grid.Column="0" Grid.Row="0"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountName}"/>
                 <Label Style="{StaticResource normalFont}"
-                        Grid.Column="1" Grid.Row="0"
-                        Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountNumber}"/>
+                       Grid.Column="1" Grid.Row="0"
+                       Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountNumber}"/>
                 <Label Style="{StaticResource normalFont}"
-                        Grid.Column="0" Grid.Row="1"
-                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountType, Converter={StaticResource AccountTypeConverter}}"/>
+                       Grid.Column="0" Grid.Row="1"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountType, Converter={StaticResource AccountTypeConverter}}"/>
                 <Label Style="{StaticResource normalFont}"
-                        Grid.Column="1" Grid.Row="1"
-                        Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountEmail}"/>
+                       Grid.Column="1" Grid.Row="1"
+                       Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountEmail}"/>
                 <Label Style="{StaticResource normalFont}"
-                        Grid.Column="1" Grid.Row="1"
-                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.trialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
+                       Grid.Column="0" Grid.Row="3"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.trialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
                 <Label Style="{StaticResource normalFont}"
-                        Grid.Column="1" Grid.Row="1"
-                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.suspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.archiveStatus|DataContext.deleteStatus}"/>
+                       Grid.Column="0" Grid.Row="4"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.suspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.archiveStatus|DataContext.deleteStatus}"/>
                 <Label Style="{StaticResource normalFont}"
-                        Grid.Column="1" Grid.Row="1"
-                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountEmail}"/>
-                </Grid>
-            <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,0,0,0">
-                <Button x:Name="LookupResultsScreenSelect_Databases_Button"
-                        Style="{StaticResource normalFont}"
-                        Content="Databases"
-                        Height="26" Width="200"
-                        Background="Transparent"
-                        BorderThickness="1" BorderBrush="#262F8CC6"
-                        VerticalAlignment="Top" HorizontalAlignment="Left"
-                        Margin="0,0,0,0"/>
+                       Grid.Column="0" Grid.Row="5"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                    <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.loginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.loginUrl}"/>
+                    </Hyperlink>
+                </Label>
+            </Grid>
+            <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+            <Button x:Name="LookupResultsScreenSelect_Databases_Button"
+                    Style="{StaticResource normalFont}"
+                    Content="Databases"
+                    Height="26" Width="200"
+                    Background="Transparent"
+                    BorderThickness="1" BorderBrush="#262F8CC6"
+                    VerticalAlignment="Top" HorizontalAlignment="Left"
+                    Margin="0,0,0,0"/>
             </Grid>
         </Grid>
     </Grid>
