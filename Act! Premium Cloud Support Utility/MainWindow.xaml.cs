@@ -25,6 +25,39 @@ namespace Act__Premium_Cloud_Support_Utility
             jenkinsServersXmlStream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml");
 
             JenkinsTasks.loadJenkinsServers();
+
+            APCAccount account = new APCAccount()
+            {
+                accountName = "Test account",
+                lookupTime = DateTime.Now,
+                lookupStatus = "Successful",
+                iitid = "biglongnumber",
+                email = "test@test.com",
+                createDate = "24th Feb 2016",
+                trialOrPaid = "Paid",
+                serialNumber = "wwwww-xxxxx-yyyyy-zzzzz",
+                seatCount = "4",
+                suspendStatus = "Not Suspended",
+                archiveStatus = "Not Archived",
+                siteName = "APCTestSite",
+                iisServer = "UST1-ACTTEST-SRV",
+                loginUrl = "https://master.hosted1.act.com/swiftpagetestsupport",
+                uploadUrl = "http://hosted1.act.com/uploads?client=swiftpagetestsupport",
+                zuoraAccount = "A00546894",
+                deleteStatus = "Deleted",
+                accountType = "ActPremiumCloudPlus"
+            };
+
+            List<APCAccount> accounts = new List<APCAccount>();
+            accounts.Add(account);
+            accounts.Add(account);
+            accounts.Add(account);
+            accounts.Add(account);
+            accounts.Add(account);
+            accounts.Add(account);
+            accounts.Add(account);
+
+            LookupListPane_Lookups_ListBox.ItemsSource = accounts;
         }
 
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)

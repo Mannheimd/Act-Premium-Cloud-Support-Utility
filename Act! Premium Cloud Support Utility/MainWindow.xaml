@@ -13,19 +13,26 @@
         <local:AccountType_Converter x:Key="AccountTypeConverter"/>
         <local:AccountTrialOrPaid_Converter x:Key="AccountTrialOrPaidConverter"/>
         <local:AccountStatus_Converter x:Key="AccountStatusConverter"/>
+        
+        <!-- Colours -->
+        <SolidColorBrush Color="#CDCDC8" x:Key="lightFontColour"/>
+        <SolidColorBrush Color="#374650" x:Key="darkFontColour"/>
 
         <!-- Text -->
         <Style TargetType="{x:Type Control}" x:Key="smallFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="normalFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="largeFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
         </Style>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type Label}" BasedOn="{StaticResource normalFont}"/>
@@ -33,6 +40,16 @@
         <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource normalFont}"/>
 
         <!-- ListBox -->
+        <Style TargetType="{x:Type ListBox}" x:Key="listBoxStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style TargetType="ListBox" BasedOn="{StaticResource listBoxStyle}"/>
 
         <!-- ListBoxItem -->
         <Style TargetType="{x:Type Control}" x:Key="listBoxItem">
@@ -83,7 +100,7 @@
         <Style TargetType="{x:Type Button}" x:Key="lightButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="#CDCDC8"/>
+            <Setter Property="Foreground" Value="{StaticResource lightFontColour}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -105,7 +122,7 @@
         <Style TargetType="{x:Type Button}" x:Key="darkButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="#374650"/>
+            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -131,22 +148,16 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid x:Name="LookupListPane" Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#374650">
-            <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="#CDCDC8"/>
+            <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="{StaticResource lightFontColour}"/>
             <Button x:Name="LookupListPane_NewLookup_Button"
                     Content="{iconPacks:PackIconMaterialLight Plus, Height=20, Width=20}"
                     Height="22" Width="22"
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Margin="0,16,16,0"
                     Style="{StaticResource lightButton}"/>
-            <ListBox Opacity="1" Margin="0,55,0,0"
+            <ListBox Margin="0,55,0,0"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                     BorderBrush="Transparent" BorderThickness="0"
-                     HorizontalContentAlignment="Stretch"
-                     x:Name="LookupListPane_Lookups_ListBox"
-                     Background="Transparent"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     Padding="0"
-                     SelectionMode="Single">
+                     x:Name="LookupListPane_Lookups_ListBox">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
