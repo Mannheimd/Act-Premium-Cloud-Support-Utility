@@ -819,6 +819,7 @@ namespace Jenkins_Tasks
         public string accountType { get; set; }
         public int timeoutValue { get; set; }
         public List<APCDatabase> databases = new List<APCDatabase>();
+        public DateTime lookupTime { get; set; }
     }
 
     public class APCDatabase
