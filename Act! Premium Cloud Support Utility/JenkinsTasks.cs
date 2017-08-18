@@ -820,6 +820,8 @@ namespace Jenkins_Tasks
         public int timeoutValue { get; set; }
         public List<APCDatabase> databases = new List<APCDatabase>();
         public DateTime lookupTime { get; set; }
+
+        // Add function here to return XML node representation of APCAccount - is this better than having it separate?
     }
 
     public class APCDatabase

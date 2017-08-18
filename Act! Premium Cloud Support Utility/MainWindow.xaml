@@ -6,14 +6,14 @@
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
-        Title="APC Support Utility - Beta v0.1.2" Height="736" Width="850" MinHeight="250" MinWidth="810">
+        Title="APC Support Utility - Beta v0.1.2" Height="736" Width="950" MinHeight="250" MinWidth="868">
     <Window.Resources>
         <!-- Converters -->
         <local:ListBoxSelectedState_Converter x:Key="ListBoxSelectedStateConverter"/>
         <local:AccountType_Converter x:Key="AccountTypeConverter"/>
         <local:AccountTrialOrPaid_Converter x:Key="AccountTrialOrPaidConverter"/>
         <local:AccountStatus_Converter x:Key="AccountStatusConverter"/>
-        
+
         <!-- Colours -->
         <SolidColorBrush Color="#CDCDC8" x:Key="lightFontColour"/>
         <SolidColorBrush Color="#374650" x:Key="darkFontColour"/>
@@ -94,8 +94,60 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="{x:Type Control}" x:Key="listBoxItemHorizonal">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Width" Value="200"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Name="OuterBorder" BorderThickness="1" BorderBrush="#262F8CC6" Background="White"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <Border Name="InnerBorder" BorderThickness="0" BorderBrush="Transparent"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <ContentPresenter />
+                                </Grid>
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="InnerBorder" Property="Background" Value="#0AB4DC"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="InnerBorder" Property="Background" Value="white"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="True" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <MultiDataTrigger.Setters>
+                                    <Setter TargetName="InnerBorder" Property="Background" Value="#CDCDC8"/>
+                                </MultiDataTrigger.Setters>
+                            </MultiDataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="ListBoxItem" BasedOn="{StaticResource listBoxItem}"/>
-        
+
         <!-- Button -->
         <Style TargetType="{x:Type Button}" x:Key="lightButton">
             <Setter Property="Background" Value="Transparent"/>
@@ -168,13 +220,13 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <Grid x:Name="LookupResultsPane" Grid.Column="1"
+        <Grid x:Name="LookupResultsPane" Grid.Column="1" Margin="0,0,0,0"
               Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}}"
               DataContext="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
             <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0">
                 <Grid.ColumnDefinitions>
@@ -222,14 +274,16 @@
                 </Label>
             </Grid>
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
-            <Button x:Name="LookupResultsScreenSelect_Databases_Button"
-                    Style="{StaticResource normalFont}"
-                    Content="Databases"
-                    Height="26" Width="200"
-                    Background="Transparent"
-                    BorderThickness="1" BorderBrush="#262F8CC6"
-                    VerticalAlignment="Top" HorizontalAlignment="Left"
-                    Margin="0,0,0,0"/>
+                <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBoxItem Content="Databases" Style="{StaticResource listBoxItemHorizonal}"/>
+                    <ListBoxItem Content="Details" Style="{StaticResource listBoxItemHorizonal}"/>
+                    <ListBoxItem Content="Activity" Style="{StaticResource listBoxItemHorizonal}"/>
+                </ListBox>
             </Grid>
         </Grid>
     </Grid>
