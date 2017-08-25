@@ -10,6 +10,7 @@
     <Window.Resources>
         <!-- Converters -->
         <local:ListBoxSelectedState_Converter x:Key="ListBoxSelectedStateConverter"/>
+        <local:ListBoxItemSelectedState_Converter x:Key="ListBoxItemSelectedStateConverter"/>
         <local:AccountType_Converter x:Key="AccountTypeConverter"/>
         <local:AccountTrialOrPaid_Converter x:Key="AccountTrialOrPaidConverter"/>
         <local:AccountStatus_Converter x:Key="AccountStatusConverter"/>
@@ -273,6 +274,18 @@
                     </Hyperlink>
                 </Label>
             </Grid>
+            <Grid x:Name="LookupResultsDatabasesPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+                  Visibility="{Binding ElementName=LookupResultsDatabaseButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
+                <Label Content="Databases"/>
+            </Grid>
+            <Grid x:Name="LookupResultsDetailsPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+                  Visibility="{Binding ElementName=LookupResultsDetailsButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
+                <Label Content="Details"/>
+            </Grid>
+            <Grid x:Name="LookupResultsActivityPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+                  Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
+                <Label Content="Activities"/>
+            </Grid>
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ListBox.ItemsPanel>
@@ -280,9 +293,9 @@
                             <WrapPanel IsItemsHost="True" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
-                    <ListBoxItem Content="Databases" Style="{StaticResource listBoxItemHorizonal}"/>
-                    <ListBoxItem Content="Details" Style="{StaticResource listBoxItemHorizonal}"/>
-                    <ListBoxItem Content="Activity" Style="{StaticResource listBoxItemHorizonal}"/>
+                    <ListBoxItem x:Name="LookupResultsDatabaseButton" Content="Databases" Style="{StaticResource listBoxItemHorizonal}"/>
+                    <ListBoxItem x:Name="LookupResultsDetailsButton" Content="Details" Style="{StaticResource listBoxItemHorizonal}"/>
+                    <ListBoxItem x:Name="LookupResultsActivityButton" Content="Activity" Style="{StaticResource listBoxItemHorizonal}"/>
                 </ListBox>
             </Grid>
         </Grid>

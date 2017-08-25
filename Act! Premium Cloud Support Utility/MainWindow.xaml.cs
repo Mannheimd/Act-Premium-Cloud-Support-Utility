@@ -111,6 +111,22 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    public class ListBoxItemSelectedState_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value.ToString() == "False")
+                return Visibility.Hidden;
+            else
+                return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
     public class AccountType_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
