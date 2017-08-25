@@ -71,3 +71,22 @@ C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Clou
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Debug\MahApps.Metro.IconPacks.pdb
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Debug\MahApps.Metro.IconPacks.xml
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Debug\GeneratedInternalTypeHelper.g.cs
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.exe
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\Act! Premium Cloud Support Utility.pdb
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\MahApps.Metro.IconPacks.dll
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\MahApps.Metro.IconPacks.pdb
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\bin\Debug\MahApps.Metro.IconPacks.xml
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csprojResolveAssemblyReference.cache
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\MainWindow.g.cs
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\ResendWelcomeEmail.g.cs
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\UpdateTimeoutValue.g.cs
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\App.g.cs
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\GeneratedInternalTypeHelper.g.cs
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility_MarkupCompile.cache
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility_MarkupCompile.lref
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\MainWindow.baml
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\ResendWelcomeEmail.baml
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\UpdateTimeoutValue.baml
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.g.resources
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act__Premium_Cloud_Support_Utility.Properties.Resources.resources
+G:\Users\Chris\Dropbox\Development\C# Stuff\Act! Premium Cloud Support Utility\Act! Premium Cloud Support Utility\obj\Debug\Act! Premium Cloud Support Utility.csproj.GenerateResource.Cache

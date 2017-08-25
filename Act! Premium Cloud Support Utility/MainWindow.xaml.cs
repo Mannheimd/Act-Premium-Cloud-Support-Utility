@@ -30,7 +30,7 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 accountName = "Test account",
                 lookupTime = DateTime.Now,
-                lookupStatus = "Successful",
+                lookupStatus = APCAccountLookupStatus.Successful,
                 iitid = "biglongnumber",
                 email = "test@test.com",
                 createDate = "24th Feb 2016",
@@ -99,6 +99,13 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (parameter != null && parameter.ToString() == "Reverse")
+            {
+                if (value == null)
+                    return Visibility.Visible;
+                else
+                    return Visibility.Hidden;
+            }
             if (value == null)
                 return Visibility.Hidden;
             else
@@ -127,6 +134,32 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    /// <summary>
+    /// Takes a JenkinsTasks.AccountLookupStatus value, returns true if state is "Successful"
+    /// </summary>
+    public class AccountLookupSuccess_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool IsSuccessful = false;
+            if (value != null && value.ToString() == APCAccountLookupStatus.Successful.ToString())
+                IsSuccessful = true;
+            
+            if (parameter != null && parameter.ToString() == "Reverse")
+                IsSuccessful = !IsSuccessful;
+
+            if (IsSuccessful)
+                return Visibility.Visible;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
     public class AccountType_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -140,6 +173,34 @@ namespace Act__Premium_Cloud_Support_Utility
                 return value;
             }
             else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    /// <summary>
+    /// Takes APCAccount. If lookupStatus isn't Successful, account name reflects lookup status.
+    /// </summary>
+    public class LookupListAccountName_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null)
+            {
+                APCAccount SelectedAccount = (value as APCAccount);
+                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.Successful)
+                    return SelectedAccount.accountName;
+
+                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.NotFound)
+                    return "Account Not found";
+
+                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.Failed)
+                    return "Lookup failed";
+            }
+            return "";
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)

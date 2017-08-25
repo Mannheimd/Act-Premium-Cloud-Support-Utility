@@ -14,6 +14,8 @@
         <local:AccountType_Converter x:Key="AccountTypeConverter"/>
         <local:AccountTrialOrPaid_Converter x:Key="AccountTrialOrPaidConverter"/>
         <local:AccountStatus_Converter x:Key="AccountStatusConverter"/>
+        <local:AccountLookupSuccess_Converter x:Key="AccountLookupSuccessConverter"/>
+        <local:LookupListAccountName_Converter x:Key="LookupListAccountNameConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#CDCDC8" x:Key="lightFontColour"/>
@@ -214,12 +216,17 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding accountName}"/>
+                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Converter={StaticResource LookupListAccountNameConverter}}"/>
                             <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding lookupTime}"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+        </Grid>
+        <Grid x:Name="NoLookupSelectedPane" Grid.Column="1" Margin="0,0,0,0"
+              Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}, ConverterParameter=Reverse}">
+            <Label Content="No account selected" Style="{StaticResource largeFont}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         <Grid x:Name="LookupResultsPane" Grid.Column="1" Margin="0,0,0,0"
               Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}}"
@@ -229,7 +236,12 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
-            <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0">
+            <Grid x:Name="LookupResultsNewLookupPane" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
+                <Label Content="NewLookup"/>
+            </Grid>
+            <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
@@ -286,7 +298,8 @@
                   Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Activities"/>
             </Grid>
-            <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+            <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>

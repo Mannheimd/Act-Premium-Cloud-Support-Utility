@@ -406,7 +406,7 @@ namespace Jenkins_Tasks
             // Check that the output is valid
             if (SearchString(lookupCustomerOutput, "Searching " + lookupType + " for ", "...") != lookupValue)
             {
-                lookupAccount.lookupStatus = "Failed";
+                lookupAccount.lookupStatus = APCAccountLookupStatus.Failed;
 
                 return false; ;
             }
@@ -414,7 +414,7 @@ namespace Jenkins_Tasks
             // Check if customer couldn't be found
             if (lookupCustomerOutput.Contains("Unable to find customer by"))
             {
-                lookupAccount.lookupStatus = "Not Found";
+                lookupAccount.lookupStatus = APCAccountLookupStatus.NotFound;
 
                 return false; ;
             }
@@ -454,7 +454,7 @@ namespace Jenkins_Tasks
             // Get a list of databases from the output
             lookupAccount.databases = ParseForDatabases(lookupCustomerOutput);
 
-            lookupAccount.lookupStatus = "Successful";
+            lookupAccount.lookupStatus = APCAccountLookupStatus.Successful;
 
             return true;
         }
@@ -800,7 +800,8 @@ namespace Jenkins_Tasks
 
     public class APCAccount
     {
-        public string lookupStatus { get; set; }
+        public APCAccountLookupStatus lookupStatus { get; set; }
+        public APCAccountLookupBy lookupBy { get; set; }
         public string iitid { get; set; }
         public string accountName { get; set; }
         public string email { get; set; }
@@ -837,4 +838,20 @@ namespace Jenkins_Tasks
         public string role { get; set; }
         public string lastLogin { get; set; }
     }
+
+    public enum APCAccountLookupStatus
+    {
+        Successful,
+        NotFound,
+        Failed
+    };
+
+    public enum APCAccountLookupBy
+    {
+        AccountNumber,
+        EmailAddress,
+        SiteName,
+        SubscriptionNumber,
+        IITID
+    };
 }
