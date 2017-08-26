@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
         mc:Ignorable="d"
         Title="APC Support Utility - Beta v0.1.2" Height="736" Width="950" MinHeight="250" MinWidth="868">
     <Window.Resources>
@@ -17,6 +19,7 @@
         <local:AccountLookupSuccess_Converter x:Key="AccountLookupSuccessConverter"/>
         <local:LookupListAccountName_Converter x:Key="LookupListAccountNameConverter"/>
         <local:LookupResultSelectedTab_Converter x:Key="LookupResultSelectedTabConverter"/>
+        <local:BooleanToVisibility_Converter x:Key="BooleanToVisibilityConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#CDCDC8" x:Key="lightFontColour"/>
@@ -213,10 +216,16 @@
                     Click="LookupListPane_NewLookup_Click"/>
             <ListBox Margin="0,55,0,0"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                     x:Name="LookupListPane_Lookups_ListBox">
+                     x:Name="LookupListPane_Lookups_ListBox"
+                     ItemsSource="{Binding Path=LookupResults}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
+                            <Button VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,5,5,0"
+                                    Content="{iconPacks:PackIconMaterialLight Plus, Height=15, Width=15, Rotation=45}"
+                                    Style="{StaticResource darkButton}"
+                                    Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsMouseOver, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Click="LookupListPane_RemoveLookup_Click"/>
                             <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Converter={StaticResource LookupListAccountNameConverter}}"/>
                             <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding lookupTime}"/>
                         </Grid>

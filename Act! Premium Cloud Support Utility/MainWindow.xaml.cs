@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -24,6 +25,8 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             InitializeComponent();
             LookupListPane_Lookups_ListBox.ItemsSource = LookupResults;
+            CollectionView LookupListDisplayOrder = (CollectionView)CollectionViewSource.GetDefaultView(LookupListPane_Lookups_ListBox.ItemsSource);
+            LookupListDisplayOrder.SortDescriptions.Add(new SortDescription("lookupCreateTime", ListSortDirection.Descending));
 
             jenkinsServersXmlStream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml");
 
@@ -66,8 +69,16 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void LookupListPane_NewLookup_Click(object sender, RoutedEventArgs e)
         {
+            tempint++;
             APCAccount account = new APCAccount();
+            account.lookupCreateTime = DateTime.Now;
             LookupResults.Add(account);
+        }
+
+        private void LookupListPane_RemoveLookup_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount Account = (APCAccount)(sender as Button).DataContext;
+            LookupResults.Remove(Account);
         }
     }
 
@@ -149,6 +160,32 @@ namespace Act__Premium_Cloud_Support_Utility
                 return value;
             }
             else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+    
+    /// <summary>
+    /// Returns Visibility.Visible or Visibility.Hidden depending on if entity has mouse over.
+    /// </summary>
+    public class BooleanToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool IsMouseOver = false;
+            if (value != null && value.ToString() == "True")
+                IsMouseOver = true;
+
+            if (parameter != null && parameter.ToString() == "Reverse")
+                IsMouseOver = !IsMouseOver;
+
+            if (IsMouseOver)
+                return Visibility.Visible;
+            else
+                return Visibility.Hidden;
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
