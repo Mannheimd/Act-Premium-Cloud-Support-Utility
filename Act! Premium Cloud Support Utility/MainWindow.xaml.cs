@@ -69,7 +69,6 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void LookupListPane_NewLookup_Click(object sender, RoutedEventArgs e)
         {
-            tempint++;
             APCAccount account = new APCAccount();
             account.lookupCreateTime = DateTime.Now;
             LookupResults.Add(account);
