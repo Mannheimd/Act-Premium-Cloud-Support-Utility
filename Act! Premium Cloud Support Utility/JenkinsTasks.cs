@@ -802,6 +802,7 @@ namespace Jenkins_Tasks
     {
         public APCAccountLookupStatus lookupStatus { get; set; }
         public APCAccountLookupBy lookupBy { get; set; }
+        public APCAccountSelectedTab selectedTab { get; set; }
         public string iitid { get; set; }
         public string accountName { get; set; }
         public string email { get; set; }
@@ -841,6 +842,7 @@ namespace Jenkins_Tasks
 
     public enum APCAccountLookupStatus
     {
+        NotStarted,
         Successful,
         NotFound,
         Failed
@@ -853,5 +855,13 @@ namespace Jenkins_Tasks
         SiteName,
         SubscriptionNumber,
         IITID
+    };
+
+    public enum APCAccountSelectedTab
+    {
+        None,
+        Databases,
+        Details,
+        Activity
     };
 }

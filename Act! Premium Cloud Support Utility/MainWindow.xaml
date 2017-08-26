@@ -16,6 +16,7 @@
         <local:AccountStatus_Converter x:Key="AccountStatusConverter"/>
         <local:AccountLookupSuccess_Converter x:Key="AccountLookupSuccessConverter"/>
         <local:LookupListAccountName_Converter x:Key="LookupListAccountNameConverter"/>
+        <local:LookupResultSelectedTab_Converter x:Key="LookupResultSelectedTabConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#CDCDC8" x:Key="lightFontColour"/>
@@ -206,10 +207,10 @@
             <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="{StaticResource lightFontColour}"/>
             <Button x:Name="LookupListPane_NewLookup_Button"
                     Content="{iconPacks:PackIconMaterialLight Plus, Height=20, Width=20}"
-                    Height="22" Width="22"
+                    Height="22" Width="22" Margin="0,16,16,0"
                     VerticalAlignment="Top" HorizontalAlignment="Right"
-                    Margin="0,16,16,0"
-                    Style="{StaticResource lightButton}"/>
+                    Style="{StaticResource lightButton}"
+                    Click="LookupListPane_NewLookup_Click"/>
             <ListBox Margin="0,55,0,0"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                      x:Name="LookupListPane_Lookups_ListBox">
@@ -300,7 +301,8 @@
             </Grid>
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
-                <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                         SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.selectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel IsItemsHost="True" />
