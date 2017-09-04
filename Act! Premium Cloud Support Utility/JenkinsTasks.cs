@@ -15,11 +15,15 @@ using System.Collections.Generic;
 
 namespace Jenkins_Tasks
 {
+    static class JenkinsInfo
+    {
+        public static List<JenkinsServer> jenkinsServerList { get; set; }
+        public static List<APCLookupType> lookupTypeList { get; set; }
+    }
+
     class JenkinsTasks
     {
         public static byte[] additionalEntropy = { 5, 8, 3, 4, 7 }; // Used to further encrypt Jenkins authentication information
-
-        public static List<JenkinsServer> jenkinsServerList = new List<JenkinsServer>();
 
         /// <summary>
         /// Secures the user's Jenkins credentials against the Windows user profile and stores them in the registry under HKCU
@@ -351,34 +355,13 @@ namespace Jenkins_Tasks
             return await getRequest.Content.ReadAsStringAsync();
         }
 
-        public static bool loadJenkinsServers()
+        public static List<JenkinsServer> getJenkinsServerList()
         {
-            // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
-            XmlDocument jenkinsServerXml = new XmlDocument();
-            try
-            {
-                string xmlString = null;
+            List<JenkinsServer> jenkinsServerList = new List<JenkinsServer>();
 
-                // Open the XML file from embedded resources
-                using (MainWindow.jenkinsServersXmlStream)
-                {
-                    using (StreamReader sr = new StreamReader(MainWindow.jenkinsServersXmlStream))
-                    {
-                        xmlString = sr.ReadToEnd();
-                    }
-                }
+            Stream jenkinsServersXmlStream = Application.Current.GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml");
+            XmlDocument jenkinsServerXml = loadXmlFromXmlStream(jenkinsServersXmlStream);
 
-                // Add the text to the Jenkins Servers XmlDocument
-                jenkinsServerXml.LoadXml(xmlString);
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("Unable to load Jenkins servers - failure in loadJenkinsServersXml().\n\n" + error.Message);
-
-                return false;
-            }
-
-            // Load the Jenkins servers
             XmlNodeList serverNodeList = jenkinsServerXml.SelectNodes("servers/server");
             foreach (XmlNode serverNode in serverNodeList)
             {
@@ -389,7 +372,51 @@ namespace Jenkins_Tasks
 
                 jenkinsServerList.Add(mew);
             }
-            return true;
+
+            return jenkinsServerList;
+        }
+
+        public static List<APCLookupType> buildAPCLookupTypeList()
+        {
+            List <APCLookupType> lookupTypeList = new List<APCLookupType>();
+
+            lookupTypeList.Add(new APCLookupType { internalName = "ZuoraAccount", friendlyName = "Account Number" });
+            lookupTypeList.Add(new APCLookupType { internalName = "EmailAddress", friendlyName = "Email Address" });
+            lookupTypeList.Add(new APCLookupType { internalName = "SiteName", friendlyName = "Site Name" });
+            lookupTypeList.Add(new APCLookupType { internalName = "ZuoraSubscription", friendlyName = "Subscription Number" });
+            lookupTypeList.Add(new APCLookupType { internalName = "IITID", friendlyName = "IITID" });
+
+            return lookupTypeList;
+        }
+
+        public static XmlDocument loadXmlFromXmlStream(Stream xmlStream)
+        {
+            // Loads the Jenkins Server XML from embedded resources. Later update will also store this locally and check a server for an updated version.
+            XmlDocument jenkinsServerXml = new XmlDocument();
+            try
+            {
+                string xmlString = null;
+
+                // Open the XML file from embedded resources
+                using (xmlStream)
+                {
+                    using (StreamReader sr = new StreamReader(xmlStream))
+                    {
+                        xmlString = sr.ReadToEnd();
+                    }
+                }
+
+                // Add the text to the Jenkins Servers XmlDocument
+                jenkinsServerXml.LoadXml(xmlString);
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show("Unable to load Jenkins servers - failure when loading XML document from XML Stream.\n\n" + error.Message);
+
+                return null;
+            }
+
+            return jenkinsServerXml;
         }
 
         public async Task<bool> FindAccount(string lookupType, string lookupValue, JenkinsServer server)
@@ -801,7 +828,6 @@ namespace Jenkins_Tasks
     public class APCAccount
     {
         public APCAccountLookupStatus lookupStatus { get; set; }
-        public APCAccountLookupBy lookupBy { get; set; }
         public APCAccountSelectedTab selectedTab { get; set; }
         public string iitid { get; set; }
         public string accountName { get; set; }
@@ -819,10 +845,13 @@ namespace Jenkins_Tasks
         public string zuoraAccount { get; set; }
         public string deleteStatus { get; set; }
         public string accountType { get; set; }
+        public string lookupValue { get; set; }
         public int timeoutValue { get; set; }
         public List<APCDatabase> databases = new List<APCDatabase>();
+        public APCLookupType lookupType { get; set; }
         public DateTime lookupTime { get; set; }
         public DateTime lookupCreateTime { get; set; }
+        public JenkinsServer jenkinsServer { get; set; }
 
         // Add function here to return XML node representation of APCAccount - is this better than having it separate?
     }
@@ -841,21 +870,19 @@ namespace Jenkins_Tasks
         public string lastLogin { get; set; }
     }
 
+    public class APCLookupType
+    {
+        public string internalName { get; set; }
+        public string friendlyName { get; set; }
+    }
+
     public enum APCAccountLookupStatus
     {
         NotStarted,
+        InProgress,
         Successful,
         NotFound,
         Failed
-    };
-
-    public enum APCAccountLookupBy
-    {
-        AccountNumber,
-        EmailAddress,
-        SiteName,
-        SubscriptionNumber,
-        IITID
     };
 
     public enum APCAccountSelectedTab

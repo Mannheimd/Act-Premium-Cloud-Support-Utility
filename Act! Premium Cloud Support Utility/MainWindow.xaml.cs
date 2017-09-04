@@ -18,19 +18,18 @@ namespace Act__Premium_Cloud_Support_Utility
 {
     public partial class MainWindow : Window
     {
-        public static Stream jenkinsServersXmlStream = null;
         public static ObservableCollection<APCAccount> LookupResults = new ObservableCollection<APCAccount>();
 
         public MainWindow()
         {
+            JenkinsInfo.jenkinsServerList = JenkinsTasks.getJenkinsServerList();
+            JenkinsInfo.lookupTypeList = JenkinsTasks.buildAPCLookupTypeList();
+
             InitializeComponent();
+
             LookupListPane_Lookups_ListBox.ItemsSource = LookupResults;
             CollectionView LookupListDisplayOrder = (CollectionView)CollectionViewSource.GetDefaultView(LookupListPane_Lookups_ListBox.ItemsSource);
             LookupListDisplayOrder.SortDescriptions.Add(new SortDescription("lookupCreateTime", ListSortDirection.Descending));
-
-            jenkinsServersXmlStream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml");
-
-            JenkinsTasks.loadJenkinsServers();
         }
 
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
@@ -206,6 +205,9 @@ namespace Act__Premium_Cloud_Support_Utility
                 if (SelectedAccount.lookupStatus == APCAccountLookupStatus.NotStarted)
                     return "New Lookup";
 
+                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.InProgress)
+                    return "Lookup Running";
+
                 if (SelectedAccount.lookupStatus == APCAccountLookupStatus.Successful)
                     return SelectedAccount.accountName;
 
@@ -321,6 +323,19 @@ namespace Act__Premium_Cloud_Support_Utility
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
             throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class EnumToValues_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Enum.GetNames(value.GetType());
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

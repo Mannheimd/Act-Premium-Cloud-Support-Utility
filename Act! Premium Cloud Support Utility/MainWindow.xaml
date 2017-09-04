@@ -4,9 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
+        xmlns:jenkinsTasks="clr-namespace:Jenkins_Tasks"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-        xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
         mc:Ignorable="d"
         Title="APC Support Utility - Beta v0.1.2" Height="736" Width="950" MinHeight="250" MinWidth="868">
     <Window.Resources>
@@ -20,26 +19,32 @@
         <local:LookupListAccountName_Converter x:Key="LookupListAccountNameConverter"/>
         <local:LookupResultSelectedTab_Converter x:Key="LookupResultSelectedTabConverter"/>
         <local:BooleanToVisibility_Converter x:Key="BooleanToVisibilityConverter"/>
+        <local:EnumToValues_Converter x:Key="EnumToValuesConverter"/>
 
         <!-- Colours -->
-        <SolidColorBrush Color="#CDCDC8" x:Key="lightFontColour"/>
-        <SolidColorBrush Color="#374650" x:Key="darkFontColour"/>
+        <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
+        <SolidColorBrush Color="#374650" x:Key="darkBlue"/>
+        <SolidColorBrush Color="#328CC3" x:Key="mediumBlue"/>
+        <SolidColorBrush Color="#0AB4DC" x:Key="lightBlue"/>
+        <SolidColorBrush Color="#78786E" x:Key="darkGray"/>
+        <SolidColorBrush Color="#939389" x:Key="mediumGray"/>
+        <SolidColorBrush Color="#CDCDC8" x:Key="lightGray"/>
 
         <!-- Text -->
         <Style TargetType="{x:Type Control}" x:Key="smallFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="normalFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="largeFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
-            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type Label}" BasedOn="{StaticResource normalFont}"/>
@@ -104,7 +109,7 @@
         <Style TargetType="{x:Type Control}" x:Key="listBoxItemHorizonal">
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -159,7 +164,7 @@
         <Style TargetType="{x:Type Button}" x:Key="lightButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="{StaticResource lightFontColour}"/>
+            <Setter Property="Foreground" Value="{StaticResource lightGray}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -174,14 +179,14 @@
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Foreground" Value="#939389"/>
+                    <Setter Property="Foreground" Value="{StaticResource mediumGray}"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type Button}" x:Key="darkButton">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="{StaticResource darkFontColour}"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -201,13 +206,17 @@
             </Style.Triggers>
         </Style>
     </Window.Resources>
+    
+    <!-- Lookup window -->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250" />
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        
+        <!-- "My Lookups" pane on the left -->
         <Grid x:Name="LookupListPane" Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#374650">
-            <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="{StaticResource lightFontColour}"/>
+            <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="{StaticResource lightGray}"/>
             <Button x:Name="LookupListPane_NewLookup_Button"
                     Content="{iconPacks:PackIconMaterialLight Plus, Height=20, Width=20}"
                     Height="22" Width="22" Margin="0,16,16,0"
@@ -233,12 +242,16 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <Grid x:Name="NoLookupSelectedPane" Grid.Column="1" Margin="0,0,0,0"
+        
+        <!-- Blank pane showing "No account selected", displays when no lookup is selected -->
+        <Grid Grid.Column="1" Margin="0,0,0,0"
               Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}, ConverterParameter=Reverse}">
             <Label Content="No account selected" Style="{StaticResource largeFont}"
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
-        <Grid x:Name="LookupResultsPane" Grid.Column="1" Margin="0,0,0,0"
+        
+        <!-- Displays lookup results when lookup is selected -->
+        <Grid Grid.Column="1" Margin="0,0,0,0"
               Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}}"
               DataContext="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem}">
             <Grid.RowDefinitions>
@@ -246,10 +259,55 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
-            <Grid x:Name="LookupResultsNewLookupPane" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+            
+            <!-- Perform lookup, displays when selected lookup is not successful -->
+            <Grid x:Name="LookupResultsNewLookupPane" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,15,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
-                <Label Content="NewLookup"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Margin="0,5,0,0" Grid.Row="0">
+                    <ListBox Margin="0,0,0,0"
+                             BorderThickness="1" BorderBrush="{StaticResource lightGray}"
+                             HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                             Width="500"
+                             ItemsSource="{Binding Source={x:Static jenkinsTasks:JenkinsInfo.jenkinsServerList}}"
+                             SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.jenkinsServer}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding name}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+                <Grid Margin="0,5,0,0" Grid.Row="1">
+                    <ListBox Margin="0,0,0,0"
+                             BorderThickness="1" BorderBrush="{StaticResource lightGray}"
+                             HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                             Width="500"
+                             ItemsSource="{Binding Source={x:Static jenkinsTasks:JenkinsInfo.lookupTypeList}}"
+                             SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupType}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding friendlyName}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+                <Grid Margin="0,5,0,0" Grid.Row="2">
+                    <TextBox VerticalAlignment="Top" HorizontalAlignment="Left"
+                             Width="500"
+                             Style="{StaticResource normalFont}" Text="{Binding lookupValue}"/>
+                </Grid>
             </Grid>
+            
+            <!-- Shows basic account info, displays when successful lookup is selected -->
             <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <Grid.ColumnDefinitions>
@@ -296,18 +354,26 @@
                     </Hyperlink>
                 </Label>
             </Grid>
+
+            <!-- Shows list of databases, displays when screen selecter has "Databases" selected -->
             <Grid x:Name="LookupResultsDatabasesPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDatabaseButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Databases"/>
             </Grid>
+
+            <!-- Shows detailed information on account, displays when screen selecter has "Details" selected -->
             <Grid x:Name="LookupResultsDetailsPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDetailsButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Details"/>
             </Grid>
+
+            <!-- Shows the provisioning log from a lookup, displays when screen selecter has "Activity" selected -->
             <Grid x:Name="LookupResultsActivityPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Activities"/>
             </Grid>
+            
+            <!-- Screen selecter for account information -->
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
