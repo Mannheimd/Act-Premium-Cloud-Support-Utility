@@ -69,14 +69,27 @@ namespace Act__Premium_Cloud_Support_Utility
         private void LookupListPane_NewLookup_Click(object sender, RoutedEventArgs e)
         {
             APCAccount account = new APCAccount();
-            account.lookupCreateTime = DateTime.Now;
+            account.LookupCreateTime = DateTime.Now;
             LookupResults.Add(account);
+            LookupListPane_Lookups_ListBox.SelectedIndex = 0;
         }
 
         private void LookupListPane_RemoveLookup_Click(object sender, RoutedEventArgs e)
         {
             APCAccount Account = (APCAccount)(sender as Button).DataContext;
             LookupResults.Remove(Account);
+        }
+
+        private async void NewLookupPane_LookupButton_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount account = (APCAccount)(sender as Button).DataContext;
+            if (account.JenkinsServer != null
+                && account.LookupType != null
+                && account.LookupValue != null
+                && account.LookupValue.Trim() != "")
+            {
+                await JenkinsTasks.RunAPCAccountLookup(account);
+            }
         }
     }
 
@@ -145,6 +158,34 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    public class AccountLookupStatus_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && value.ToString() == APCAccountLookupStatus.Successful.ToString())
+                return "Lookup Complete";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.NotStarted.ToString())
+                return "";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.NotFound.ToString())
+                return "Account not found";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.InProgress.ToString())
+                return "Locating account...";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.Failed.ToString())
+                return "Lookup failed";
+
+            return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class AccountType_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -199,25 +240,11 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value != null)
+            if (value != null && value is string)
             {
-                APCAccount SelectedAccount = (value as APCAccount);
-                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.NotStarted)
-                    return "New Lookup";
-
-                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.InProgress)
-                    return "Lookup Running";
-
-                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.Successful)
-                    return SelectedAccount.accountName;
-
-                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.NotFound)
-                    return "Account Not found";
-
-                if (SelectedAccount.lookupStatus == APCAccountLookupStatus.Failed)
-                    return "Lookup Failed";
+                return value;
             }
-            return "";
+            return "New Lookup";
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
@@ -323,19 +350,6 @@ namespace Act__Premium_Cloud_Support_Utility
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
             throw new Exception("This method is not implemented.");
-        }
-    }
-
-    public class EnumToValues_Converter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return Enum.GetNames(value.GetType());
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
         }
     }
 }

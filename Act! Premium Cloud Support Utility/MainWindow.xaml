@@ -16,10 +16,10 @@
         <local:AccountTrialOrPaid_Converter x:Key="AccountTrialOrPaidConverter"/>
         <local:AccountStatus_Converter x:Key="AccountStatusConverter"/>
         <local:AccountLookupSuccess_Converter x:Key="AccountLookupSuccessConverter"/>
+        <local:AccountLookupStatus_Converter x:Key="AccountLookupStatusConverter"/>
         <local:LookupListAccountName_Converter x:Key="LookupListAccountNameConverter"/>
         <local:LookupResultSelectedTab_Converter x:Key="LookupResultSelectedTabConverter"/>
         <local:BooleanToVisibility_Converter x:Key="BooleanToVisibilityConverter"/>
-        <local:EnumToValues_Converter x:Key="EnumToValuesConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
@@ -29,6 +29,8 @@
         <SolidColorBrush Color="#78786E" x:Key="darkGray"/>
         <SolidColorBrush Color="#939389" x:Key="mediumGray"/>
         <SolidColorBrush Color="#CDCDC8" x:Key="lightGray"/>
+        <SolidColorBrush Color="#00E4AB" x:Key="green"/>
+        <SolidColorBrush Color="#E6004B" x:Key="red"/>
 
         <!-- Text -->
         <Style TargetType="{x:Type Control}" x:Key="smallFont">
@@ -205,6 +207,32 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style TargetType="{x:Type Button}" x:Key="darkButtonBordered">
+            <Setter Property="Background" Value="Transparent"/>
+            <!--<Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource lightGray}"/>-->
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource lightGray}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource lightBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     
     <!-- Lookup window -->
@@ -235,8 +263,8 @@
                                     Style="{StaticResource darkButton}"
                                     Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsMouseOver, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Click="LookupListPane_RemoveLookup_Click"/>
-                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Converter={StaticResource LookupListAccountNameConverter}}"/>
-                            <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding lookupTime}"/>
+                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding AccountName, Converter={StaticResource LookupListAccountNameConverter}}"/>
+                            <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding LookupTime}"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -262,19 +290,23 @@
             
             <!-- Perform lookup, displays when selected lookup is not successful -->
             <Grid x:Name="LookupResultsNewLookupPane" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,15,0"
-                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Grid Margin="0,5,0,0" Grid.Row="0">
-                    <ListBox Margin="0,0,0,0"
+                    <Label Style="{StaticResource normalFont}" Content="Region"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <ListBox Margin="0,30,0,0"
                              BorderThickness="1" BorderBrush="{StaticResource lightGray}"
                              HorizontalAlignment="Left" VerticalAlignment="Stretch"
                              Width="500"
                              ItemsSource="{Binding Source={x:Static jenkinsTasks:JenkinsInfo.jenkinsServerList}}"
-                             SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.jenkinsServer}">
+                             SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.JenkinsServer}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -285,12 +317,14 @@
                     </ListBox>
                 </Grid>
                 <Grid Margin="0,5,0,0" Grid.Row="1">
-                    <ListBox Margin="0,0,0,0"
+                    <Label Style="{StaticResource normalFont}" Content="Lookup By"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <ListBox Margin="0,30,0,0"
                              BorderThickness="1" BorderBrush="{StaticResource lightGray}"
                              HorizontalAlignment="Left" VerticalAlignment="Stretch"
                              Width="500"
                              ItemsSource="{Binding Source={x:Static jenkinsTasks:JenkinsInfo.lookupTypeList}}"
-                             SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupType}">
+                             SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupType}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -301,15 +335,29 @@
                     </ListBox>
                 </Grid>
                 <Grid Margin="0,5,0,0" Grid.Row="2">
+                    <Label Style="{StaticResource normalFont}" Content="Lookup Value"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     <TextBox VerticalAlignment="Top" HorizontalAlignment="Left"
+                             Margin="0,30,0,0"
+                             BorderBrush="{StaticResource lightGray}"
                              Width="500"
-                             Style="{StaticResource normalFont}" Text="{Binding lookupValue}"/>
+                             Style="{StaticResource normalFont}" Text="{Binding LookupValue}"/>
+                </Grid>
+                <Grid Margin="0,20.5,0,0" Grid.Row="3">
+                    <Button Style="{StaticResource darkButtonBordered}" Content="Lookup"
+                            Width="500"
+                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Click="NewLookupPane_LookupButton_Click"/>
+                </Grid>
+                <Grid Margin="0,5,0,0" Grid.Row="4">
+                    <Label Style="{StaticResource normalFont}" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupStatusConverter}}"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
                 </Grid>
             </Grid>
             
             <!-- Shows basic account info, displays when successful lookup is selected -->
             <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
-                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
@@ -325,32 +373,32 @@
                 <Label Style="{StaticResource largeFont}"
                        Grid.Column="0" Grid.Row="0"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountName}"/>
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="1" Grid.Row="0"
                        Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountNumber}"/>
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountNumber}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="0" Grid.Row="1"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountType, Converter={StaticResource AccountTypeConverter}}"/>
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountType, Converter={StaticResource AccountTypeConverter}}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="1" Grid.Row="1"
                        Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.accountEmail}"/>
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountEmail}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="0" Grid.Row="3"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.trialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TrialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="0" Grid.Row="4"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.suspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.archiveStatus|DataContext.deleteStatus}"/>
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SuspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.ArchiveStatus|DataContext.DeleteStatus}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="0" Grid.Row="5"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                    <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.loginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
-                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.loginUrl}"/>
+                    <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}"/>
                     </Hyperlink>
                 </Label>
             </Grid>
@@ -375,9 +423,9 @@
             
             <!-- Screen selecter for account information -->
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
-                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.lookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                         SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.selectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}">
+                         SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SelectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel IsItemsHost="True" />

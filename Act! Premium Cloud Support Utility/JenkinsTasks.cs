@@ -12,6 +12,7 @@ using System.Net.Http.Headers;
 using System.IO;
 using Act__Premium_Cloud_Support_Utility;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Jenkins_Tasks
 {
@@ -270,7 +271,6 @@ namespace Jenkins_Tasks
                 {
                     if (failCount > 30)
                     {
-                        MessageBox.Show("Looks like a problem occurred. Please try running your request again. If the problem persists, please report it through your usual channels.");
                         break;
                     }
 
@@ -321,7 +321,6 @@ namespace Jenkins_Tasks
                         }
                         else if (building.InnerXml == "false" & result.InnerXml != "SUCCESS")
                         {
-                            MessageBox.Show("Looks like a problem occurred. Please try running your lookup again. If the problem persists, please report it through your usual channels."); //Update with better error handling
                             break;
                         }
                     }
@@ -341,8 +340,6 @@ namespace Jenkins_Tasks
             }
             else
             {
-                MessageBox.Show("Build creation failed with reason: " + postBuildRequest.ReasonPhrase);
-
                 return null;
             }
         }
@@ -419,71 +416,77 @@ namespace Jenkins_Tasks
             return jenkinsServerXml;
         }
 
-        public async Task<bool> FindAccount(string lookupType, string lookupValue, JenkinsServer server)
+        public static async Task RunAPCAccountLookup(APCAccount account)
         {
-            APCAccount lookupAccount = new APCAccount();
+            account.LookupStatus = APCAccountLookupStatus.InProgress;
 
             // Post a request to build LookupCustomer and wait for a response
-            string lookupCustomerOutput = await runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
-                + lookupType
-                + "&LookupValue="
-                + lookupValue
-                + "&delay=0sec");
+            string lookupCustomerOutput = null;
+            try
+            {
+                lookupCustomerOutput = await runJenkinsBuild(account.JenkinsServer, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
+                    + account.LookupType.internalName
+                    + "&LookupValue="
+                    + account.LookupValue.Trim()
+                    + "&delay=0sec");
+            }
+            catch
+            {
+                account.LookupStatus = APCAccountLookupStatus.Failed;
+            }
 
             // Check that the output is valid
-            if (SearchString(lookupCustomerOutput, "Searching " + lookupType + " for ", "...") != lookupValue)
+            if (SearchString(lookupCustomerOutput, "Searching " + account.LookupType.internalName + " for ", "...") != account.LookupValue.Trim())
             {
-                lookupAccount.lookupStatus = APCAccountLookupStatus.Failed;
+                account.LookupStatus = APCAccountLookupStatus.Failed;
 
-                return false; ;
+                return;
             }
 
             // Check if customer couldn't be found
             if (lookupCustomerOutput.Contains("Unable to find customer by"))
             {
-                lookupAccount.lookupStatus = APCAccountLookupStatus.NotFound;
+                account.LookupStatus = APCAccountLookupStatus.NotFound;
 
-                return false; ;
+                return;
             }
-
-            // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-            lookupAccount.iitid = SearchString(lookupCustomerOutput, "IITID: ", @"
+            
+            // Pulling strings out of output (lines end with return, null value doesn't do the trick. Stupid humans.)
+            account.IITID = SearchString(lookupCustomerOutput, "IITID: ", @"
 ");
-            lookupAccount.accountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
+            account.AccountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
 ");
-            lookupAccount.email = SearchString(lookupCustomerOutput, "Email: ", @"
+            account.Email = SearchString(lookupCustomerOutput, "Email: ", @"
 ");
-            lookupAccount.createDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
+            account.CreateDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
 ");
-            lookupAccount.trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
+            account.TrialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
 ");
-            lookupAccount.serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
+            account.SerialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
 ");
-            lookupAccount.seatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
+            account.SeatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
 ");
-            lookupAccount.suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
+            account.SuspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
 ");
-            lookupAccount.archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
+            account.ArchiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
 ");
-            lookupAccount.siteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
+            account.SiteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
 ");
-            lookupAccount.iisServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
+            account.IISServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
 ");
-            lookupAccount.loginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
+            account.LoginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
 ");
-            lookupAccount.uploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
+            account.UploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
 ");
-            lookupAccount.zuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
+            account.ZuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
 ");
-            lookupAccount.deleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
+            account.DeleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
 ");
 
             // Get a list of databases from the output
-            lookupAccount.databases = ParseForDatabases(lookupCustomerOutput);
+            account.Databases = ParseForDatabases(lookupCustomerOutput);
 
-            lookupAccount.lookupStatus = APCAccountLookupStatus.Successful;
-
-            return true;
+            account.LookupStatus = APCAccountLookupStatus.Successful;
         }
 
         public async Task<bool> unlockDatabase(string databaseName, string sqlServer, JenkinsServer server)
@@ -621,9 +624,9 @@ namespace Jenkins_Tasks
             if (UnsecureJenkinsCreds(server.id) != null)
             {
                 string output = await runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
-                    + account.siteName
+                    + account.SiteName
                     + "&IISServer="
-                    + account.iisServer
+                    + account.IISServer
                     + "&delay=0sec");
 
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
@@ -633,9 +636,9 @@ namespace Jenkins_Tasks
                 string outputCurrentTimeout = SearchString(output, "Current Timeout: ", @"
 ");
 
-                if (outputSiteName == account.siteName && outputIISServer == account.iisServer)
+                if (outputSiteName == account.SiteName && outputIISServer == account.IISServer)
                 {
-                    account.timeoutValue = Convert.ToInt32(outputCurrentTimeout);
+                    account.TimeoutValue = Convert.ToInt32(outputCurrentTimeout);
 
                     return true;
                 }
@@ -666,9 +669,9 @@ namespace Jenkins_Tasks
                 if (UnsecureJenkinsCreds(server.id) != null)
                 {
                     string output = await runJenkinsBuild(server, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
-                        + account.siteName
+                        + account.SiteName
                         + "&IISServer="
-                        + account.iisServer
+                        + account.IISServer
                         + "&Timeout="
                         + newValue
                         + "&delay=0sec");
@@ -680,7 +683,7 @@ namespace Jenkins_Tasks
                     string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
  ");
 
-                    if (outputSiteName == account.siteName && outputIISServer == account.iisServer && outputTimeout == newValue)
+                    if (outputSiteName == account.SiteName && outputIISServer == account.IISServer && outputTimeout == newValue)
                     {
                         return true;
                     }
@@ -731,7 +734,7 @@ namespace Jenkins_Tasks
             }
         }
 
-        private string SearchString(string mainText, string startString, string endString)
+        public static string SearchString(string mainText, string startString, string endString)
         {
             try
             {
@@ -744,7 +747,7 @@ namespace Jenkins_Tasks
             }
         }
 
-        private List<APCDatabase> ParseForDatabases(string mainText)
+        public static List<APCDatabase> ParseForDatabases(string mainText)
         {
             string workingText = mainText;
             List<APCDatabase> list = new List<APCDatabase>();
@@ -773,7 +776,7 @@ namespace Jenkins_Tasks
             return list;
         }
 
-        private List<APCDatabaseUser> ParseForDatabaseUsers(string mainText)
+        public static List<APCDatabaseUser> ParseForDatabaseUsers(string mainText)
         {
             string workingText = mainText;
             List<APCDatabaseUser> list = new List<APCDatabaseUser>();
@@ -825,33 +828,201 @@ namespace Jenkins_Tasks
         public string name { get; set; }
     }
 
-    public class APCAccount
+    public class APCAccount : INotifyPropertyChanged
     {
-        public APCAccountLookupStatus lookupStatus { get; set; }
-        public APCAccountSelectedTab selectedTab { get; set; }
-        public string iitid { get; set; }
-        public string accountName { get; set; }
-        public string email { get; set; }
-        public string createDate { get; set; }
-        public string trialOrPaid { get; set; }
-        public string serialNumber { get; set; }
-        public string seatCount { get; set; }
-        public string suspendStatus { get; set; }
-        public string archiveStatus { get; set; }
-        public string siteName { get; set; }
-        public string iisServer { get; set; }
-        public string loginUrl { get; set; }
-        public string uploadUrl { get; set; }
-        public string zuoraAccount { get; set; }
-        public string deleteStatus { get; set; }
-        public string accountType { get; set; }
-        public string lookupValue { get; set; }
-        public int timeoutValue { get; set; }
-        public List<APCDatabase> databases = new List<APCDatabase>();
-        public APCLookupType lookupType { get; set; }
-        public DateTime lookupTime { get; set; }
-        public DateTime lookupCreateTime { get; set; }
-        public JenkinsServer jenkinsServer { get; set; }
+        private APCAccountLookupStatus _lookupStatus;
+        private APCAccountSelectedTab _selectedTab;
+        private string _iitid;
+        private string _accountName;
+        private string _email;
+        private string _createDate;
+        private string _trialOrPaid;
+        private string _serialNumber;
+        private string _seatCount;
+        private string _suspendStatus;
+        private string _archiveStatus;
+        private string _siteName;
+        private string _iisServer;
+        private string _loginUrl;
+        private string _uploadUrl;
+        private string _zuoraAccount;
+        private string _deleteStatus;
+        private string _accountType;
+        private string _lookupValue;
+        private int _timeoutValue;
+        private List<APCDatabase> _databases;
+        private APCLookupType _lookupType;
+        private DateTime _lookupTime;
+        private DateTime _lookupCreateTime;
+        private JenkinsServer _jenkinsServer;
+
+        public APCAccountLookupStatus LookupStatus
+        {
+            get { return _lookupStatus; }
+            set { SetPropertyField("LookupStatus", ref _lookupStatus, value); }
+        }
+        
+        public APCAccountSelectedTab SelectedTab
+        {
+            get { return _selectedTab; }
+            set { SetPropertyField("SelectedTab", ref _selectedTab, value); }
+        }
+        
+        public string IITID
+        {
+            get { return _iitid; }
+            set { SetPropertyField("IITID", ref _iitid, value); }
+        }
+
+        public string AccountName
+        {
+            get { return _accountName; }
+            set { SetPropertyField("AccountName", ref _accountName, value); }
+        }
+
+        public string Email
+        {
+            get { return _email; }
+            set { SetPropertyField("Email", ref _email, value); }
+        }
+
+        public string CreateDate
+        {
+            get { return _createDate; }
+            set { SetPropertyField("CreateDate", ref _createDate, value); }
+        }
+
+        public string TrialOrPaid
+        {
+            get { return _trialOrPaid; }
+            set { SetPropertyField("TrialOrPaid", ref _trialOrPaid, value); }
+        }
+
+        public string SerialNumber
+        {
+            get { return _serialNumber; }
+            set { SetPropertyField("SerialNumber", ref _serialNumber, value); }
+        }
+
+        public string SeatCount
+        {
+            get { return _seatCount; }
+            set { SetPropertyField("SeatCount", ref _seatCount, value); }
+        }
+
+        public string SuspendStatus
+        {
+            get { return _suspendStatus; }
+            set { SetPropertyField("SuspendStatus", ref _suspendStatus, value); }
+        }
+
+        public string ArchiveStatus
+        {
+            get { return _archiveStatus; }
+            set { SetPropertyField("ArchiveStatus", ref _archiveStatus, value); }
+        }
+
+        public string SiteName
+        {
+            get { return _siteName; }
+            set { SetPropertyField("SiteName", ref _siteName, value); }
+        }
+
+        public string IISServer
+        {
+            get { return _iisServer; }
+            set { SetPropertyField("IISServer", ref _iisServer, value); }
+        }
+
+        public string LoginUrl
+        {
+            get { return _loginUrl; }
+            set { SetPropertyField("LoginUrl", ref _loginUrl, value); }
+        }
+
+        public string UploadUrl
+        {
+            get { return _uploadUrl; }
+            set { SetPropertyField("UploadUrl", ref _uploadUrl, value); }
+        }
+
+        public string ZuoraAccount
+        {
+            get { return _zuoraAccount; }
+            set { SetPropertyField("ZuoraAccount", ref _zuoraAccount, value); }
+        }
+
+        public string DeleteStatus
+        {
+            get { return _deleteStatus; }
+            set { SetPropertyField("DeleteStatus", ref _deleteStatus, value); }
+        }
+
+        public string AccountType
+        {
+            get { return _accountType; }
+            set { SetPropertyField("AccountType", ref _accountType, value); }
+        }
+
+        public string LookupValue
+        {
+            get { return _lookupValue; }
+            set { SetPropertyField("LookupValue", ref _lookupValue, value); }
+        }
+
+        public int TimeoutValue
+        {
+            get { return _timeoutValue; }
+            set { SetPropertyField("TimeoutValue", ref _timeoutValue, value); }
+        }
+
+        public List<APCDatabase> Databases
+        {
+            get { return _databases; }
+            set { SetPropertyField("Databases", ref _databases, value); }
+        }
+
+        public APCLookupType LookupType
+        {
+            get { return _lookupType; }
+            set { SetPropertyField("LookupType", ref _lookupType, value); }
+        }
+
+        public DateTime LookupTime
+        {
+            get { return _lookupTime; }
+            set { SetPropertyField("LookupTime", ref _lookupTime, value); }
+        }
+
+        public DateTime LookupCreateTime
+        {
+            get { return _lookupCreateTime; }
+            set { SetPropertyField("LookupCreateTime", ref _lookupCreateTime, value); }
+        }
+
+        public JenkinsServer JenkinsServer
+        {
+            get { return _jenkinsServer; }
+            set { SetPropertyField("JenkinsServer", ref _jenkinsServer, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
 
         // Add function here to return XML node representation of APCAccount - is this better than having it separate?
     }
