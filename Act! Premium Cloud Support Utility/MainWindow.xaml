@@ -20,6 +20,7 @@
         <local:LookupListAccountName_Converter x:Key="LookupListAccountNameConverter"/>
         <local:LookupResultSelectedTab_Converter x:Key="LookupResultSelectedTabConverter"/>
         <local:BooleanToVisibility_Converter x:Key="BooleanToVisibilityConverter"/>
+        <local:AccountTimeout_Converter x:Key="AccountTimeoutConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
@@ -278,7 +279,7 @@
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         
-        <!-- Displays lookup results when lookup is selected -->
+        <!-- Displays lookup results when lookup is selected (also for running new lookup) -->
         <Grid Grid.Column="1" Margin="0,0,0,0"
               Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}}"
               DataContext="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem}">
@@ -360,12 +361,13 @@
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="20"/><!-- Just a spacer, no data should be in here -->
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
-                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="10"/><!-- Just a spacer, no data should be in here -->
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -375,17 +377,17 @@
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName}"/>
                 <Label Style="{StaticResource normalFont}"
-                       Grid.Column="1" Grid.Row="0"
-                       Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Grid.Column="2" Grid.Row="0"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountNumber}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="0" Grid.Row="1"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountType, Converter={StaticResource AccountTypeConverter}}"/>
                 <Label Style="{StaticResource normalFont}"
-                       Grid.Column="1" Grid.Row="1"
-                       Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountEmail}"/>
+                       Grid.Column="2" Grid.Row="1"
+                       Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"/>
                 <Label Style="{StaticResource normalFont}"
                        Grid.Column="0" Grid.Row="3"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
@@ -395,10 +397,10 @@
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SuspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.ArchiveStatus|DataContext.DeleteStatus}"/>
                 <Label Style="{StaticResource normalFont}"
-                       Grid.Column="0" Grid.Row="5"
+                       Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
                        Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                     <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
-                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}"/>
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl, StringFormat='Login URL: \{0\}'}"/>
                     </Hyperlink>
                 </Label>
             </Grid>
@@ -412,7 +414,14 @@
             <!-- Shows detailed information on account, displays when screen selecter has "Details" selected -->
             <Grid x:Name="LookupResultsDetailsPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDetailsButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
-                <Label Content="Details"/>
+                <StackPanel>
+                    <Label Margin="0,0,0,0">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl, StringFormat='Upload URL: \{0\}'}"/>
+                    </Label>
+                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber, StringFormat='Serial Number: \{0\}'}"/>
+                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount, StringFormat='Users: \{0\}'}"/>
+                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}, StringFormat='Inactivity Timeout: \{0\}'}"/>
+                </StackPanel>
             </Grid>
 
             <!-- Shows the provisioning log from a lookup, displays when screen selecter has "Activity" selected -->

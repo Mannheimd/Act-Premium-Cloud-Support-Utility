@@ -186,6 +186,9 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    /// <summary>
+    /// Returns friendly version of APC Account Type (Act! Premium Cloud or APC+)
+    /// </summary>
     public class AccountType_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -345,6 +348,23 @@ namespace Act__Premium_Cloud_Support_Utility
                 return currentStatus;
             }
             else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class AccountTimeout_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && value is string)
+            {
+                return (value as string) + " minutes";
+            }
+            else return "Fetching...";
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)

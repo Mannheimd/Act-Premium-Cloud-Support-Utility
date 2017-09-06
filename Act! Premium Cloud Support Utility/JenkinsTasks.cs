@@ -424,7 +424,7 @@ namespace Jenkins_Tasks
             string lookupCustomerOutput = null;
             try
             {
-                lookupCustomerOutput = await runJenkinsBuild(account.JenkinsServer, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
+                lookupCustomerOutput = await runJenkinsBuild(account.JenkinsServer, @"/job/CloudOps1-LookupCustomerMachine/buildWithParameters?LookupCustomerBy="
                     + account.LookupType.internalName
                     + "&LookupValue="
                     + account.LookupValue.Trim()
@@ -435,8 +435,11 @@ namespace Jenkins_Tasks
                 account.LookupStatus = APCAccountLookupStatus.Failed;
             }
 
+            string lookupData = SearchString(lookupCustomerOutput, "[STARTDATA]", "[ENDDATA]");
+
             // Check that the output is valid
-            if (SearchString(lookupCustomerOutput, "Searching " + account.LookupType.internalName + " for ", "...") != account.LookupValue.Trim())
+            if (SearchString(lookupData, "[LookupValue=", "]") != account.LookupValue.Trim()
+                || SearchString(lookupData, "[LookupCustomerBy=", "]") != account.LookupType.internalName)
             {
                 account.LookupStatus = APCAccountLookupStatus.Failed;
 
@@ -444,47 +447,41 @@ namespace Jenkins_Tasks
             }
 
             // Check if customer couldn't be found
-            if (lookupCustomerOutput.Contains("Unable to find customer by"))
+            if (SearchString(lookupData, "[LookupResult=", "]") == "NotFound")
             {
                 account.LookupStatus = APCAccountLookupStatus.NotFound;
 
                 return;
             }
-            
+
             // Pulling strings out of output (lines end with return, null value doesn't do the trick. Stupid humans.)
-            account.IITID = SearchString(lookupCustomerOutput, "IITID: ", @"
-");
-            account.AccountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
-");
-            account.Email = SearchString(lookupCustomerOutput, "Email: ", @"
-");
-            account.CreateDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
-");
-            account.TrialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
-");
-            account.SerialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
-");
-            account.SeatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
-");
-            account.SuspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
-");
-            account.ArchiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
-");
-            account.SiteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
-");
-            account.IISServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
-");
-            account.LoginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
-");
-            account.UploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
-");
-            account.ZuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
-");
-            account.DeleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
-");
+            account.IITID = SearchString(lookupData, "[IITID=", "]").Trim();
+            account.AccountName = SearchString(lookupData, "[AccountName=", "]").Trim();
+            account.Email = SearchString(lookupData, "[Email=", "]").Trim();
+            account.CreateDate = SearchString(lookupData, "[CreateDate=", "]").Trim();
+            account.TrialOrPaid = SearchString(lookupData, "[TrialOrPaid=", "]").Trim();
+            account.SerialNumber = SearchString(lookupData, "[SerialNumber=", "]").Trim();
+            account.SeatCount = SearchString(lookupData, "[SeatCount=", "]").Trim();
+            account.SuspendStatus = SearchString(lookupData, "[SuspendStatus=", "]").Trim();
+            account.ArchiveStatus = SearchString(lookupData, "[ArchiveStatus=", "]").Trim();
+            account.DeleteStatus = SearchString(lookupData, "[DeleteStatus=", "]").Trim();
+            account.ZuoraAccount = SearchString(lookupData, "[ZuoraAccount=", "]").Trim();
+            account.AccountType = SearchString(lookupData, "[Product=", "]").Trim();
+
+            if (SearchString(lookupData, "[SiteInfoFound=", "]") == "true")
+            {
+                string siteInfo = SearchString(lookupData, "[SITEINFOSTART]", "[SITEINFOEND]");
+                string site = SearchString(siteInfo, "[SiteInfo=", "]");
+                account.SiteName = SearchString(lookupData, "{SiteName=", "}").Trim();
+                account.IISServer = SearchString(lookupData, "{IISServer=", "}").Trim();
+                account.LoginUrl = SearchString(lookupData, "{URL=", "}").Trim();
+                account.UploadUrl = SearchString(lookupData, "{UploadURL=", "}").Trim();
+            }
 
             // Get a list of databases from the output
-            account.Databases = ParseForDatabases(lookupCustomerOutput);
+            account.Databases = ParseForDatabases(lookupData);
+
+            account.LookupTime = DateTime.Now;
 
             account.LookupStatus = APCAccountLookupStatus.Successful;
         }
