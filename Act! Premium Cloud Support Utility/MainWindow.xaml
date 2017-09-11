@@ -285,8 +285,8 @@
               DataContext="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="28"/>
             </Grid.RowDefinitions>
             
             <!-- Perform lookup, displays when selected lookup is not successful -->
@@ -406,32 +406,45 @@
             </Grid>
 
             <!-- Shows list of databases, displays when screen selecter has "Databases" selected -->
-            <Grid x:Name="LookupResultsDatabasesPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+            <Grid x:Name="LookupResultsDatabasesPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDatabaseButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Databases"/>
             </Grid>
 
             <!-- Shows detailed information on account, displays when screen selecter has "Details" selected -->
-            <Grid x:Name="LookupResultsDetailsPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+            <Grid x:Name="LookupResultsDetailsPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDetailsButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
-                <StackPanel>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0">
                     <Label Margin="0,0,0,0">
-                        <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl, StringFormat='Upload URL: \{0\}'}"/>
+                        <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl, StringFormat='Upload URL: \{0\}'}"/>
+                        </Hyperlink>
                     </Label>
                     <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber, StringFormat='Serial Number: \{0\}'}"/>
                     <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount, StringFormat='Users: \{0\}'}"/>
                     <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}, StringFormat='Inactivity Timeout: \{0\}'}"/>
+                    <Button Margin="0,0,0,0" Content="Resend welcome email" Width="100"/>
+                    <Button Margin="0,0,0,0" Content="Change inactivity timeout" Width="100"/>
+                </StackPanel>
+                <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
+                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.CreateDate, StringFormat='Create Date: \{0\}'}"/>
+                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IISServer, StringFormat='IIS Server: \{0\}'}"/>
+                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IITID, StringFormat='IITID: \{0\}'}"/>
                 </StackPanel>
             </Grid>
 
             <!-- Shows the provisioning log from a lookup, displays when screen selecter has "Activity" selected -->
-            <Grid x:Name="LookupResultsActivityPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
+            <Grid x:Name="LookupResultsActivityPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Activities"/>
             </Grid>
             
             <!-- Screen selecter for account information -->
-            <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
+            <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                          SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SelectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}">
