@@ -279,7 +279,7 @@
                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
         
-        <!-- Displays lookup results when lookup is selected (also for running new lookup) -->
+        <!-- Lookup Results -->
         <Grid Grid.Column="1" Margin="0,0,0,0"
               Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedStateConverter}}"
               DataContext="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem}">
@@ -289,7 +289,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             
-            <!-- Perform lookup, displays when selected lookup is not successful -->
+            <!-- Lookup Results: New Lookup -->
             <Grid x:Name="LookupResultsNewLookupPane" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,15,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
                 <Grid.RowDefinitions>
@@ -356,7 +356,7 @@
                 </Grid>
             </Grid>
             
-            <!-- Shows basic account info, displays when successful lookup is selected -->
+            <!-- Lookup Results: Basic Info -->
             <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <Grid.ColumnDefinitions>
@@ -405,13 +405,13 @@
                 </Label>
             </Grid>
 
-            <!-- Shows list of databases, displays when screen selecter has "Databases" selected -->
+            <!-- Lookup Results: Databases -->
             <Grid x:Name="LookupResultsDatabasesPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDatabaseButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Databases"/>
             </Grid>
 
-            <!-- Shows detailed information on account, displays when screen selecter has "Details" selected -->
+            <!-- LookupResults: Details -->
             <Grid x:Name="LookupResultsDetailsPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDetailsButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Grid.RowDefinitions>
@@ -437,13 +437,13 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Shows the provisioning log from a lookup, displays when screen selecter has "Activity" selected -->
+            <!-- Lookup Results: Activity -->
             <Grid x:Name="LookupResultsActivityPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                 <Label Content="Activities"/>
             </Grid>
             
-            <!-- Screen selecter for account information -->
+            <!-- Lookup Results: Tab Selector -->
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -453,8 +453,8 @@
                             <WrapPanel IsItemsHost="True" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
-                    <ListBoxItem x:Name="LookupResultsDatabaseButton" Content="Databases" Style="{StaticResource listBoxItemHorizonal}"/>
                     <ListBoxItem x:Name="LookupResultsDetailsButton" Content="Details" Style="{StaticResource listBoxItemHorizonal}"/>
+                    <ListBoxItem x:Name="LookupResultsDatabaseButton" Content="Databases" Style="{StaticResource listBoxItemHorizonal}"/>
                     <ListBoxItem x:Name="LookupResultsActivityButton" Content="Activity" Style="{StaticResource listBoxItemHorizonal}"/>
                 </ListBox>
             </Grid>
