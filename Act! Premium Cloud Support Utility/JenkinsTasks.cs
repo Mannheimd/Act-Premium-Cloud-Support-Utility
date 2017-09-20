@@ -1071,9 +1071,50 @@ namespace Jenkins_Tasks
 
     public class APCDatabaseUser
     {
-        public string loginName { get; set; }
-        public string role { get; set; }
-        public string lastLogin { get; set; }
+        private string _contactName;
+        private string _loginName;
+        private string _role;
+        private DateTime _lastLogin;
+        
+        public string ContactName
+        {
+            get { return _contactName; }
+            set { SetPropertyField("LookupTime", ref _contactName, value); }
+        }
+
+        public string LoginName
+        {
+            get { return _loginName; }
+            set { SetPropertyField("LookupTime", ref _loginName, value); }
+        }
+
+        public string Role
+        {
+            get { return _role; }
+            set { SetPropertyField("LookupTime", ref _role, value); }
+        }
+
+        public DateTime LastLogin
+        {
+            get { return _lastLogin; }
+            set { SetPropertyField("LookupTime", ref _lastLogin, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public class APCLookupType
