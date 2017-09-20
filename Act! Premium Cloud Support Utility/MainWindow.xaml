@@ -86,7 +86,7 @@
         <Style TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource hyperlinkStyle}"/>
 
         <!-- ListBox -->
-        <Style TargetType="{x:Type ListBox}" x:Key="listBoxStyle">
+        <Style TargetType="{x:Type ListBox}" x:Key="listBoxDarkBackgroundStyle">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="SelectionMode" Value="Single"/>
             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
@@ -95,7 +95,15 @@
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Padding" Value="0"/>
         </Style>
-        <Style TargetType="ListBox" BasedOn="{StaticResource listBoxStyle}"/>
+        <Style TargetType="{x:Type ListBox}" x:Key="listBoxLightBackgroundStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource lightGray}"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style TargetType="ListBox" BasedOn="{StaticResource listBoxLightBackgroundStyle}"/>
 
         <!-- ListBoxItem -->
         <Style TargetType="{x:Type Control}" x:Key="listBoxItem">
@@ -283,7 +291,7 @@
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Style="{StaticResource lightButton}"
                     Click="LookupListPane_NewLookup_Click"/>
-            <ListBox Margin="0,55,0,0"
+            <ListBox Margin="0,55,0,0" Style="{StaticResource listBoxDarkBackgroundStyle}"
                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                      x:Name="LookupListPane_Lookups_ListBox"
                      ItemsSource="{Binding Path=LookupResults}">
@@ -440,7 +448,30 @@
             <!-- Lookup Results: Databases -->
             <Grid x:Name="LookupResultsDatabasesPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsDatabaseButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
-                <Label Content="Databases"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Database list -->
+                <Grid Grid.Column="0">
+                    <ListBox Margin="0,0,0,10" Width="300" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Name}"/>
+                                    <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding Server}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+                
+                <!-- Users List -->
+                <Grid Grid.Column="1"></Grid>
+                
+                <!-- Backups List -->
+                <Grid Grid.Column="1" Visibility="Hidden"></Grid>
             </Grid>
 
             <!-- LookupResults: Details -->
@@ -498,7 +529,8 @@
             <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10,0,0"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
                 <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                         SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SelectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}">
+                         SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SelectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}"
+                         BorderBrush="Transparent" BorderThickness="0">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel IsItemsHost="True" />
