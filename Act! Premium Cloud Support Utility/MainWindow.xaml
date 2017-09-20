@@ -49,10 +49,36 @@
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockStyle">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockHyperlinkStyle">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource lightBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type Hyperlink}" x:Key="hyperlinkStyle">
+            <Setter Property="TextBlock.TextDecorations"  Value="{x:Null}"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource lightBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type Label}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource normalFont}"/>
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource textBlockStyle}"/>
+        <Style TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource hyperlinkStyle}"/>
 
         <!-- ListBox -->
         <Style TargetType="{x:Type ListBox}" x:Key="listBoxStyle">
@@ -419,21 +445,40 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0">
-                    <Label Margin="0,0,0,0">
+                    <TextBlock Margin="5,5,0,0">
+                        Upload URL: 
                         <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
-                            <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl, StringFormat='Upload URL: \{0\}'}"/>
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
                         </Hyperlink>
-                    </Label>
-                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber, StringFormat='Serial Number: \{0\}'}"/>
-                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount, StringFormat='Users: \{0\}'}"/>
-                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}, StringFormat='Inactivity Timeout: \{0\}'}"/>
+                    </TextBlock>
+                    <TextBlock Margin="5,5,0,0">
+                        Serial Number: 
+                        <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber}"/>
+                    </TextBlock>
+                    <TextBlock Margin="5,5,0,0">
+                        Users: 
+                        <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount}"/>
+                    </TextBlock>
+                    <TextBlock Margin="5,5,0,0">
+                        Inactivity Timeout: 
+                        <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
+                    </TextBlock>
                     <Button Margin="0,0,0,0" Content="Resend welcome email" Width="100"/>
                     <Button Margin="0,0,0,0" Content="Change inactivity timeout" Width="100"/>
                 </StackPanel>
                 <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
-                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.CreateDate, StringFormat='Create Date: \{0\}'}"/>
-                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IISServer, StringFormat='IIS Server: \{0\}'}"/>
-                    <Label Margin="0,0,0,0" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IITID, StringFormat='IITID: \{0\}'}"/>
+                    <TextBlock Margin="5,5,0,0">
+                        Create Date:
+                        <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.CreateDate}"/>
+                    </TextBlock>
+                    <TextBlock Margin="5,5,0,0">
+                        IIS Server: 
+                        <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IISServer}"/>
+                    </TextBlock>
+                    <TextBlock Margin="5,5,0,0">
+                        IITID: 
+                        <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IITID}"/>
+                    </TextBlock>
                 </StackPanel>
             </Grid>
 
