@@ -91,6 +91,12 @@ namespace Act__Premium_Cloud_Support_Utility
                 await JenkinsTasks.RunAPCAccountLookup(account);
             }
         }
+
+        private void LookupResults_DatabaseList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            APCDatabase Database = (APCDatabase)(sender as ListBoxItem).DataContext;
+            // This will auto populate ready for list of users
+        }
     }
 
     public class ListBoxSelectedState_Converter : IValueConverter

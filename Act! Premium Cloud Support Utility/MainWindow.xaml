@@ -455,7 +455,8 @@
                 
                 <!-- Database list -->
                 <Grid Grid.Column="0">
-                    <ListBox Margin="0,0,0,10" Width="300" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}">
+                    <ListBox Margin="0,0,0,10" Width="300" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}"
+                             SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
