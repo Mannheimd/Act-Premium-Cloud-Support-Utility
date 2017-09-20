@@ -521,23 +521,23 @@ namespace Jenkins_Tasks
         public async Task<bool> getDatabaseUsers(APCDatabase database, JenkinsServer server)
         {
             // Clear the current database user list
-            database.users.Clear();
+            database.Users.Clear();
 
             // Post a request to build LookupCustomer and wait for a response
             if (UnsecureJenkinsCreds(server.id) != null)
             {
                 string output = await runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
-                    + database.server
+                    + database.Server
                     + "&DatabaseName="
-                    + database.name
+                    + database.Name
                     + "&delay=0sec");
 
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
 
-                if (outputDatabaseName.ToLower() == database.name.ToLower())
+                if (outputDatabaseName.ToLower() == database.Name.ToLower())
                 {
-                    database.users = ParseForDatabaseUsers(output);
+                    database.Users = ParseForDatabaseUsers(output);
 
                     return true;
                 }
@@ -706,9 +706,9 @@ namespace Jenkins_Tasks
             if (UnsecureJenkinsCreds(server.id) != null)
             {
                 string output = await runJenkinsBuild(server, @"/job/CloudOps1-ResetCustomerLoginPassword/buildWithParameters?&SQLServer="
-                    + database.server
+                    + database.Server
                     + "&DatabaseName="
-                    + database.name
+                    + database.Name
                     + "&UserName="
                     + user.loginName
                     + "&delay=0sec");
@@ -716,7 +716,7 @@ namespace Jenkins_Tasks
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
                 bool oneRowAffected = output.Contains("(1 rows affected)");
 
-                if (outputDatabaseName == database.name && oneRowAffected == true)
+                if (outputDatabaseName == database.Name && oneRowAffected == true)
                 {
                     return true;
                 }
@@ -744,25 +744,29 @@ namespace Jenkins_Tasks
             }
         }
 
-        public static List<APCDatabase> ParseForDatabases(string mainText)
+        public static List<APCDatabase> ParseForDatabases(string lookupData)
         {
-            string workingText = mainText;
-            List<APCDatabase> list = new List<APCDatabase>();
+            // Get the Database information block
+            string DatabaseInfo = SearchString(lookupData, "[DATABASEINFOSTART]", "[DATABASEINFOEND]");
+
+            List<APCDatabase> DatabaseList = new List<APCDatabase>();
             try
             {
-                // Get lines with databases on
-                string[] lines = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None);
+                // Get database lines
+                string[] Databases = DatabaseInfo.Split(new string[] { "[Database=" }, StringSplitOptions.None);
 
                 // For each line, separate the name and server
-                // Loop starts at line 1 rather than 0
-                for (int i = 1; i < lines.Length; i++)
+                foreach (string Database in Databases)
                 {
-                    APCDatabase database = new APCDatabase();
+                    if (!Database.Contains("{")) // This prevents it throwing an empty database into the list, caused by the 0 value being nothing helpful
+                        continue;
 
-                    database.name = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[0]).Split(null)[0];
-                    database.server = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[1]).Split(null)[0];
+                    APCDatabase NewDatabase = new APCDatabase();
 
-                    list.Add(database);
+                    NewDatabase.Name = SearchString(Database, "{Name=", "}");
+                    NewDatabase.Server = SearchString(Database, "{Server=", "}");
+
+                    DatabaseList.Add(NewDatabase);
                 }
             }
             catch (Exception error)
@@ -770,7 +774,7 @@ namespace Jenkins_Tasks
                 MessageBox.Show("Error occurred whilst getting database list:\n\n" + error.Message);
             }
 
-            return list;
+            return DatabaseList;
         }
 
         public static List<APCDatabaseUser> ParseForDatabaseUsers(string mainText)
@@ -1026,9 +1030,43 @@ namespace Jenkins_Tasks
 
     public class APCDatabase
     {
-        public string name { get; set; }
-        public string server { get; set; }
-        public List<APCDatabaseUser> users = new List<APCDatabaseUser>();
+        private string _name;
+        private string _server;
+        private List<APCDatabaseUser> _users;
+
+        public string Name
+        {
+            get { return _name; }
+            set { SetPropertyField("LookupTime", ref _name, value); }
+        }
+
+        public string Server
+        {
+            get { return _server; }
+            set { SetPropertyField("LookupTime", ref _server, value); }
+        }
+
+        public List<APCDatabaseUser> Users
+        {
+            get { return _users; }
+            set { SetPropertyField("LookupTime", ref _users, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public class APCDatabaseUser
