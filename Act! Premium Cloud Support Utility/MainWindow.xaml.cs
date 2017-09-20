@@ -92,9 +92,13 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
-        private void LookupResults_DatabaseList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void LookupResults_DatabaseList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // This will auto populate ready for list of users
+            APCAccount Account = (APCAccount)(sender as ListBox).DataContext;
+            APCDatabase Database = e.AddedItems[0] as APCDatabase;
+
+            if (Database.Users == null)
+                Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Account.JenkinsServer);
         }
     }
 

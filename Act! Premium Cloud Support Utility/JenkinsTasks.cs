@@ -518,38 +518,53 @@ namespace Jenkins_Tasks
             }
         }
 
-        public async Task<bool> getDatabaseUsers(APCDatabase database, JenkinsServer server)
+        public static async Task<List<APCDatabaseUser>> getDatabaseUsers(APCDatabase database, JenkinsServer server)
         {
-            // Clear the current database user list
-            database.Users.Clear();
+            // Check the Jenkins login credentials
+            if (UnsecureJenkinsCreds(server.id) == null)
+                return null;
 
             // Post a request to build LookupCustomer and wait for a response
-            if (UnsecureJenkinsCreds(server.id) != null)
+            string BuildOutput = await runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
+                + database.Server
+                + "&DatabaseName="
+                + database.Name
+                + "&delay=0sec");
+
+            // Get the actual data from the output
+            string Data = SearchString(BuildOutput, "[STARTDATA]", "[ENDDATA]");
+
+            // Check if successful
+            string BuildStatus = SearchString(BuildOutput, "[UserInfoFound=", "]");
+            if (BuildStatus != "true")
+                return null;
+                
+            // Create a new list
+            List<APCDatabaseUser> UserList = new List<APCDatabaseUser>();
+
+            // Get UserInfo block
+            string UserInfo = SearchString(Data, "[USERINFOSTART]", "[USERINFOEND]");
+
+            // Get User lines
+            string[] Users = UserInfo.Split(new string[] { "[User=" }, StringSplitOptions.None);
+
+            // For each line, build a user object
+            foreach (string User in Users)
             {
-                string output = await runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
-                    + database.Server
-                    + "&DatabaseName="
-                    + database.Name
-                    + "&delay=0sec");
+                if (!User.Contains("{")) // This prevents it throwing an empty user into the list, caused by the 0 value being nothing helpful
+                    continue;
 
-                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
+                APCDatabaseUser NewUser = new APCDatabaseUser();
 
-                if (outputDatabaseName.ToLower() == database.Name.ToLower())
-                {
-                    database.Users = ParseForDatabaseUsers(output);
+                NewUser.ContactName = SearchString(User, "{fullname=", "}");
+                NewUser.LoginName = SearchString(User, "{userlogin=", "}");
+                NewUser.LastLogin = Convert.ToDateTime(SearchString(User, "{logondate=", "}"));
+                NewUser.Role = SearchString(User, "{displayname=", "}");
 
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                UserList.Add(NewUser);
             }
-            else
-            {
-                return false;
-            }
+
+            return UserList;
         }
 
         public async Task<bool> resendWelcomeEmail(string accountIITID, string accountEmail, JenkinsServer server)
@@ -710,7 +725,7 @@ namespace Jenkins_Tasks
                     + "&DatabaseName="
                     + database.Name
                     + "&UserName="
-                    + user.loginName
+                    + user.LoginName
                     + "&delay=0sec");
 
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
@@ -755,7 +770,7 @@ namespace Jenkins_Tasks
                 // Get database lines
                 string[] Databases = DatabaseInfo.Split(new string[] { "[Database=" }, StringSplitOptions.None);
 
-                // For each line, separate the name and server
+                // For each line, build a database object
                 foreach (string Database in Databases)
                 {
                     if (!Database.Contains("{")) // This prevents it throwing an empty database into the list, caused by the 0 value being nothing helpful
@@ -769,56 +784,12 @@ namespace Jenkins_Tasks
                     DatabaseList.Add(NewDatabase);
                 }
             }
-            catch (Exception error)
+            catch
             {
-                MessageBox.Show("Error occurred whilst getting database list:\n\n" + error.Message);
+                // await Tumbleweed()
             }
 
             return DatabaseList;
-        }
-
-        public static List<APCDatabaseUser> ParseForDatabaseUsers(string mainText)
-        {
-            string workingText = mainText;
-            List<APCDatabaseUser> list = new List<APCDatabaseUser>();
-            try
-            {
-                // Cut data to after the line of ----¦----¦----¦---- nonsense
-                workingText = workingText.Split(new string[] { @"----------¦----------¦----------¦-------------¦-------------¦----------------¦---------¦----------------¦-----------¦--------------¦---------------
-" }, StringSplitOptions.None)[1];
-
-                // Cut data to before "<linebreak><linebreak>(1 rows affected)"
-                workingText = workingText.Split(new string[] { @"
-
-(1 rows affected)" }, StringSplitOptions.None)[0];
-
-                // Get all lines
-                string[] lines = workingText.Split(new string[] { @"
-" }, StringSplitOptions.None);
-
-                // For each line, get the user information
-                // Loop starts at line 2 rather than 0
-                foreach (string line in lines)
-                {
-                    APCDatabaseUser user = new APCDatabaseUser();
-
-                    // Split the line up into individual values
-                    string[] lineSplit = line.Split('¦');
-
-                    // Grab the needed information
-                    user.loginName = lineSplit[0];
-                    user.lastLogin = lineSplit[9];
-                    user.role = lineSplit[6];
-
-                    list.Add(user);
-                }
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("Error occurred whilst getting database users:\n\n" + error.Message);
-            }
-
-            return list;
         }
     }
 
@@ -1028,7 +999,7 @@ namespace Jenkins_Tasks
         // Add function here to return XML node representation of APCAccount - is this better than having it separate?
     }
 
-    public class APCDatabase
+    public class APCDatabase : INotifyPropertyChanged
     {
         private string _name;
         private string _server;
@@ -1069,7 +1040,7 @@ namespace Jenkins_Tasks
         public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    public class APCDatabaseUser
+    public class APCDatabaseUser : INotifyPropertyChanged
     {
         private string _contactName;
         private string _loginName;
