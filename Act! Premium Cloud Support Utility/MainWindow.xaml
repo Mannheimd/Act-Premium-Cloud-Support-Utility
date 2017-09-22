@@ -553,7 +553,7 @@
                                          Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                                          Style="{StaticResource smallFont}"/>
                             <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
-                            <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}"/>
+                            <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}" Click="Button_ResendWelcomeEmail_Click"/>
                         </StackPanel>
                     </Border>
                     <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"

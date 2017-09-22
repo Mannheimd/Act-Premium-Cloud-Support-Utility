@@ -24,7 +24,7 @@ namespace Jenkins_Tasks
 
     class JenkinsTasks
     {
-        public static byte[] additionalEntropy = { 5, 8, 3, 4, 7 }; // Used to further encrypt Jenkins authentication information
+        public static byte[] additionalEntropy = { 5, 8, 3, 4, 7 }; // Used to further encrypt Jenkins authentication information, changing this will cause any currently stored Jenkins login details on the client machine to be invalid
 
         /// <summary>
         /// Secures the user's Jenkins credentials against the Windows user profile and stores them in the registry under HKCU
@@ -591,66 +591,55 @@ namespace Jenkins_Tasks
             return UserList;
         }
 
-        public async Task<bool> resendWelcomeEmail(string accountIITID, string accountEmail, JenkinsServer server)
+        /// <summary>
+        /// Builds CloudOps1-ResendWelcomeEmail to resend a customer's welcome email
+        /// </summary>
+        /// <param name="Account">APC Account to resend welcome email for</param>
+        /// <param name="SendType">Specifies if to send to primary account email, or the user specified</param>
+        /// <param name="SpecifiedEmail">Can be null - User specified email address to send to</param>
+        /// <returns></returns>
+        public static async Task resendWelcomeEmail(APCAccount Account, WelcomeEmailSendTo SendType, string SpecifiedEmail)
         {
-            bool sendType = false; // true is alt email, false is default email
-            string sendTo = null; // alt email address
-            bool send = false; // output from send or cancel
+            Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.InProgress;
 
-            ResendWelcomeEmail resendWelcomeEmail = new ResendWelcomeEmail(accountEmail);
-            resendWelcomeEmail.resultBool += value => sendType = value;
-            resendWelcomeEmail.resultString += value => sendTo = value;
-            resendWelcomeEmail.resultSend += value => send = value;
-            resendWelcomeEmail.ShowDialog();
+            string SendEmailTo;
 
-            if (send)
+            if (SendType == WelcomeEmailSendTo.PrimaryAccountEmail)
+                SendEmailTo = Account.Email;
+            else
+                SendEmailTo = SpecifiedEmail.Trim();
+
+            // Post a request to build LookupCustomer and wait for a response
+            if (UnsecureJenkinsCreds(Account.JenkinsServer.id) != null)
             {
-                // set accountEmail to null if not needed, else set it to specified address
-                if (sendType)
+                string output = await runJenkinsBuild(Account.JenkinsServer, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
+                    + Account.IITID
+                    + "&AltEmailAddress="
+                    + SendEmailTo
+                    + "&delay=0sec");
+
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputIITID = SearchString(output, "IITID: ", @"
+");
+                string outputEmail = SearchString(output, "Email Address: ", @"
+");
+
+                if (outputIITID == Account.IITID && outputEmail == SendEmailTo)
                 {
-                    accountEmail = sendTo;
+                    Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Successful;
+                }
+                else if (outputIITID == Account.IITID && SendType == WelcomeEmailSendTo.PrimaryAccountEmail)
+                {
+                    Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Successful;
                 }
                 else
                 {
-                    accountEmail = null;
-                }
-
-                // Post a request to build LookupCustomer and wait for a response
-                if (UnsecureJenkinsCreds(server.id) != null)
-                {
-                    string output = await runJenkinsBuild(server, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
-                        + accountIITID
-                        + "&AltEmailAddress="
-                        + accountEmail
-                        + "&delay=0sec");
-
-                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                    string outputIITID = SearchString(output, "IITID: ", @"
-");
-                    string outputEmail = SearchString(output, "Email Address: ", @"
-");
-
-                    if (outputIITID == accountIITID && outputEmail == accountEmail)
-                    {
-                        return true;
-                    }
-                    else if (outputIITID == accountIITID && !sendType)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
+                    Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Failed;
                 }
             }
             else
             {
-                return false;
+                Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Failed;
             }
         }
 
@@ -835,6 +824,7 @@ namespace Jenkins_Tasks
     {
         private APCAccountLookupStatus _lookupStatus;
         private APCAccountSelectedTab _selectedTab;
+        private ResendWelcomeEmailStatus _resendWelcomeEmailStatus;
         private string _iitid;
         private string _accountName;
         private string _email;
@@ -870,7 +860,13 @@ namespace Jenkins_Tasks
             get { return _selectedTab; }
             set { SetPropertyField("SelectedTab", ref _selectedTab, value); }
         }
-        
+
+        public ResendWelcomeEmailStatus ResendWelcomeEmailStatus
+        {
+            get { return _resendWelcomeEmailStatus; }
+            set { SetPropertyField("SelectedTab", ref _resendWelcomeEmailStatus, value); }
+        }
+
         public string IITID
         {
             get { return _iitid; }
@@ -1155,5 +1151,19 @@ namespace Jenkins_Tasks
         InProgress,
         Failed,
         Successful
+    };
+
+    public enum WelcomeEmailSendTo
+    {
+        PrimaryAccountEmail,
+        SpecifiedEmail
+    };
+
+    public enum ResendWelcomeEmailStatus
+    {
+        NotStarted,
+        InProgress,
+        Successful,
+        Failed
     };
 }

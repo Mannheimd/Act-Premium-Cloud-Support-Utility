@@ -82,6 +82,19 @@ namespace Act__Premium_Cloud_Support_Utility
             LookupResults.Remove(Account);
         }
 
+        private async void Button_ResendWelcomeEmail_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount Account = (APCAccount)(sender as Button).DataContext;
+            WelcomeEmailSendTo SendTo = WelcomeEmailSendTo.PrimaryAccountEmail;
+            if (specifyEmail_RadioButton.IsChecked == true)
+            {
+                SendTo = WelcomeEmailSendTo.SpecifiedEmail;
+            }
+            string SpecifiedEmail = specifyEmail_TextBox.Text.Trim();
+
+            await JenkinsTasks.resendWelcomeEmail(Account, SendTo, SpecifiedEmail);
+        }
+
         private async void NewLookupPane_LookupButton_Click(object sender, RoutedEventArgs e)
         {
             APCAccount account = (APCAccount)(sender as Button).DataContext;
