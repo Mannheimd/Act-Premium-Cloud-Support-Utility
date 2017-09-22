@@ -535,12 +535,12 @@ namespace Jenkins_Tasks
         /// <returns>Returns a list of APCDatabaseUsers</returns>
         public static async Task<List<APCDatabaseUser>> getDatabaseUsers(APCDatabase database, JenkinsServer server)
         {
-            database.UserLoadStatus = APCUserLoadStatus.InProgress;
+            database.UserLoadStatus = JenkinsBuildStatus.InProgress;
 
             // Check the Jenkins login credentials
             if (UnsecureJenkinsCreds(server.id) == null)
             {
-                database.UserLoadStatus = APCUserLoadStatus.Failed;
+                database.UserLoadStatus = JenkinsBuildStatus.Failed;
                 return null;
             }
 
@@ -558,7 +558,7 @@ namespace Jenkins_Tasks
             string BuildStatus = SearchString(BuildOutput, "[UserInfoFound=", "]");
             if (BuildStatus != "true")
             {
-                database.UserLoadStatus = APCUserLoadStatus.Failed;
+                database.UserLoadStatus = JenkinsBuildStatus.Failed;
                 return null;
             }
                 
@@ -587,7 +587,7 @@ namespace Jenkins_Tasks
                 UserList.Add(NewUser);
             }
 
-            database.UserLoadStatus = APCUserLoadStatus.Successful;
+            database.UserLoadStatus = JenkinsBuildStatus.Successful;
             return UserList;
         }
 
@@ -600,7 +600,7 @@ namespace Jenkins_Tasks
         /// <returns></returns>
         public static async Task resendWelcomeEmail(APCAccount Account, WelcomeEmailSendTo SendType, string SpecifiedEmail)
         {
-            Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.InProgress;
+            Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.InProgress;
 
             string SendEmailTo;
 
@@ -626,20 +626,20 @@ namespace Jenkins_Tasks
 
                 if (outputIITID == Account.IITID && outputEmail == SendEmailTo)
                 {
-                    Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Successful;
+                    Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.Successful;
                 }
                 else if (outputIITID == Account.IITID && SendType == WelcomeEmailSendTo.PrimaryAccountEmail)
                 {
-                    Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Successful;
+                    Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.Successful;
                 }
                 else
                 {
-                    Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Failed;
+                    Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.Failed;
                 }
             }
             else
             {
-                Account.ResendWelcomeEmailStatus = ResendWelcomeEmailStatus.Failed;
+                Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.Failed;
             }
         }
 
@@ -693,7 +693,7 @@ namespace Jenkins_Tasks
         /// <returns></returns>
         public static async Task updateTimeout(APCAccount Account, string NewTimeoutValue)
         {
-            Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.InProgress;
+            Account.ChangeInactivityTimeoutStatus = JenkinsBuildStatus.InProgress;
 
             // Post a request to build LookupCustomer and wait for a response
             if (UnsecureJenkinsCreds(Account.JenkinsServer.id) != null)
@@ -715,19 +715,19 @@ namespace Jenkins_Tasks
 
                 if (outputSiteName == Account.SiteName && outputIISServer == Account.IISServer && outputTimeout == NewTimeoutValue)
                 {
-                    Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.Successful;
+                    Account.ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Successful;
                 }
                 else
                 {
-                    Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.Failed;
+                    Account.ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Failed;
                 }
             }
             else
             {
-                Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.Failed;
+                Account.ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Failed;
             }
 
-            if (Account.ChangeInactivityTimeoutStatus == ChangeInactivityTimeoutStatus.Successful)
+            if (Account.ChangeInactivityTimeoutStatus == JenkinsBuildStatus.Successful)
             {
                 // Re-check the timeout value
                 Account.TimeoutValue = null;
@@ -825,8 +825,8 @@ namespace Jenkins_Tasks
     {
         private APCAccountLookupStatus _lookupStatus;
         private APCAccountSelectedTab _selectedTab;
-        private ResendWelcomeEmailStatus _resendWelcomeEmailStatus;
-        private ChangeInactivityTimeoutStatus _changeInactivityTimeoutStatus;
+        private JenkinsBuildStatus _resendWelcomeEmailStatus;
+        private JenkinsBuildStatus _changeInactivityTimeoutStatus;
         private string _iitid;
         private string _accountName;
         private string _email;
@@ -863,13 +863,13 @@ namespace Jenkins_Tasks
             set { SetPropertyField("SelectedTab", ref _selectedTab, value); }
         }
 
-        public ResendWelcomeEmailStatus ResendWelcomeEmailStatus
+        public JenkinsBuildStatus ResendWelcomeEmailStatus
         {
             get { return _resendWelcomeEmailStatus; }
             set { SetPropertyField("SelectedTab", ref _resendWelcomeEmailStatus, value); }
         }
 
-        public ChangeInactivityTimeoutStatus ChangeInactivityTimeoutStatus
+        public JenkinsBuildStatus ChangeInactivityTimeoutStatus
         {
             get { return _changeInactivityTimeoutStatus; }
             set { SetPropertyField("SelectedTab", ref _changeInactivityTimeoutStatus, value); }
@@ -1039,7 +1039,7 @@ namespace Jenkins_Tasks
         private string _name;
         private string _server;
         private List<APCDatabaseUser> _users;
-        private APCUserLoadStatus _userLoadStatus;
+        private JenkinsBuildStatus _userLoadStatus;
 
         public string Name
         {
@@ -1064,7 +1064,7 @@ namespace Jenkins_Tasks
             PropertyChanged?.Invoke(this, e);
         }
 
-        public APCUserLoadStatus UserLoadStatus
+        public JenkinsBuildStatus UserLoadStatus
         {
             get { return _userLoadStatus; }
             set { SetPropertyField("LookupTime", ref _userLoadStatus, value); }
@@ -1153,7 +1153,7 @@ namespace Jenkins_Tasks
         Activity
     };
 
-    public enum APCUserLoadStatus
+    public enum JenkinsBuildStatus
     {
         NotStarted,
         InProgress,
@@ -1165,21 +1165,5 @@ namespace Jenkins_Tasks
     {
         PrimaryAccountEmail,
         SpecifiedEmail
-    };
-
-    public enum ResendWelcomeEmailStatus
-    {
-        NotStarted,
-        InProgress,
-        Successful,
-        Failed
-    };
-
-    public enum ChangeInactivityTimeoutStatus
-    {
-        NotStarted,
-        InProgress,
-        Successful,
-        Failed
     };
 }
