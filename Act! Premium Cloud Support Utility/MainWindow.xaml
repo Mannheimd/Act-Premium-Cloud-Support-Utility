@@ -176,6 +176,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.Setters>
                                     <Setter TargetName="InnerBorder" Property="Background" Value="#0AB4DC"/>
+                                    <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#0AB4DC"/>
                                 </MultiDataTrigger.Setters>
                             </MultiDataTrigger>
                             <MultiDataTrigger>
@@ -184,6 +185,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.Setters>
                                     <Setter TargetName="InnerBorder" Property="Background" Value="white"/>
+                                    <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#CDCDC8"/>
                                 </MultiDataTrigger.Setters>
                             </MultiDataTrigger>
                             <MultiDataTrigger>
@@ -193,6 +195,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <MultiDataTrigger.Setters>
                                     <Setter TargetName="InnerBorder" Property="Background" Value="#CDCDC8"/>
+                                    <Setter TargetName="OuterBorder" Property="BorderBrush" Value="#CDCDC8"/>
                                 </MultiDataTrigger.Setters>
                             </MultiDataTrigger>
                         </ControlTemplate.Triggers>
@@ -256,7 +259,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="1">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="0.5">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -280,7 +283,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="1">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="0.5">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
@@ -538,8 +541,8 @@
                     <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,5,0,0" Content="Resend welcome email" Width="300" HorizontalAlignment="Left"
                                   Style="{StaticResource darkToggleButtonBordered}"/>
                     <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
-                            BorderBrush="{StaticResource lightGray}" BorderThickness="1"
-                            Margin="5,-1,0,0" Width="300" HorizontalAlignment="Left">
+                            BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                            Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
                         <StackPanel Margin="0,0,0,10">
                             <Label Content="Choose an option" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                             <RadioButton x:Name="primaryEmail_RadioButton" GroupName="resendWelcomeEmailRadio"
@@ -556,8 +559,8 @@
                     <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
                                   Style="{StaticResource darkToggleButtonBordered}"/>
                     <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
-                            BorderBrush="{StaticResource lightGray}" BorderThickness="1"
-                            Margin="5,-1,0,0" Width="300" HorizontalAlignment="Left">
+                            BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                            Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
                         <StackPanel Margin="0,0,0,10">
                             <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Style="{StaticResource smallFont}"/>
                             <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
