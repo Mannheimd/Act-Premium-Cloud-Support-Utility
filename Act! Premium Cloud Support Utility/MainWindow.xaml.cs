@@ -1,4 +1,5 @@
-﻿using Jenkins_Tasks;
+﻿using MahApps.Metro.IconPacks;
+using Jenkins_Tasks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,6 +33,15 @@ namespace Act__Premium_Cloud_Support_Utility
             LookupListPane_Lookups_ListBox.ItemsSource = LookupResults;
             CollectionView LookupListDisplayOrder = (CollectionView)CollectionViewSource.GetDefaultView(LookupListPane_Lookups_ListBox.ItemsSource);
             LookupListDisplayOrder.SortDescriptions.Add(new SortDescription("lookupCreateTime", ListSortDirection.Descending));
+
+            APCAccount DebugAccount = new APCAccount()
+            {
+                LookupStatus = APCAccountLookupStatus.Successful,
+                ResendWelcomeEmailStatus = JenkinsBuildStatus.Failed,
+                ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Successful
+            };
+
+            LookupResults.Add(DebugAccount);
         }
 
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
@@ -120,7 +130,7 @@ namespace Act__Premium_Cloud_Support_Utility
             APCAccount Account = (APCAccount)(sender as ListBox).DataContext;
             APCDatabase Database = e.AddedItems[0] as APCDatabase;
 
-            if (Database.UserLoadStatus == APCUserLoadStatus.Failed || Database.UserLoadStatus == APCUserLoadStatus.NotStarted)
+            if (Database.UserLoadStatus == JenkinsBuildStatus.Failed || Database.UserLoadStatus == JenkinsBuildStatus.NotStarted)
                 Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Account.JenkinsServer);
         }
 
@@ -411,6 +421,52 @@ namespace Act__Premium_Cloud_Support_Utility
                 return (value as string) + " minutes";
             }
             else return "Fetching...";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class JenkinsBuildStatusToProgressIndicatorIcon_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null || (value as string) == "")
+                return null;
+
+            if ((value as string) == JenkinsBuildStatus.NotStarted.ToString())
+                return null;
+
+            if ((value as string) == JenkinsBuildStatus.InProgress.ToString())
+            {
+                return new PackIconMaterial()
+                {
+                    Kind = PackIconMaterialKind.Refresh,
+                    Spin = true,
+                    SpinDuration = 2,
+                    Height = 15,
+                    Width = 15
+                };
+            }
+
+            if ((value as string) == JenkinsBuildStatus.Successful.ToString())
+            {
+                return new PackIconMaterial()
+                {
+                    Kind = PackIconMaterialKind.Check,
+                    Height = 15,
+                    Width = 15
+                };
+            }
+
+            if ((value as string) == JenkinsBuildStatus.Failed.ToString())
+            {
+                
+            }
+
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)

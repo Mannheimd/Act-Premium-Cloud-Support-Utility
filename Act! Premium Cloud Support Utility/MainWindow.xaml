@@ -21,6 +21,7 @@
         <local:LookupResultSelectedTab_Converter x:Key="LookupResultSelectedTabConverter"/>
         <local:BooleanToVisibility_Converter x:Key="BooleanToVisibilityConverter"/>
         <local:AccountTimeout_Converter x:Key="AccountTimeoutConverter"/>
+        <local:JenkinsBuildStatusToProgressIndicatorIcon_Converter x:Key="JenkinsBuildStatusToProgressIndicatorIconConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
@@ -519,6 +520,7 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
+                <!-- Top section -->
                 <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0" ScrollViewer.CanContentScroll="True">
                     <TextBlock Margin="5,5,0,0">
                         Upload URL: 
@@ -538,8 +540,13 @@
                         Inactivity Timeout: 
                         <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
                     </TextBlock>
-                    <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,5,0,0" Content="Resend welcome email" Width="300" HorizontalAlignment="Left"
-                                  Style="{StaticResource darkToggleButtonBordered}"/>
+                    <Grid>
+                        <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,5,0,0" Content="Resend welcome email" Width="300"
+                                      HorizontalAlignment="Left" VerticalAlignment="Top"
+                                      Style="{StaticResource darkToggleButtonBordered}"/>
+                        <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                               Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"/>
+                    </Grid>
                     <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
                             BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
                             Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
@@ -569,6 +576,7 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
+                <!-- Bottom section -->
                 <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
                     <TextBlock Margin="5,5,0,0">
                         Create Date:
