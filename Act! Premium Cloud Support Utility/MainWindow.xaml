@@ -549,8 +549,8 @@
                             <RadioButton x:Name="specifyEmail_RadioButton" GroupName="resendWelcomeEmailRadio" Content="Specify different email address"
                                          Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                                          Style="{StaticResource smallFont}"/>
-                            <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
-                            <Button Width="290" Margin="5,5,0,0" Content="Send" Style="{StaticResource darkButtonBordered}"/>
+                            <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
+                            <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}"/>
                         </StackPanel>
                     </Border>
                     <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
@@ -559,10 +559,10 @@
                             BorderBrush="{StaticResource lightGray}" BorderThickness="1"
                             Margin="5,-1,0,0" Width="300" HorizontalAlignment="Left">
                         <StackPanel Margin="0,0,0,10">
-                            <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                            <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                            <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Style="{StaticResource smallFont}"/>
+                            <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                                      PreviewTextInput="ValidateTextInputNumbersOnly"/>
-                            <Button Width="290" Margin="5,5,0,0" Content="Change" Style="{StaticResource darkButtonBordered}"/>
+                            <Button Margin="5,5,5,0" Content="Change" Style="{StaticResource darkButtonBordered}"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
