@@ -6,10 +6,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Xml;
@@ -99,6 +101,12 @@ namespace Act__Premium_Cloud_Support_Utility
 
             if (Database.UserLoadStatus == APCUserLoadStatus.Failed || Database.UserLoadStatus == APCUserLoadStatus.NotStarted)
                 Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Account.JenkinsServer);
+        }
+
+        private void ValidateTextInputNumbersOnly(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 
@@ -220,23 +228,28 @@ namespace Act__Premium_Cloud_Support_Utility
     }
     
     /// <summary>
-    /// Returns Visibility.Visible or Visibility.Hidden depending on if entity has mouse over.
+    /// Converts 1 to Visible, 0 to either Hidden by default or Collapsed is parameter contains "Collapsible". Reverses this result if parameter contains "Reverse"
     /// </summary>
     public class BooleanToVisibility_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool IsMouseOver = false;
+            bool BooleanOfAwesome = false;
             if (value != null && value.ToString() == "True")
-                IsMouseOver = true;
+                BooleanOfAwesome = true;
 
-            if (parameter != null && parameter.ToString() == "Reverse")
-                IsMouseOver = !IsMouseOver;
+            if (parameter != null && parameter.ToString().Contains("Reverse"))
+                BooleanOfAwesome = !BooleanOfAwesome;
 
-            if (IsMouseOver)
+            if (BooleanOfAwesome)
                 return Visibility.Visible;
             else
+            {
+                if (parameter != null && parameter.ToString().Contains("Collapsible"))
+                    return Visibility.Collapsed;
+
                 return Visibility.Hidden;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)

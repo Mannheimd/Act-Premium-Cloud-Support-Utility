@@ -249,8 +249,6 @@
         </Style>
         <Style TargetType="{x:Type Button}" x:Key="darkButtonBordered">
             <Setter Property="Background" Value="Transparent"/>
-            <!--<Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="{StaticResource lightGray}"/>-->
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <Setter Property="Height" Value="26"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
@@ -258,6 +256,30 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource lightGray}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{StaticResource lightBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}" x:Key="darkToggleButtonBordered">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
                         <Border Background="{TemplateBinding Background}" BorderBrush="{StaticResource lightGray}" BorderThickness="1">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -494,7 +516,7 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0">
+                <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0" ScrollViewer.CanContentScroll="True">
                     <TextBlock Margin="5,5,0,0">
                         Upload URL: 
                         <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
@@ -513,8 +535,36 @@
                         Inactivity Timeout: 
                         <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
                     </TextBlock>
-                    <Button Margin="0,0,0,0" Content="Resend welcome email" Width="100"/>
-                    <Button Margin="0,0,0,0" Content="Change inactivity timeout" Width="100"/>
+                    <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,5,0,0" Content="Resend welcome email" Width="300" HorizontalAlignment="Left"
+                                  Style="{StaticResource darkToggleButtonBordered}"/>
+                    <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                            BorderBrush="{StaticResource lightGray}" BorderThickness="1"
+                            Margin="5,-1,0,0" Width="300" HorizontalAlignment="Left">
+                        <StackPanel Margin="0,0,0,10">
+                            <Label Content="Choose an option" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                            <RadioButton x:Name="primaryEmail_RadioButton" GroupName="resendWelcomeEmailRadio"
+                                         Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"
+                                         Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                         Style="{StaticResource smallFont}"/>
+                            <RadioButton x:Name="specifyEmail_RadioButton" GroupName="resendWelcomeEmailRadio" Content="Specify different email address"
+                                         Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                         Style="{StaticResource smallFont}"/>
+                            <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
+                            <Button Width="290" Margin="5,5,0,0" Content="Send" Style="{StaticResource darkButtonBordered}"/>
+                        </StackPanel>
+                    </Border>
+                    <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
+                                  Style="{StaticResource darkToggleButtonBordered}"/>
+                    <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                            BorderBrush="{StaticResource lightGray}" BorderThickness="1"
+                            Margin="5,-1,0,0" Width="300" HorizontalAlignment="Left">
+                        <StackPanel Margin="0,0,0,10">
+                            <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                            <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                     PreviewTextInput="ValidateTextInputNumbersOnly"/>
+                            <Button Width="290" Margin="5,5,0,0" Content="Change" Style="{StaticResource darkButtonBordered}"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
                 <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
                     <TextBlock Margin="5,5,0,0">
