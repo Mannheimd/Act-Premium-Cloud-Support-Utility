@@ -371,6 +371,9 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             if (value != null && value is string)
             {
+                if ((value as string) == "undetermined")
+                    return "Unable to obtain. Account may be suspended.";
+
                 return (value as string) + " minutes";
             }
             else return "Fetching...";

@@ -416,6 +416,11 @@ namespace Jenkins_Tasks
             return jenkinsServerXml;
         }
 
+        /// <summary>
+        /// Main lookup function, will run CloudOps1-LookupCustomerMachine and add results to the account
+        /// </summary>
+        /// <param name="account">The APC account to be looked up - could be a newly created account or one we're refreshing</param>
+        /// <returns></returns>
         public static async Task RunAPCAccountLookup(APCAccount account)
         {
             account.LookupStatus = APCAccountLookupStatus.InProgress;
@@ -483,7 +488,11 @@ namespace Jenkins_Tasks
 
             account.LookupTime = DateTime.Now;
 
+            // Lookup is now a success, even though we're gonna do some more work
             account.LookupStatus = APCAccountLookupStatus.Successful;
+
+            // Get the inactivity timeout
+            account.TimeoutValue = await getTimeout(account);
         }
 
         public async Task<bool> unlockDatabase(string databaseName, string sqlServer, JenkinsServer server)
@@ -630,12 +639,18 @@ namespace Jenkins_Tasks
             }
         }
 
-        public async Task<bool> getTimeout(APCAccount account, JenkinsServer server)
+        /// <summary>
+        /// Runs CloudOps1-ListExistingClientTimeout and returns the current timeout value as a string. Would be better as an int, but Jenkins returns a string and that's how I coded the UI.
+        /// The converter for timeout value only works because the value can be null, and because the value could be 0 or negative (because someone messed up) I don't want to take that as "is null".
+        /// </summary>
+        /// <param name="account">APCAccount you want the inactivity timeout for</param>
+        /// <returns></returns>
+        public static async Task<string> getTimeout(APCAccount account)
         {
             // Post a request to build LookupCustomer and wait for a response
-            if (UnsecureJenkinsCreds(server.id) != null)
+            if (UnsecureJenkinsCreds(account.JenkinsServer.id) != null)
             {
-                string output = await runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
+                string output = await runJenkinsBuild(account.JenkinsServer, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
                     + account.SiteName
                     + "&IISServer="
                     + account.IISServer
@@ -650,18 +665,19 @@ namespace Jenkins_Tasks
 
                 if (outputSiteName == account.SiteName && outputIISServer == account.IISServer)
                 {
-                    account.TimeoutValue = Convert.ToInt32(outputCurrentTimeout);
+                    if (outputCurrentTimeout.Trim() == "")
+                        return "undetermined";
 
-                    return true;
+                    return outputCurrentTimeout.Trim();
                 }
                 else
                 {
-                    return false;
+                    return null;
                 }
             }
             else
             {
-                return false;
+                return null;
             }
         }
 
@@ -821,7 +837,7 @@ namespace Jenkins_Tasks
         private string _deleteStatus;
         private string _accountType;
         private string _lookupValue;
-        private int _timeoutValue;
+        private string _timeoutValue;
         private List<APCDatabase> _databases;
         private APCLookupType _lookupType;
         private DateTime _lookupTime;
@@ -942,7 +958,7 @@ namespace Jenkins_Tasks
             set { SetPropertyField("LookupValue", ref _lookupValue, value); }
         }
 
-        public int TimeoutValue
+        public string TimeoutValue
         {
             get { return _timeoutValue; }
             set { SetPropertyField("TimeoutValue", ref _timeoutValue, value); }
