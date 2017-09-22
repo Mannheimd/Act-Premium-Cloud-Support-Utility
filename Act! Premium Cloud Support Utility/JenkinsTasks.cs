@@ -420,7 +420,7 @@ namespace Jenkins_Tasks
         /// Main lookup function, will run CloudOps1-LookupCustomerMachine and add results to the account
         /// </summary>
         /// <param name="account">The APC account to be looked up - could be a newly created account or one we're refreshing</param>
-        /// <returns></returns>
+        /// <returns>Nothing</returns>
         public static async Task RunAPCAccountLookup(APCAccount account)
         {
             account.LookupStatus = APCAccountLookupStatus.InProgress;
@@ -527,11 +527,22 @@ namespace Jenkins_Tasks
             }
         }
 
+        /// <summary>
+        /// Builds CloudOps1-ListCustomerDatabaseUsers-Machine to get list of database users
+        /// </summary>
+        /// <param name="database">APCDatabase to get users for</param>
+        /// <param name="server">JenkinsServer to run build on</param>
+        /// <returns>Returns a list of APCDatabaseUsers</returns>
         public static async Task<List<APCDatabaseUser>> getDatabaseUsers(APCDatabase database, JenkinsServer server)
         {
+            database.UserLoadStatus = APCUserLoadStatus.InProgress;
+
             // Check the Jenkins login credentials
             if (UnsecureJenkinsCreds(server.id) == null)
+            {
+                database.UserLoadStatus = APCUserLoadStatus.Failed;
                 return null;
+            }
 
             // Post a request to build LookupCustomer and wait for a response
             string BuildOutput = await runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
@@ -546,7 +557,10 @@ namespace Jenkins_Tasks
             // Check if successful
             string BuildStatus = SearchString(BuildOutput, "[UserInfoFound=", "]");
             if (BuildStatus != "true")
+            {
+                database.UserLoadStatus = APCUserLoadStatus.Failed;
                 return null;
+            }
                 
             // Create a new list
             List<APCDatabaseUser> UserList = new List<APCDatabaseUser>();
@@ -573,6 +587,7 @@ namespace Jenkins_Tasks
                 UserList.Add(NewUser);
             }
 
+            database.UserLoadStatus = APCUserLoadStatus.Successful;
             return UserList;
         }
 
@@ -644,7 +659,7 @@ namespace Jenkins_Tasks
         /// The converter for timeout value only works because the value can be null, and because the value could be 0 or negative (because someone messed up) I don't want to take that as "is null".
         /// </summary>
         /// <param name="account">APCAccount you want the inactivity timeout for</param>
-        /// <returns></returns>
+        /// <returns>String representing account inactivity timeout, null, or "undetermined"</returns>
         public static async Task<string> getTimeout(APCAccount account)
         {
             // Post a request to build LookupCustomer and wait for a response
@@ -1020,6 +1035,7 @@ namespace Jenkins_Tasks
         private string _name;
         private string _server;
         private List<APCDatabaseUser> _users;
+        private APCUserLoadStatus _userLoadStatus;
 
         public string Name
         {
@@ -1042,6 +1058,12 @@ namespace Jenkins_Tasks
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, e);
+        }
+
+        public APCUserLoadStatus UserLoadStatus
+        {
+            get { return _userLoadStatus; }
+            set { SetPropertyField("LookupTime", ref _userLoadStatus, value); }
         }
 
         protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
@@ -1125,5 +1147,13 @@ namespace Jenkins_Tasks
         Databases,
         Details,
         Activity
+    };
+
+    public enum APCUserLoadStatus
+    {
+        NotStarted,
+        InProgress,
+        Failed,
+        Successful
     };
 }

@@ -97,7 +97,7 @@ namespace Act__Premium_Cloud_Support_Utility
             APCAccount Account = (APCAccount)(sender as ListBox).DataContext;
             APCDatabase Database = e.AddedItems[0] as APCDatabase;
 
-            if (Database.Users == null)
+            if (Database.UserLoadStatus == APCUserLoadStatus.Failed || Database.UserLoadStatus == APCUserLoadStatus.NotStarted)
                 Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Account.JenkinsServer);
         }
     }
