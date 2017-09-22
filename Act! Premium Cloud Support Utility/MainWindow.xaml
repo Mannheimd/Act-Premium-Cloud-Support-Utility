@@ -565,7 +565,7 @@
                             <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Style="{StaticResource smallFont}"/>
                             <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                                      PreviewTextInput="ValidateTextInputNumbersOnly"/>
-                            <Button Margin="5,5,5,0" Content="Change" Style="{StaticResource darkButtonBordered}"/>
+                            <Button Margin="5,5,5,0" Content="Change" Style="{StaticResource darkButtonBordered}" Click="Button_ChangeInactivityTimeout_Click"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>

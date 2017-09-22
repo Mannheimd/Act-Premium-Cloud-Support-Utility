@@ -95,6 +95,14 @@ namespace Act__Premium_Cloud_Support_Utility
             await JenkinsTasks.resendWelcomeEmail(Account, SendTo, SpecifiedEmail);
         }
 
+        private async void Button_ChangeInactivityTimeout_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount Account = (APCAccount)(sender as Button).DataContext;
+            string NewTimeoutValue = newTimeoutValue_TextBox.Text.Trim();
+
+            await JenkinsTasks.updateTimeout(Account, NewTimeoutValue);
+        }
+
         private async void NewLookupPane_LookupButton_Click(object sender, RoutedEventArgs e)
         {
             APCAccount account = (APCAccount)(sender as Button).DataContext;

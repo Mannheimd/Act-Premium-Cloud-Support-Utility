@@ -685,53 +685,54 @@ namespace Jenkins_Tasks
             }
         }
 
-        public async Task<bool> updateTimeout(APCAccount account, JenkinsServer server)
+        /// <summary>
+        /// Builds CloudOps1-UpdateExistingClientTimeout to change the account's inactivity timeout value, then re-checks the timeout value
+        /// </summary>
+        /// <param name="Account">APCAccount to run the timeout change on</param>
+        /// <param name="NewTimeoutValue">New timeout value, integers only please - I know it's a string, don't be a smartarse</param>
+        /// <returns></returns>
+        public static async Task updateTimeout(APCAccount Account, string NewTimeoutValue)
         {
-            string newValue = null; // new timeout value to set
-            bool proceed = false; // output from send or cancel
+            Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.InProgress;
 
-            UpdateTimeoutValue updateTimeoutValue = new UpdateTimeoutValue();
-            updateTimeoutValue.resultValue += value => newValue = value;
-            updateTimeoutValue.resultProceed += value => proceed = value;
-            updateTimeoutValue.ShowDialog();
-
-            if (proceed)
+            // Post a request to build LookupCustomer and wait for a response
+            if (UnsecureJenkinsCreds(Account.JenkinsServer.id) != null)
             {
-                // Post a request to build LookupCustomer and wait for a response
-                if (UnsecureJenkinsCreds(server.id) != null)
-                {
-                    string output = await runJenkinsBuild(server, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
-                        + account.SiteName
-                        + "&IISServer="
-                        + account.IISServer
-                        + "&Timeout="
-                        + newValue
-                        + "&delay=0sec");
+                string output = await runJenkinsBuild(Account.JenkinsServer, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
+                    + Account.SiteName
+                    + "&IISServer="
+                    + Account.IISServer
+                    + "&Timeout="
+                    + NewTimeoutValue
+                    + "&delay=0sec");
 
-                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                    string outputSiteName = SearchString(output, "Updating customer ", " on server ");
-                    string outputIISServer = SearchString(output, "on server ", @" 
+                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
+                string outputSiteName = SearchString(output, "Updating customer ", " on server ");
+                string outputIISServer = SearchString(output, "on server ", @" 
 ");
-                    string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
+                string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
  ");
 
-                    if (outputSiteName == account.SiteName && outputIISServer == account.IISServer && outputTimeout == newValue)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                if (outputSiteName == Account.SiteName && outputIISServer == Account.IISServer && outputTimeout == NewTimeoutValue)
+                {
+                    Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.Successful;
                 }
                 else
                 {
-                    return false;
+                    Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.Failed;
                 }
             }
             else
             {
-                return false;
+                Account.ChangeInactivityTimeoutStatus = ChangeInactivityTimeoutStatus.Failed;
+            }
+
+            if (Account.ChangeInactivityTimeoutStatus == ChangeInactivityTimeoutStatus.Successful)
+            {
+                // Re-check the timeout value
+                Account.TimeoutValue = null;
+
+                Account.TimeoutValue = await getTimeout(Account);
             }
         }
 
@@ -825,6 +826,7 @@ namespace Jenkins_Tasks
         private APCAccountLookupStatus _lookupStatus;
         private APCAccountSelectedTab _selectedTab;
         private ResendWelcomeEmailStatus _resendWelcomeEmailStatus;
+        private ChangeInactivityTimeoutStatus _changeInactivityTimeoutStatus;
         private string _iitid;
         private string _accountName;
         private string _email;
@@ -865,6 +867,12 @@ namespace Jenkins_Tasks
         {
             get { return _resendWelcomeEmailStatus; }
             set { SetPropertyField("SelectedTab", ref _resendWelcomeEmailStatus, value); }
+        }
+
+        public ChangeInactivityTimeoutStatus ChangeInactivityTimeoutStatus
+        {
+            get { return _changeInactivityTimeoutStatus; }
+            set { SetPropertyField("SelectedTab", ref _changeInactivityTimeoutStatus, value); }
         }
 
         public string IITID
@@ -1160,6 +1168,14 @@ namespace Jenkins_Tasks
     };
 
     public enum ResendWelcomeEmailStatus
+    {
+        NotStarted,
+        InProgress,
+        Successful,
+        Failed
+    };
+
+    public enum ChangeInactivityTimeoutStatus
     {
         NotStarted,
         InProgress,
