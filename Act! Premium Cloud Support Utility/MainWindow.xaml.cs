@@ -16,12 +16,28 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Xml;
+using System.Runtime.CompilerServices;
 
 namespace Act__Premium_Cloud_Support_Utility
 {
-    public static class CurrentWindowState
+    public class CurrentWindowState : DependencyObject
     {
-        public static WindowDisplayMode DisplayMode { get; set; }
+        public static readonly CurrentWindowState Instance = new CurrentWindowState();
+        private CurrentWindowState() { }
+
+        public WindowDisplayMode DisplayMode
+        {
+            get
+            {
+                return (WindowDisplayMode)GetValue(DisplayModeProperty);
+            }
+            set
+            {
+                SetValue(DisplayModeProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty DisplayModeProperty = DependencyProperty.Register("DisplayMode", typeof(WindowDisplayMode), typeof(CurrentWindowState), new UIPropertyMetadata());
     }
 
     public static class ApplicationVariables
@@ -36,10 +52,21 @@ namespace Act__Premium_Cloud_Support_Utility
 
         public MainWindow()
         {
-            JenkinsInfo.jenkinsServerList = JenkinsTasks.getJenkinsServerList();
+            AddServerToUserConfig(new JenkinsServer()
+            {
+                id = "DBG1",
+                name = "Debug 1",
+                url = "http://localhost/"
+            });
+
+            JenkinsInfo.AvailableJenkinsServers = JenkinsTasks.getJenkinsServerList();
+            JenkinsInfo.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
             JenkinsInfo.lookupTypeList = JenkinsTasks.buildAPCLookupTypeList();
 
-            CurrentWindowState.DisplayMode = WindowDisplayMode.Config;
+            if (JenkinsInfo.ConfiguredJenkinsServers.Count < 1)
+                CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Config;
+            else
+                CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Lookup;
 
             LoadConfiguredServersFromUserConfig();
 
@@ -80,8 +107,6 @@ namespace Act__Premium_Cloud_Support_Utility
                     url = "http://localhost/"
                 }
             };
-
-            RemoveServerFromUserConfig(DebugAccount.JenkinsServer);
 
             LookupResults.Add(DebugAccount);
         }
@@ -335,6 +360,22 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void ConfigPane_Back_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (JenkinsInfo.ConfiguredJenkinsServers.Count < 0)
+            {
+                if (MessageBox.Show("You have no configured servers. Are you sure you want to leave?", "No Configured Servers", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return;
+            }
+
+            CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Lookup;
+        }
+
+        private void LookupListPane_Configure_Button_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Config;
         }
     }
 
@@ -681,7 +722,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (parameter != null && parameter is string)
                 Parameters = (parameter as string).ToLower();
 
-            if (Parameters.Contains(CurrentWindowState.DisplayMode.ToString().ToLower()))
+            if (Parameters.Contains(CurrentWindowState.Instance.DisplayMode.ToString().ToLower()))
                 VisibilityBool = true;
 
             if (Parameters.Contains("reverse"))

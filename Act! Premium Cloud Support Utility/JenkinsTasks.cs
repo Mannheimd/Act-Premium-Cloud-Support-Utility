@@ -18,7 +18,8 @@ namespace Jenkins_Tasks
 {
     static class JenkinsInfo
     {
-        public static List<JenkinsServer> jenkinsServerList { get; set; }
+        public static List<JenkinsServer> AvailableJenkinsServers { get; set; }
+        public static List<JenkinsServer> ConfiguredJenkinsServers { get; set; }
         public static List<APCLookupType> lookupTypeList { get; set; }
     }
 
@@ -905,13 +906,13 @@ namespace Jenkins_Tasks
         public JenkinsBuildStatus ResendWelcomeEmailStatus
         {
             get { return _resendWelcomeEmailStatus; }
-            set { SetPropertyField("SelectedTab", ref _resendWelcomeEmailStatus, value); }
+            set { SetPropertyField("ResendWelcomeEmailStatus", ref _resendWelcomeEmailStatus, value); }
         }
 
         public JenkinsBuildStatus ChangeInactivityTimeoutStatus
         {
             get { return _changeInactivityTimeoutStatus; }
-            set { SetPropertyField("SelectedTab", ref _changeInactivityTimeoutStatus, value); }
+            set { SetPropertyField("ChangeInactivityTimeoutStatus", ref _changeInactivityTimeoutStatus, value); }
         }
 
         public string IITID
@@ -1031,7 +1032,7 @@ namespace Jenkins_Tasks
         public List<APCAccountActivity> AccountActivity
         {
             get { return _accountActivity; }
-            set { SetPropertyField("Databases", ref _accountActivity, value); }
+            set { SetPropertyField("AccountActivity", ref _accountActivity, value); }
         }
 
         public APCLookupType LookupType
@@ -1087,19 +1088,19 @@ namespace Jenkins_Tasks
         public string Name
         {
             get { return _name; }
-            set { SetPropertyField("LookupTime", ref _name, value); }
+            set { SetPropertyField("Name", ref _name, value); }
         }
 
         public string Server
         {
             get { return _server; }
-            set { SetPropertyField("LookupTime", ref _server, value); }
+            set { SetPropertyField("Server", ref _server, value); }
         }
 
         public List<APCDatabaseUser> Users
         {
             get { return _users; }
-            set { SetPropertyField("LookupTime", ref _users, value); }
+            set { SetPropertyField("Users", ref _users, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -1135,25 +1136,25 @@ namespace Jenkins_Tasks
         public string ContactName
         {
             get { return _contactName; }
-            set { SetPropertyField("LookupTime", ref _contactName, value); }
+            set { SetPropertyField("ContactName", ref _contactName, value); }
         }
 
         public string LoginName
         {
             get { return _loginName; }
-            set { SetPropertyField("LookupTime", ref _loginName, value); }
+            set { SetPropertyField("LoginName", ref _loginName, value); }
         }
 
         public string Role
         {
             get { return _role; }
-            set { SetPropertyField("LookupTime", ref _role, value); }
+            set { SetPropertyField("Role", ref _role, value); }
         }
 
         public DateTime LastLogin
         {
             get { return _lastLogin; }
-            set { SetPropertyField("LookupTime", ref _lastLogin, value); }
+            set { SetPropertyField("LastLogin", ref _lastLogin, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)

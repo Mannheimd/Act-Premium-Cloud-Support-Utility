@@ -304,12 +304,17 @@
 
     <Grid>
         <!-- Config window -->
-        <Grid Visibility="{Binding Converter={StaticResource WindowDisplayModeToVisibilityConverter}, ConverterParameter=Config}">
-            
+        <Grid Visibility="{Binding DisplayMode, Source={x:Static local:CurrentWindowState.Instance}, Converter={StaticResource WindowDisplayModeToVisibilityConverter}, ConverterParameter=Config}">
+            <Button x:Name="ConfigPane_Back_Button"
+                        Content="{iconPacks:PackIconMaterial ArrowLeft, Height=20, Width=20}"
+                        Height="22" Width="22" Margin="16,16,0,0"
+                        VerticalAlignment="Top" HorizontalAlignment="Left"
+                        Style="{StaticResource darkButton}"
+                        Click="ConfigPane_Back_Button_Click"/>
         </Grid>
         
         <!-- Lookup window -->
-        <Grid Visibility="{Binding Converter={StaticResource WindowDisplayModeToVisibilityConverter}, ConverterParameter=Lookup}">
+        <Grid Visibility="{Binding DisplayMode, Source={x:Static local:CurrentWindowState.Instance}, Converter={StaticResource WindowDisplayModeToVisibilityConverter}, ConverterParameter=Lookup}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250" />
                 <ColumnDefinition Width="*"/>
@@ -347,7 +352,7 @@
                         Height="22" Width="22" Margin="16,0,0,16"
                         VerticalAlignment="Bottom" HorizontalAlignment="Left"
                         Style="{StaticResource lightButton}"
-                        Click="LookupListPane_NewLookup_Click"/>
+                        Click="LookupListPane_Configure_Button_Click"/>
             </Grid>
         
             <!-- Blank pane showing "No account selected", displays when no lookup is selected -->
@@ -384,7 +389,7 @@
                                  BorderThickness="1" BorderBrush="{StaticResource lightGray}"
                                  HorizontalAlignment="Left" VerticalAlignment="Stretch"
                                  Width="500"
-                                 ItemsSource="{Binding Source={x:Static jenkinsTasks:JenkinsInfo.jenkinsServerList}}"
+                                 ItemsSource="{Binding Source={x:Static jenkinsTasks:JenkinsInfo.ConfiguredJenkinsServers}}"
                                  SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.JenkinsServer}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
