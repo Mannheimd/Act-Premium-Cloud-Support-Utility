@@ -601,7 +601,24 @@
             <!-- Lookup Results: Activity -->
             <Grid x:Name="LookupResultsActivityPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
-                
+                <ListBox x:Name="LookupResults_ActivityList" Margin="0,0,15,15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                         ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Activities}"
+                          HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="dateColumn" Width="200"/>
+                                    <ColumnDefinition SharedSizeGroup="actionColumn" Width="200"/>
+                                    <ColumnDefinition SharedSizeGroup="detailColumn" Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Content="{Binding Date}"/>
+                                <Label Grid.Column="1" Content="{Binding Type}"/>
+                                <Label Grid.Column="2" Content="{Binding Detail}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Grid>
             
             <!-- Lookup Results: Tab Selector -->
