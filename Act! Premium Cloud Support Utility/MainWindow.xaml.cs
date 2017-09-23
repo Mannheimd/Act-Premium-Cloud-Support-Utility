@@ -19,6 +19,17 @@ using System.Xml;
 
 namespace Act__Premium_Cloud_Support_Utility
 {
+    public static class CurrentWindowState
+    {
+        public static WindowDisplayMode DisplayMode { get; set; }
+    }
+
+    public static class ApplicationVariables
+    {
+        public static string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Glacier";
+        public static string UserConfigFilePath = AppDataPath + @"\userconfig.xml";
+    }
+
     public partial class MainWindow : Window
     {
         public static ObservableCollection<APCAccount> LookupResults = new ObservableCollection<APCAccount>();
@@ -27,6 +38,10 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             JenkinsInfo.jenkinsServerList = JenkinsTasks.getJenkinsServerList();
             JenkinsInfo.lookupTypeList = JenkinsTasks.buildAPCLookupTypeList();
+
+            CurrentWindowState.DisplayMode = WindowDisplayMode.Config;
+
+            LoadConfiguredServersFromUserConfig();
 
             InitializeComponent();
 
@@ -66,7 +81,164 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
             };
 
+            RemoveServerFromUserConfig(DebugAccount.JenkinsServer);
+
             LookupResults.Add(DebugAccount);
+        }
+
+        private static bool CreateDefaultUserConfigFile()
+        {
+            try
+            {
+                if (!Directory.Exists(ApplicationVariables.AppDataPath))
+                    Directory.CreateDirectory(ApplicationVariables.AppDataPath);
+
+                File.Create(ApplicationVariables.UserConfigFilePath).Close();
+            }
+            catch
+            {
+                return false;
+            }
+
+            XmlDocument DefaultConfig = new XmlDocument();
+            XmlDeclaration DeclarationOfIndependence = DefaultConfig.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement Root = DefaultConfig.DocumentElement;
+            DefaultConfig.InsertBefore(DeclarationOfIndependence, Root);
+
+            XmlElement UserConfig = DefaultConfig.CreateElement("userconfig");
+            DefaultConfig.AppendChild(UserConfig);
+
+            XmlElement Application = DefaultConfig.CreateElement("application");
+            UserConfig.AppendChild(Application);
+
+            XmlElement ConfiguredServers = DefaultConfig.CreateElement("configuredservers");
+            UserConfig.AppendChild(ConfiguredServers);
+
+            try
+            {
+                DefaultConfig.Save(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static List<JenkinsServer> LoadConfiguredServersFromUserConfig()
+        {
+            List<JenkinsServer> Servers = new List<JenkinsServer>();
+
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return Servers;
+            }
+
+            XmlNodeList ServerNodes = UserConfig.SelectNodes(@"userconfig/configuredservers/server");
+
+            if (ServerNodes == null || ServerNodes.Count == 0)
+                return Servers;
+
+            foreach (XmlNode ServerNode in ServerNodes)
+            {
+                JenkinsServer Server = new JenkinsServer()
+                {
+                    id = ServerNode.Attributes["id"].Value,
+                    name = ServerNode.Attributes["name"].Value,
+                    url = ServerNode.Attributes["url"].Value
+                };
+
+                Servers.Add(Server);
+            }
+
+            return Servers;
+        }
+
+        private static bool AddServerToUserConfig(JenkinsServer Server)
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            XmlElement ServerElement = UserConfig.CreateElement("server");
+            XmlAttribute IdAttribute = UserConfig.CreateAttribute("id");
+            IdAttribute.Value = Server.id;
+            XmlAttribute NameAttribute = UserConfig.CreateAttribute("name");
+            NameAttribute.Value = Server.name;
+            XmlAttribute UrlAttribute = UserConfig.CreateAttribute("url");
+            UrlAttribute.Value = Server.url;
+
+            ServerElement.Attributes.Append(IdAttribute);
+            ServerElement.Attributes.Append(NameAttribute);
+            ServerElement.Attributes.Append(UrlAttribute);
+
+            XmlNode ConfiguredServers = UserConfig.SelectSingleNode(@"userconfig/configuredservers");
+            ConfiguredServers.AppendChild(ServerElement);
+
+            try
+            {
+                UserConfig.Save(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool RemoveServerFromUserConfig(JenkinsServer Server)
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            XmlNodeList ServerNodes = UserConfig.SelectNodes(@"userconfig/configuredservers/server");
+
+            if (ServerNodes == null || ServerNodes.Count == 0)
+                return false;
+
+            foreach (XmlNode ServerNode in ServerNodes)
+            {
+                if (ServerNode.Attributes["id"].Value == Server.id
+                    && ServerNode.Attributes["name"].Value == Server.name
+                    && ServerNode.Attributes["url"].Value == Server.url)
+                {
+                    XmlNode ConfiguredServers = UserConfig.SelectSingleNode(@"userconfig/configuredservers");
+                    ConfiguredServers.RemoveChild(ServerNode);
+
+                    try
+                    {
+                        UserConfig.Save(ApplicationVariables.UserConfigFilePath);
+
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
@@ -489,5 +661,50 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             throw new Exception("This method is not implemented.");
         }
+    }
+
+    /// <summary>
+    /// Returns a Visibility state for the pane.
+    /// Parameter must contain the WindowDisplayModes that the pane wants to display in.
+    /// "reverse" in parameter will reverse the option.
+    /// "collapsible" in parameter will return "Collapsed" instead of "Hidden".
+    /// Uses String.Contains() to find args, so don't need to delimit values but it's a good idea to anyway.
+    /// Parameters and DisplayModes are made ToLower() to prevent caps from causing any issues.
+    /// </summary>
+    public class WindowDisplayModeToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string Parameters = null;
+            bool VisibilityBool = false;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string).ToLower();
+
+            if (Parameters.Contains(CurrentWindowState.DisplayMode.ToString().ToLower()))
+                VisibilityBool = true;
+
+            if (Parameters.Contains("reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public enum WindowDisplayMode
+    {
+        Lookup,
+        Config
     }
 }
