@@ -147,7 +147,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 566 "..\..\MainWindow.xaml"
+        #line 567 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Primitives.ToggleButton ChangeInactivityTimeoutButton;
         
@@ -155,7 +155,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 568 "..\..\MainWindow.xaml"
+        #line 572 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Border ChangeInactivityTimeoutOptions;
         
@@ -163,7 +163,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 573 "..\..\MainWindow.xaml"
+        #line 577 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.TextBox newTimeoutValue_TextBox;
         
@@ -171,7 +171,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 597 "..\..\MainWindow.xaml"
+        #line 601 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Grid LookupResultsActivityPane;
         
@@ -179,7 +179,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 603 "..\..\MainWindow.xaml"
+        #line 607 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.Grid LookupResultsScreenSelectPane;
         
@@ -187,7 +187,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 613 "..\..\MainWindow.xaml"
+        #line 617 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.ListBoxItem LookupResultsDetailsButton;
         
@@ -195,7 +195,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 614 "..\..\MainWindow.xaml"
+        #line 618 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.ListBoxItem LookupResultsDatabaseButton;
         
@@ -203,7 +203,7 @@ namespace Act__Premium_Cloud_Support_Utility {
         #line hidden
         
         
-        #line 615 "..\..\MainWindow.xaml"
+        #line 619 "..\..\MainWindow.xaml"
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         internal System.Windows.Controls.ListBoxItem LookupResultsActivityButton;
         
@@ -340,7 +340,7 @@ namespace Act__Premium_Cloud_Support_Utility {
             case 22:
             this.newTimeoutValue_TextBox = ((System.Windows.Controls.TextBox)(target));
             
-            #line 574 "..\..\MainWindow.xaml"
+            #line 578 "..\..\MainWindow.xaml"
             this.newTimeoutValue_TextBox.PreviewTextInput += new System.Windows.Input.TextCompositionEventHandler(this.ValidateTextInputNumbersOnly);
             
             #line default
@@ -348,7 +348,7 @@ namespace Act__Premium_Cloud_Support_Utility {
             return;
             case 23:
             
-            #line 575 "..\..\MainWindow.xaml"
+            #line 579 "..\..\MainWindow.xaml"
             ((System.Windows.Controls.Button)(target)).Click += new System.Windows.RoutedEventHandler(this.Button_ChangeInactivityTimeout_Click);
             
             #line default

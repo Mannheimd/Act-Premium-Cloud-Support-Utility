@@ -563,8 +563,12 @@
                             <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}" Click="Button_ResendWelcomeEmail_Click"/>
                         </StackPanel>
                     </Border>
-                    <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
+                    <Grid>
+                        <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
                                   Style="{StaticResource darkToggleButtonBordered}"/>
+                        <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                               Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"/>
+                    </Grid>
                     <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
                             BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
                             Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">

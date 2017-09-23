@@ -38,7 +38,32 @@ namespace Act__Premium_Cloud_Support_Utility
             {
                 LookupStatus = APCAccountLookupStatus.Successful,
                 ResendWelcomeEmailStatus = JenkinsBuildStatus.Failed,
-                ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Successful
+                ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Successful,
+                IITID = "12345",
+                AccountName = "DebugTest",
+                Email = "debugtest@invalid.com",
+                CreateDate = "2000BC",
+                TrialOrPaid = "Trial",
+                SerialNumber = "12345-ABCDE-67890-FGHIJ",
+                SeatCount = "3",
+                SuspendStatus = "NotSuspended",
+                ArchiveStatus = "NotArchived",
+                SiteName = "DebugSite",
+                IISServer = "DBG1-DBGIIS-01",
+                LoginUrl = "http://localhost/",
+                UploadUrl = "http://localhost",
+                ZuoraAccount = "A00123456",
+                DeleteStatus = "NotDeleted",
+                AccountType = "ActPremiumCloudPlus",
+                TimeoutValue = "60",
+                LookupTime = DateTime.Now,
+                LookupCreateTime = DateTime.Now,
+                JenkinsServer = new JenkinsServer()
+                {
+                    id = "DBG1",
+                    name = "Debug 1",
+                    url = "http://localhost/"
+                }
             };
 
             LookupResults.Add(DebugAccount);
@@ -429,6 +454,9 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    /// <summary>
+    /// Intended to convert to a progress icon, but I couldn't get that to work in reasonable time. Converts to a text representation of the status instead.
+    /// </summary>
     public class JenkinsBuildStatusToProgressIndicatorIcon_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -441,29 +469,17 @@ namespace Act__Premium_Cloud_Support_Utility
 
             if ((value as string) == JenkinsBuildStatus.InProgress.ToString())
             {
-                return new PackIconMaterial()
-                {
-                    Kind = PackIconMaterialKind.Refresh,
-                    Spin = true,
-                    SpinDuration = 2,
-                    Height = 15,
-                    Width = 15
-                };
+                return "In progress...";
             }
 
             if ((value as string) == JenkinsBuildStatus.Successful.ToString())
             {
-                return new PackIconMaterial()
-                {
-                    Kind = PackIconMaterialKind.Check,
-                    Height = 15,
-                    Width = 15
-                };
+                return "Complete";
             }
 
             if ((value as string) == JenkinsBuildStatus.Failed.ToString())
             {
-                
+                return "Task failed. Account may be suspended.";
             }
 
             return null;
