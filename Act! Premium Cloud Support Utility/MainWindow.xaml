@@ -481,7 +481,8 @@
                 
                 <!-- Database list -->
                 <Grid Grid.Column="0">
-                    <ListBox x:Name="LookupResults_DatabaseList" Margin="0,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}"
+                    <ListBox x:Name="LookupResults_DatabaseList" Margin="0,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                             ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}"
                              SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -600,7 +601,7 @@
             <!-- Lookup Results: Activity -->
             <Grid x:Name="LookupResultsActivityPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                   Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
-                <Label Content="Activities"/>
+                
             </Grid>
             
             <!-- Lookup Results: Tab Selector -->

@@ -815,6 +815,41 @@ namespace Jenkins_Tasks
 
             return DatabaseList;
         }
+
+        public static List<APCAccountActivity> ParseForActivities(string lookupData)
+        {
+            // Get the Database information block
+            string ActivityData = SearchString(lookupData, "[PROVISIONINGINFOSTART]", "[PROVISIONINGINFOEND]");
+
+            List<APCAccountActivity> ActivityList = new List<APCAccountActivity>();
+            try
+            {
+                // Get database lines
+                string[] Activities = ActivityData.Split(new string[] { "[Activity=" }, StringSplitOptions.None);
+
+                // For each line, build a database object
+                foreach (string Activity in Activities)
+                {
+                    if (!Activity.Contains("{")) // This prevents it throwing an empty database into the list, caused by the 0 value being nothing helpful
+                        continue;
+
+                    APCAccountActivity NewActivity = new APCAccountActivity();
+
+                    NewActivity.Date = SearchString(Activity, "{Date=", "}");
+                    NewActivity.Type = SearchString(Activity, "{Type=", "}");
+                    NewActivity.Status = SearchString(Activity, "{Status=", "}");
+                    NewActivity.Detail = SearchString(Activity, "{Detail=", "}");
+
+                    ActivityList.Add(NewActivity);
+                }
+            }
+            catch
+            {
+                // await Tumbleweed()
+            }
+
+            return ActivityList;
+        }
     }
 
     public class JenkinsServer
@@ -849,6 +884,7 @@ namespace Jenkins_Tasks
         private string _lookupValue;
         private string _timeoutValue;
         private List<APCDatabase> _databases;
+        private List<APCAccountActivity> _accountActivity;
         private APCLookupType _lookupType;
         private DateTime _lookupTime;
         private DateTime _lookupCreateTime;
@@ -992,6 +1028,12 @@ namespace Jenkins_Tasks
             set { SetPropertyField("Databases", ref _databases, value); }
         }
 
+        public List<APCAccountActivity> AccountActivity
+        {
+            get { return _accountActivity; }
+            set { SetPropertyField("Databases", ref _accountActivity, value); }
+        }
+
         public APCLookupType LookupType
         {
             get { return _lookupType; }
@@ -1031,8 +1073,6 @@ namespace Jenkins_Tasks
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-
 
         // Add function here to return XML node representation of APCAccount - is this better than having it separate?
     }
@@ -1114,6 +1154,54 @@ namespace Jenkins_Tasks
         {
             get { return _lastLogin; }
             set { SetPropertyField("LookupTime", ref _lastLogin, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    public class APCAccountActivity : INotifyPropertyChanged
+    {
+        private string _date;
+        private string _type;
+        private string _status;
+        private string _detail;
+
+        public string Date
+        {
+            get { return _date; }
+            set { SetPropertyField("LookupTime", ref _date, value); }
+        }
+
+        public string Type
+        {
+            get { return _type; }
+            set { SetPropertyField("LookupTime", ref _type, value); }
+        }
+
+        public string Status
+        {
+            get { return _status; }
+            set { SetPropertyField("LookupTime", ref _status, value); }
+        }
+
+        public string Detail
+        {
+            get { return _detail; }
+            set { SetPropertyField("LookupTime", ref _detail, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
