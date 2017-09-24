@@ -25,6 +25,12 @@ namespace Act__Premium_Cloud_Support_Utility
         public static readonly CurrentWindowState Instance = new CurrentWindowState();
         private CurrentWindowState() { }
 
+        public static string LocationTop { get; set; }
+        public static string LocationLeft { get; set; }
+        public static string Height { get; set; }
+        public static string Width { get; set; }
+        public static WindowState WindowStateStaging { get; set; }
+
         public WindowDisplayMode DisplayMode
         {
             get
@@ -37,7 +43,20 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
+        public WindowState State
+        {
+            get
+            {
+                return (WindowState)GetValue(StateProperty);
+            }
+            set
+            {
+                SetValue(StateProperty, value);
+            }
+        }
+
         public static readonly DependencyProperty DisplayModeProperty = DependencyProperty.Register("DisplayMode", typeof(WindowDisplayMode), typeof(CurrentWindowState), new UIPropertyMetadata());
+        public static readonly DependencyProperty StateProperty = DependencyProperty.Register("State", typeof(WindowState), typeof(CurrentWindowState), new UIPropertyMetadata());
     }
 
     public static class ApplicationVariables
@@ -46,24 +65,119 @@ namespace Act__Premium_Cloud_Support_Utility
         public static string UserConfigFilePath = AppDataPath + @"\userconfig.xml";
     }
 
+    static class ApplicationSettings
+    {
+        public static void Load()
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+
+                CurrentWindowState.Height = UserConfig.SelectSingleNode(@"/userconfig/application/height").InnerText;
+                CurrentWindowState.Width = UserConfig.SelectSingleNode(@"/userconfig/application/width").InnerText;
+                CurrentWindowState.LocationTop = UserConfig.SelectSingleNode(@"/userconfig/application/locationtop").InnerText;
+                CurrentWindowState.LocationLeft = UserConfig.SelectSingleNode(@"/userconfig/application/locationleft").InnerText;
+
+                // This has to be after Top and Left, otherwise the maximisation doesn't work to maximum correctness
+                WindowState State;
+                Enum.TryParse(UserConfig.SelectSingleNode(@"/userconfig/application/windowstate").InnerText, out State);
+                CurrentWindowState.WindowStateStaging = State;
+            }
+            catch
+            {
+
+            }
+        }
+
+        public static void Save(WindowState WindowStateEnum)
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+
+                XmlNode ApplicationSettings = UserConfig.SelectSingleNode(@"userconfig/application");
+
+                if (ApplicationSettings.SelectSingleNode(@"height") != null)
+                    ApplicationSettings.SelectSingleNode(@"height").InnerText = CurrentWindowState.Height;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("height");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.Height);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"width") != null)
+                    ApplicationSettings.SelectSingleNode(@"width").InnerText = CurrentWindowState.Width;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("width");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.Width);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"locationtop") != null)
+                    ApplicationSettings.SelectSingleNode(@"locationtop").InnerText = CurrentWindowState.LocationTop;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("locationtop");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.LocationTop);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"locationleft") != null)
+                    ApplicationSettings.SelectSingleNode(@"locationleft").InnerText = CurrentWindowState.LocationLeft;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("locationleft");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.LocationLeft);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"windowstate") != null)
+                    ApplicationSettings.SelectSingleNode(@"windowstate").InnerText = WindowStateEnum.ToString();
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("windowstate");
+                    XmlText NewText = UserConfig.CreateTextNode(WindowStateEnum.ToString());
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                UserConfig.Save(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return;
+            }
+        }
+    }
+
     public partial class MainWindow : Window
     {
         public static ObservableCollection<APCAccount> LookupResults = new ObservableCollection<APCAccount>();
 
         public MainWindow()
         {
-            AddServerToUserConfig(new JenkinsServer()
-            {
-                id = "DBG1",
-                name = "Debug 1",
-                url = "http://localhost/"
-            });
+            ApplicationSettings.Load();
 
-            JenkinsInfo.AvailableJenkinsServers = JenkinsTasks.getJenkinsServerList();
-            JenkinsInfo.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
-            JenkinsInfo.lookupTypeList = JenkinsTasks.buildAPCLookupTypeList();
+            JenkinsInfo.Instance.AvailableJenkinsServers = JenkinsTasks.getJenkinsServerList();
+            JenkinsInfo.Instance.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
+            JenkinsInfo.Instance.LookupTypeList = JenkinsTasks.buildAPCLookupTypeList();
 
-            if (JenkinsInfo.ConfiguredJenkinsServers.Count < 1)
+            if (JenkinsInfo.Instance.ConfiguredJenkinsServers.Count < 1)
                 CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Config;
             else
                 CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Lookup;
@@ -364,7 +478,7 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void ConfigPane_Back_Button_Click(object sender, RoutedEventArgs e)
         {
-            if (JenkinsInfo.ConfiguredJenkinsServers.Count < 0)
+            if (JenkinsInfo.Instance.ConfiguredJenkinsServers.Count < 1)
             {
                 if (MessageBox.Show("You have no configured servers. Are you sure you want to leave?", "No Configured Servers", MessageBoxButton.YesNo) == MessageBoxResult.No)
                     return;
@@ -373,13 +487,72 @@ namespace Act__Premium_Cloud_Support_Utility
             CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Lookup;
         }
 
+        private async void ConfigPane_AddServer_Go_Click(object sender, RoutedEventArgs e)
+        {
+            if (ConfigPane_AvailableJenkinsServerList.SelectedItem == null || !(ConfigPane_AvailableJenkinsServerList.SelectedItem is JenkinsServer))
+                return;
+
+            // Secure and store the new login credentials
+            JenkinsTasks.SecureJenkinsCreds(
+                ConfigPane_AddServer_Username_TextBox.Text,
+                ConfigPane_AddServer_Token_TextBox.Text,
+                (ConfigPane_AvailableJenkinsServerList.SelectedItem as JenkinsServer).id
+                );
+
+            // Test login
+            if (!await JenkinsTasks.checkServerLogin(ConfigPane_AvailableJenkinsServerList.SelectedItem as JenkinsServer))
+            {
+                MessageBox.Show("Login failed. Verify you are using the correct user name and API token.", "Login Failed");
+                return;
+            }
+
+            // Add the server to the config
+            AddServerToUserConfig(ConfigPane_AvailableJenkinsServerList.SelectedItem as JenkinsServer);
+            JenkinsInfo.Instance.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
+
+            // For some reason the ConfiguredServers thing won't bind properly, so we have to update it each time we change it
+            Config_ConfiguredJenkinsServerList.ItemsSource = JenkinsInfo.Instance.ConfiguredJenkinsServers;
+        }
+
+        private void ConfigPane_RemoveServer_Click(object sender, RoutedEventArgs e)
+        {
+            if (Config_ConfiguredJenkinsServerList.SelectedItem == null || !(Config_ConfiguredJenkinsServerList.SelectedItem is JenkinsServer))
+                return;
+
+            RemoveServerFromUserConfig(Config_ConfiguredJenkinsServerList.SelectedItem as JenkinsServer);
+            JenkinsInfo.Instance.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
+
+            // For some reason the ConfiguredServers thing won't bind properly, so we have to update it each time we change it
+            Config_ConfiguredJenkinsServerList.ItemsSource = JenkinsInfo.Instance.ConfiguredJenkinsServers;
+        }
+
         private void LookupListPane_Configure_Button_Click(object sender, RoutedEventArgs e)
         {
             CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Config;
         }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            WindowState WindowStateToSave = CurrentWindowState.Instance.State;
+
+            if (CurrentWindowState.Instance.State == WindowState.Maximized)
+            {
+                CurrentWindowState.Instance.State = WindowState.Normal;
+            }
+
+            ApplicationSettings.Save(WindowStateToSave);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            CurrentWindowState.Instance.State = CurrentWindowState.WindowStateStaging;
+
+            // The binding doesn't work properly and I don't have time to fix it, so here.
+            SetValue(MainWindow.WindowStateProperty, CurrentWindowState.WindowStateStaging);
+        }
     }
 
-    public class ListBoxSelectedState_Converter : IValueConverter
+    public class ListBoxSelectedToVisibility_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -394,6 +567,27 @@ namespace Act__Premium_Cloud_Support_Utility
                 return Visibility.Hidden;
             else
                 return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class ListBoxSelectedToBool_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool Output = false;
+
+            if (value != null)
+                Output = true;
+
+            if (parameter != null && parameter.ToString() == "Reverse")
+                Output = !Output;
+
+            return Output;
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
@@ -735,6 +929,28 @@ namespace Act__Premium_Cloud_Support_Utility
                 return Visibility.Collapsed;
             else
                 return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+    public class JenkinsRootUrlToConfigureUrl_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string && value != null)
+            {
+                string RootUrl = (value as string);
+
+                if (RootUrl.EndsWith(@"/"))
+                    return new System.Uri(RootUrl + "me/configure");
+                else
+                    return new System.Uri(RootUrl + "/me/configure");
+            }
+
+            return null;
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)

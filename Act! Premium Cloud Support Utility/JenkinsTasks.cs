@@ -16,11 +16,50 @@ using System.ComponentModel;
 
 namespace Jenkins_Tasks
 {
-    static class JenkinsInfo
+    public class JenkinsInfo : DependencyObject
     {
-        public static List<JenkinsServer> AvailableJenkinsServers { get; set; }
-        public static List<JenkinsServer> ConfiguredJenkinsServers { get; set; }
-        public static List<APCLookupType> lookupTypeList { get; set; }
+        public static readonly JenkinsInfo Instance = new JenkinsInfo();
+        public JenkinsInfo() { }
+
+        public List<JenkinsServer> AvailableJenkinsServers
+        {
+            get
+            {
+                return (List<JenkinsServer>)GetValue(AvailableJenkinsServersProperty);
+            }
+            set
+            {
+                SetValue(AvailableJenkinsServersProperty, value);
+            }
+        }
+
+        public List<JenkinsServer> ConfiguredJenkinsServers
+        {
+            get
+            {
+                return (List<JenkinsServer>)GetValue(ConfiguredJenkinsServersProperty);
+            }
+            set
+            {
+                SetValue(ConfiguredJenkinsServersProperty, value);
+            }
+        }
+
+        public List<APCLookupType> LookupTypeList
+        {
+            get
+            {
+                return (List<APCLookupType>)GetValue(lookupTypeListProperty);
+            }
+            set
+            {
+                SetValue(lookupTypeListProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty AvailableJenkinsServersProperty = DependencyProperty.Register("AvailableJenkinsServers", typeof(List<JenkinsServer>), typeof(JenkinsInfo), new UIPropertyMetadata());
+        public static readonly DependencyProperty ConfiguredJenkinsServersProperty = DependencyProperty.Register("ConfiguredJenkinsServers", typeof(List<JenkinsServer>), typeof(JenkinsInfo), new UIPropertyMetadata());
+        public static readonly DependencyProperty lookupTypeListProperty = DependencyProperty.Register("lookupTypeList", typeof(List<APCLookupType>), typeof(JenkinsInfo), new UIPropertyMetadata());
     }
 
     class JenkinsTasks
