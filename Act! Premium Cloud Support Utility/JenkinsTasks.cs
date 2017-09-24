@@ -632,6 +632,120 @@ namespace Jenkins_Tasks
         }
 
         /// <summary>
+        /// Builds [job not yet made] to get list of database backups
+        /// </summary>
+        /// <param name="database">APCDatabase to get users for</param>
+        /// <param name="server">JenkinsServer to run build on</param>
+        /// <returns>Returns a list of APCDatabaseUsers</returns>
+        public static async Task<List<APCDatabaseBackup>> getDatabaseBackups(APCDatabase database, JenkinsServer server)
+        {
+            database.BackupLoadStatus = JenkinsBuildStatus.InProgress;
+
+            // Check the Jenkins login credentials
+            if (UnsecureJenkinsCreds(server.id) == null)
+            {
+                database.BackupLoadStatus = JenkinsBuildStatus.Failed;
+                return null;
+            }
+
+            // Post a request to build LookupCustomer and wait for a response
+            string BuildOutput = await runJenkinsBuild(server, @"/job/[GetTheJobLink]/buildWithParameters?&SQLServer="
+                + database.Server
+                + "&DatabaseName="
+                + database.Name
+                + "&delay=0sec");
+
+            // Get the actual data from the output
+            string Data = SearchString(BuildOutput, "[STARTDATA]", "[ENDDATA]");
+
+            // Check if successful
+            string BuildStatus = SearchString(BuildOutput, "[BackupInfoFound=", "]");
+            if (BuildStatus != "true")
+            {
+                database.BackupLoadStatus = JenkinsBuildStatus.Failed;
+                return null;
+            }
+
+            // Create a new list
+            List<APCDatabaseBackup> BackupList = new List<APCDatabaseBackup>();
+
+            // Get BackupInfo block
+            string BackupInfo = SearchString(Data, "[BACKUPINFOSTART]", "[BACKUPINFOEND]");
+
+            // Get Backup lines
+            string[] Backups = BackupInfo.Split(new string[] { "[Backup=" }, StringSplitOptions.None);
+
+            // For each line, build a user object
+            foreach (string Backup in Backups)
+            {
+                if (!Backup.Contains("{")) // This prevents it throwing an empty user into the list, caused by the 0 value being nothing helpful
+                    continue;
+
+                APCDatabaseBackup NewBackup = new APCDatabaseBackup();
+
+                // File name format:
+                // <environment>-<sql server>-<database name>-<datetime>-<full/diff>.bak
+                // Note: Some SQL servers contain hyphens
+
+                string TimeString = SearchString(Backup, database.Name + "-", "-");
+                NewBackup.Date = new DateTime(
+                    Convert.ToInt32(TimeString.Substring(0, 4)), // Year
+                    Convert.ToInt32(TimeString.Substring(4, 2)), // Month
+                    Convert.ToInt32(TimeString.Substring(6, 2)), // Day
+                    Convert.ToInt32(TimeString.Substring(8, 2)), // Hour
+                    Convert.ToInt32(TimeString.Substring(10, 2)), // Minute
+                    00 // Second
+                    );
+
+                NewBackup.Filename = SearchString(Backup, "{filename=", "}");
+                NewBackup.Type = SearchString(Backup, TimeString + "-", ".bak");
+
+                BackupList.Add(NewBackup);
+            }
+
+            database.UserLoadStatus = JenkinsBuildStatus.Successful;
+            return BackupList;
+        }
+
+        public static List<APCDatabaseBackupRestorable> GetRestorableBackupsFromFiles(List<APCDatabaseBackup> BackupFiles)
+        {
+            List<APCDatabaseBackupRestorable> RestorableBackups = new List<APCDatabaseBackupRestorable>();
+
+            // Create list of available Full backups
+            Dictionary<DateTime, APCDatabaseBackup> FullBackups = new Dictionary<DateTime, APCDatabaseBackup>();
+            foreach (APCDatabaseBackup Backup in BackupFiles)
+            {
+                if (Backup.Type == "full")
+                {
+                    FullBackups.Add(Backup.Date.Date, Backup);
+                }
+            }
+
+            // Begin assessing files for restorable things
+            foreach (APCDatabaseBackup Backup in BackupFiles)
+            {
+                // If type is Full, add to RestorableBackup
+                if (Backup.Type == "full")
+                {
+                    APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable();
+                    RestorableBackup.BackupFiles.Add(Backup);
+                    RestorableBackup.Date = Backup.Date;
+                }
+
+                // If Diff, check for Full on the same day - if there is one, add to RestorableBackup with both files
+                if (Backup.Type == "diff" && FullBackups.ContainsKey(Backup.Date.Date))
+                {
+                    APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable();
+                    RestorableBackup.BackupFiles.Add(FullBackups[Backup.Date.Date]);
+                    RestorableBackup.BackupFiles.Add(Backup);
+                    RestorableBackup.Date = Backup.Date;
+                }
+            }
+
+            return RestorableBackups;
+        }
+
+        /// <summary>
         /// Builds CloudOps1-ResendWelcomeEmail to resend a customer's welcome email
         /// </summary>
         /// <param name="Account">APC Account to resend welcome email for</param>
@@ -1130,7 +1244,9 @@ namespace Jenkins_Tasks
         private string _server;
         private List<APCDatabaseUser> _users;
         private List<APCDatabaseBackup> _backups;
+        private List<APCDatabaseBackupRestorable> _restorableBackups;
         private JenkinsBuildStatus _userLoadStatus;
+        private JenkinsBuildStatus _backupLoadStatus;
 
         public string Name
         {
@@ -1153,7 +1269,13 @@ namespace Jenkins_Tasks
         public List<APCDatabaseBackup> Backups
         {
             get { return _backups; }
-            set { SetPropertyField("Users", ref _backups, value); }
+            set { SetPropertyField("Backups", ref _backups, value); }
+        }
+
+        public List<APCDatabaseBackupRestorable> RestoreableBackups
+        {
+            get { return _restorableBackups; }
+            set { SetPropertyField("RestoreableBackups", ref _restorableBackups, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -1165,6 +1287,12 @@ namespace Jenkins_Tasks
         {
             get { return _userLoadStatus; }
             set { SetPropertyField("LookupTime", ref _userLoadStatus, value); }
+        }
+
+        public JenkinsBuildStatus BackupLoadStatus
+        {
+            get { return _backupLoadStatus; }
+            set { SetPropertyField("LookupTime", ref _backupLoadStatus, value); }
         }
 
         protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
@@ -1230,18 +1358,59 @@ namespace Jenkins_Tasks
     public class APCDatabaseBackup : INotifyPropertyChanged
     {
         private string _type;
+        private string _filename;
         private DateTime _date;
 
         public string Type
         {
             get { return _type; }
-            set { SetPropertyField("ContactName", ref _type, value); }
+            set { SetPropertyField("Type", ref _type, value); }
+        }
+
+        public string Filename
+        {
+            get { return _filename; }
+            set { SetPropertyField("Filename", ref _type, value); }
         }
 
         public DateTime Date
         {
             get { return _date; }
-            set { SetPropertyField("LoginName", ref _date, value); }
+            set { SetPropertyField("Date", ref _date, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    public class APCDatabaseBackupRestorable : INotifyPropertyChanged
+    {
+        private DateTime _date;
+        private List<APCDatabaseBackup> _backupFiles = new List<APCDatabaseBackup>();
+
+        public DateTime Date
+        {
+            get { return _date; }
+            set { SetPropertyField("Date", ref _date, value); }
+        }
+
+        public List<APCDatabaseBackup> BackupFiles
+        {
+            get { return _backupFiles; }
+            set { SetPropertyField("BackupFiles", ref _backupFiles, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
