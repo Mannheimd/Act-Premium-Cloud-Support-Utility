@@ -33,6 +33,7 @@
         <local:WindowDisplayModeToVisibility_Converter x:Key="WindowDisplayModeToVisibilityConverter"/>
         <local:JenkinsRootUrlToConfigureUrl_Converter x:Key="JenkinsRootUrlToConfigureUrlConverter"/>
         <local:DatabasesSubItemSelectedTab_Converter x:Key="DatabasesSubItemSelectedTabConverter"/>
+        <local:DatabasesSubItemSelectedToVisibility_Converter x:Key="DatabasesSubItemSelectedToVisibilityConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
@@ -603,7 +604,7 @@
                     </Grid>
                     
                     <!-- Users/Backup switch -->
-                    <ListBox Grid.Column="1" Margin="20,0,0,0" Width="40" Height="auto"
+                    <ListBox x:Name="LookupResults_DatabaseSubItemSwitch" Grid.Column="1" Margin="20,0,0,0" Width="40" Height="auto"
                              HorizontalAlignment="Left" VerticalAlignment="Top"
                              HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                              SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.DatabasesSubItemSelected, Converter={StaticResource DatabasesSubItemSelectedTabConverter}}">
@@ -618,7 +619,7 @@
                     </ListBox>
                 
                     <!-- Users List -->
-                    <Grid Grid.Column="1">
+                    <Grid Grid.Column="1" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Users}">
                         <ListBox Margin="58.5,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem}"
                                  SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                             <ListBox.ItemTemplate>
@@ -633,7 +634,9 @@
                     </Grid>
                 
                     <!-- Backups List -->
-                    <Grid Grid.Column="1" Visibility="Hidden"></Grid>
+                    <Grid Grid.Column="1" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Backups}">
+                        
+                    </Grid>
                 </Grid>
 
                 <!-- LookupResults: Details -->

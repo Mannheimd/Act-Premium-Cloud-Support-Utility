@@ -903,7 +903,7 @@ namespace Jenkins_Tasks
     {
         private APCAccountLookupStatus _lookupStatus;
         private APCAccountSelectedTab _selectedTab;
-        private APCDatabasesSubItemSelectedTab _databasesSubItemSelected;
+        private APCDatabasesSubItemSelectedTab _databasesSubItemSelected = APCDatabasesSubItemSelectedTab.Users;
         private JenkinsBuildStatus _resendWelcomeEmailStatus;
         private JenkinsBuildStatus _changeInactivityTimeoutStatus;
         private string _iitid;

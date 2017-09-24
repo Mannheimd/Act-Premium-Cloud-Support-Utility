@@ -983,6 +983,43 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    public class DatabasesSubItemSelectedToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string Parameters = null;
+            bool VisibilityBool = false;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string).ToLower();
+
+            if (value != null)
+            {
+                DatabasesSubItemSelectedTab_Converter Converter = new DatabasesSubItemSelectedTab_Converter();
+                APCDatabasesSubItemSelectedTab SelectedTab = (APCDatabasesSubItemSelectedTab)Converter.ConvertBack(value, targetType, parameter, culture);
+
+                if (Parameters.Contains(SelectedTab.ToString().ToLower()))
+                    VisibilityBool = true;
+            }
+
+            if (Parameters.Contains("reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
     public class JenkinsRootUrlToConfigureUrl_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
