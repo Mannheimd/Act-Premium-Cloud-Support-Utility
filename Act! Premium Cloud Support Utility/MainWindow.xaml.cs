@@ -802,6 +802,40 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
+    /// <summary>
+    /// Converts APCAccountSelectedTab to a ListBox SelectedItem integer
+    /// </summary>
+    public class DatabasesSubItemSelectedTab_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return 0;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Users.ToString())
+                return 0;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Backups.ToString())
+                return 1;
+
+            return -1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            if (value.ToString() == "-1")
+                return APCDatabasesSubItemSelectedTab.Users;
+
+            if (value.ToString() == "0")
+                return APCDatabasesSubItemSelectedTab.Users;
+
+            if (value.ToString() == "1")
+                return APCDatabasesSubItemSelectedTab.Backups;
+
+            return APCDatabasesSubItemSelectedTab.Users;
+        }
+    }
+
     public class AccountTrialOrPaid_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -948,6 +982,7 @@ namespace Act__Premium_Cloud_Support_Utility
             throw new Exception("This method is not implemented.");
         }
     }
+
     public class JenkinsRootUrlToConfigureUrl_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

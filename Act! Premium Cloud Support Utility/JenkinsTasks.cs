@@ -903,6 +903,7 @@ namespace Jenkins_Tasks
     {
         private APCAccountLookupStatus _lookupStatus;
         private APCAccountSelectedTab _selectedTab;
+        private APCDatabasesSubItemSelectedTab _databasesSubItemSelected;
         private JenkinsBuildStatus _resendWelcomeEmailStatus;
         private JenkinsBuildStatus _changeInactivityTimeoutStatus;
         private string _iitid;
@@ -940,6 +941,12 @@ namespace Jenkins_Tasks
         {
             get { return _selectedTab; }
             set { SetPropertyField("SelectedTab", ref _selectedTab, value); }
+        }
+
+        public APCDatabasesSubItemSelectedTab DatabasesSubItemSelected
+        {
+            get { return _databasesSubItemSelected; }
+            set { SetPropertyField("SelectedTab", ref _databasesSubItemSelected, value); }
         }
 
         public JenkinsBuildStatus ResendWelcomeEmailStatus
@@ -1296,5 +1303,11 @@ namespace Jenkins_Tasks
     {
         PrimaryAccountEmail,
         SpecifiedEmail
+    };
+
+    public enum APCDatabasesSubItemSelectedTab
+    {
+        Users,
+        Backups
     };
 }

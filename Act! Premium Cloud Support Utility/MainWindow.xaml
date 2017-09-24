@@ -32,6 +32,7 @@
         <local:JenkinsBuildStatusToProgressIndicatorIcon_Converter x:Key="JenkinsBuildStatusToProgressIndicatorIconConverter"/>
         <local:WindowDisplayModeToVisibility_Converter x:Key="WindowDisplayModeToVisibilityConverter"/>
         <local:JenkinsRootUrlToConfigureUrl_Converter x:Key="JenkinsRootUrlToConfigureUrlConverter"/>
+        <local:DatabasesSubItemSelectedTab_Converter x:Key="DatabasesSubItemSelectedTabConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
@@ -600,10 +601,25 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
+                    
+                    <!-- Users/Backup switch -->
+                    <ListBox Grid.Column="1" Margin="20,0,0,0" Width="40" Height="auto"
+                             HorizontalAlignment="Left" VerticalAlignment="Top"
+                             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                             SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.DatabasesSubItemSelected, Converter={StaticResource DatabasesSubItemSelectedTabConverter}}">
+                        <ListBoxItem x:Name="DatabasesTab_UsersOption"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Label Content="{iconPacks:PackIconFontAwesome Users, Height=24, Width=24}"/>
+                        </ListBoxItem>
+                        <ListBoxItem x:Name="DatabasesTab_BackupsOption"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Label Content="{iconPacks:PackIconFontAwesome FolderOutline, Height=24, Width=24}"/>
+                        </ListBoxItem>
+                    </ListBox>
                 
                     <!-- Users List -->
                     <Grid Grid.Column="1">
-                        <ListBox Margin="20,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem}"
+                        <ListBox Margin="58.5,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem}"
                                  SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
