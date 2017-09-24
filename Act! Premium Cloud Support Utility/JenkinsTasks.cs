@@ -1220,6 +1220,40 @@ namespace Jenkins_Tasks
         public event PropertyChangedEventHandler PropertyChanged;
     }
 
+    public class APCDatabaseBackup : INotifyPropertyChanged
+    {
+        private string _type;
+        private DateTime _date;
+
+        public string Type
+        {
+            get { return _type; }
+            set { SetPropertyField("ContactName", ref _type, value); }
+        }
+
+        public DateTime Date
+        {
+            get { return _date; }
+            set { SetPropertyField("LoginName", ref _date, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
+
+        protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+
     public class APCAccountActivity : INotifyPropertyChanged
     {
         private string _date;
