@@ -742,6 +742,14 @@ namespace Jenkins_Tasks
                 }
             }
 
+            RestorableBackups.Sort(delegate(APCDatabaseBackupRestorable x, APCDatabaseBackupRestorable y)
+            {
+                if (x.Date == null && y.Date == null) return 0;
+                else if (x.Date == null) return -1;
+                else if (y.Date == null) return 1;
+                else return x.Date.CompareTo(y.Date);
+            });
+
             return RestorableBackups;
         }
 
