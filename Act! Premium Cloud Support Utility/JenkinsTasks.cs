@@ -1129,6 +1129,7 @@ namespace Jenkins_Tasks
         private string _name;
         private string _server;
         private List<APCDatabaseUser> _users;
+        private List<APCDatabaseBackup> _backups;
         private JenkinsBuildStatus _userLoadStatus;
 
         public string Name
@@ -1147,6 +1148,12 @@ namespace Jenkins_Tasks
         {
             get { return _users; }
             set { SetPropertyField("Users", ref _users, value); }
+        }
+
+        public List<APCDatabaseBackup> Backups
+        {
+            get { return _backups; }
+            set { SetPropertyField("Users", ref _backups, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
