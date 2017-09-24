@@ -550,6 +550,18 @@ namespace Act__Premium_Cloud_Support_Utility
             // The binding doesn't work properly and I don't have time to fix it, so here.
             SetValue(MainWindow.WindowStateProperty, CurrentWindowState.WindowStateStaging);
         }
+
+        private async void LookupResults_Reset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount account = (APCAccount)(sender as Button).DataContext;
+            if (account.JenkinsServer != null
+                && account.LookupType != null
+                && account.LookupValue != null
+                && account.LookupValue.Trim() != "")
+            {
+                await JenkinsTasks.RunAPCAccountLookup(account);
+            }
+        }
     }
 
     public class ListBoxSelectedToVisibility_Converter : IValueConverter
