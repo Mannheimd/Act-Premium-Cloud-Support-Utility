@@ -458,13 +458,17 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void Button_ResendWelcomeEmail_Click(object sender, RoutedEventArgs e)
         {
+            string SpecifiedEmail = specifyEmail_TextBox.Text.Trim();
+
             APCAccount Account = (APCAccount)(sender as Button).DataContext;
             WelcomeEmailSendTo SendTo = WelcomeEmailSendTo.PrimaryAccountEmail;
             if (specifyEmail_RadioButton.IsChecked == true)
             {
                 SendTo = WelcomeEmailSendTo.SpecifiedEmail;
+
+                if (SpecifiedEmail == null || SpecifiedEmail == "")
+                    return;
             }
-            string SpecifiedEmail = specifyEmail_TextBox.Text.Trim();
 
             await JenkinsTasks.resendWelcomeEmail(Account, SendTo, SpecifiedEmail);
         }
@@ -473,6 +477,9 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             APCAccount Account = (APCAccount)(sender as Button).DataContext;
             string NewTimeoutValue = newTimeoutValue_TextBox.Text.Trim();
+
+            if (NewTimeoutValue == null || NewTimeoutValue == "")
+                return;
 
             await JenkinsTasks.updateTimeout(Account, NewTimeoutValue);
         }

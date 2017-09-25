@@ -808,7 +808,6 @@ namespace Jenkins_Tasks
         public static async Task resendWelcomeEmail(APCAccount Account, WelcomeEmailSendTo SendType, string SpecifiedEmail)
         {
             Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.InProgress;
-            MessageBox.Show("Yippetydoodah");
 
             string SendEmailTo;
 
@@ -849,8 +848,6 @@ namespace Jenkins_Tasks
             {
                 Account.ResendWelcomeEmailStatus = JenkinsBuildStatus.Failed;
             }
-
-            MessageBox.Show("Yippetyday");
         }
 
         /// <summary>
