@@ -458,7 +458,7 @@
             
                 <!-- Lookup Results: New Lookup -->
                 <Grid x:Name="LookupResultsNewLookupPane" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,15,0"
-                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
+                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext, Converter={StaticResource AccountLookupSuccessConverter}, ConverterParameter=Reverse}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
@@ -525,7 +525,7 @@
             
                 <!-- Lookup Results: Basic Info -->
                 <Grid x:Name="LookupResultsBasicInfoPane" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
-                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
+                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext, Converter={StaticResource AccountLookupSuccessConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="20"/><!-- Just a spacer, no data should be in here -->
@@ -783,7 +783,7 @@
             
                 <!-- Lookup Results: Tab Selector -->
                 <Grid x:Name="LookupResultsScreenSelectPane" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,10,0,0"
-                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupSuccessConverter}}">
+                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext, Converter={StaticResource AccountLookupSuccessConverter}}">
                     <ListBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                              SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SelectedTab, Converter={StaticResource LookupResultSelectedTabConverter}}"
                              BorderBrush="Transparent" BorderThickness="0">

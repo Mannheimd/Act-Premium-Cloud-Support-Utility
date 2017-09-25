@@ -695,10 +695,18 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+                return Visibility.Hidden;
+
+            APCAccount Account = (APCAccount) value;
+
             bool IsSuccessful = false;
-            if (value != null && value.ToString() == APCAccountLookupStatus.Successful.ToString())
+            if (Account.LookupStatus == APCAccountLookupStatus.Successful)
                 IsSuccessful = true;
-            
+
+            if (Account.DidLookupComplete)
+                IsSuccessful = true;
+
             if (parameter != null && parameter.ToString() == "Reverse")
                 IsSuccessful = !IsSuccessful;
 

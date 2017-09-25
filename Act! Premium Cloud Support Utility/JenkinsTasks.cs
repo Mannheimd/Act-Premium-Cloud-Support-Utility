@@ -533,6 +533,7 @@ namespace Jenkins_Tasks
 
             // Lookup is now a success, even though we're gonna do some more work
             account.LookupStatus = APCAccountLookupStatus.Successful;
+            account.DidLookupComplete = true;
 
             // Get the inactivity timeout
             account.TimeoutValue = await getTimeout(account);
@@ -1070,6 +1071,7 @@ namespace Jenkins_Tasks
         private APCDatabasesSubItemSelectedTab _databasesSubItemSelected = APCDatabasesSubItemSelectedTab.Users;
         private JenkinsBuildStatus _resendWelcomeEmailStatus;
         private JenkinsBuildStatus _changeInactivityTimeoutStatus;
+        private bool _didLookupComplete = false;
         private string _iitid;
         private string _accountName;
         private string _email;
@@ -1124,6 +1126,12 @@ namespace Jenkins_Tasks
         {
             get { return _changeInactivityTimeoutStatus; }
             set { SetPropertyField("ChangeInactivityTimeoutStatus", ref _changeInactivityTimeoutStatus, value); }
+        }
+
+        public bool DidLookupComplete
+        {
+            get { return _didLookupComplete; }
+            set { SetPropertyField("DidLookupComplete", ref _didLookupComplete, value); }
         }
 
         public string IITID
