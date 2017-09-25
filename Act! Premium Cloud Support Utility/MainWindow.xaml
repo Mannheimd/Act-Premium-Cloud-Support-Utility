@@ -34,6 +34,7 @@
         <local:JenkinsRootUrlToConfigureUrl_Converter x:Key="JenkinsRootUrlToConfigureUrlConverter"/>
         <local:DatabasesSubItemSelectedTab_Converter x:Key="DatabasesSubItemSelectedTabConverter"/>
         <local:DatabasesSubItemSelectedToVisibility_Converter x:Key="DatabasesSubItemSelectedToVisibilityConverter"/>
+        <local:JenkinsBuildStatusToVisibility_Converter x:Key="JenkinsBuildStatusToVisibilityConverter"/>
 
         <!-- Colours -->
         <SolidColorBrush Color="#FE5000" x:Key="swiftpageOrange"/>
@@ -529,7 +530,6 @@
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="20"/><!-- Just a spacer, no data should be in here -->
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="55"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -539,9 +539,9 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="LookupResults_Reset_Button" Grid.Column="3" Grid.RowSpan="9000"
+                    <Button x:Name="LookupResults_Reset_Button" Grid.Column="2" Grid.RowSpan="9000"
                             Content="{iconPacks:PackIconMaterialLight Refresh, Height=20, Width=20}"
-                            Height="22" Width="22" Margin="16,16,16,0"
+                            Height="22" Width="22" Margin="0,16,16,0"
                             VerticalAlignment="Top" HorizontalAlignment="Right"
                             Style="{StaticResource darkButton}"
                             Click="LookupResults_Reset_Button_Click"/>
@@ -589,7 +589,7 @@
                 
                     <!-- Database list -->
                     <Grid Grid.Column="0">
-                        <ListBox x:Name="LookupResults_DatabaseList" Margin="0,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                        <ListBox x:Name="LookupResults_DatabaseList" Margin="0,0,0,15" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
                                  ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}"
                                  SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                             <ListBox.ItemTemplate>
@@ -619,8 +619,12 @@
                     </ListBox>
                 
                     <!-- Users List -->
-                    <Grid Grid.Column="1" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Users}">
-                        <ListBox Margin="58.5,0,0,10" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem}"
+                    <Grid Grid.Column="1" Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Users}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
                                  SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -634,8 +638,38 @@
                     </Grid>
                 
                     <!-- Backups List -->
-                    <Grid Grid.Column="1" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Backups}">
-                        
+                    <Grid Grid.Column="1" Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Backups}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="200"/>
+                        </Grid.ColumnDefinitions>
+                        <ListBox Grid.Column="0" x:Name="LookupResults_BackupList"
+                                 Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                 ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreableBackups}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Date}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Margin="15,0,15,0" Grid.Column="1" Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
+                            <Button HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                                    Content="Load backups"
+                                    Style="{StaticResource darkButtonBordered}"
+                                    Click="LookupResults_DatabaseBackups_LoadBackups_Click"/>
+                            <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
+                                   Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible}"/>
+                            <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
+                                    Content="Retain Backup"
+                                    Style="{StaticResource darkButtonBordered}"
+                                    Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
+                            <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
+                                   Content="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible}"/>
+                        </StackPanel>
                     </Grid>
                 </Grid>
 

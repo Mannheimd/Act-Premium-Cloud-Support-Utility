@@ -63,6 +63,7 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public static string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Glacier";
         public static string UserConfigFilePath = AppDataPath + @"\userconfig.xml";
+        public static ReadOnlyCollection<TimeZoneInfo> TimeZones = TimeZoneInfo.GetSystemTimeZones();
     }
 
     static class ApplicationSettings
@@ -461,6 +462,25 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
+        private async void LookupResults_DatabaseBackups_LoadBackups_Click(object sender, RoutedEventArgs e)
+        {
+            APCDatabase Database = (APCDatabase)(sender as Button).DataContext;
+            if (Database.Server != null
+                && Database.Name != null)
+            {
+                await JenkinsTasks.getDatabaseBackups(Database, Database.Database_APCAccount.JenkinsServer);
+            }
+        }
+
+        private async void LookupResults_DatabaseBackups_RetainBackup_Click(object sender, RoutedEventArgs e)
+        {
+            APCDatabaseBackupRestorable Backup = (APCDatabaseBackupRestorable)(sender as Button).DataContext;
+            if (Backup != null)
+            {
+                await JenkinsTasks.RetainDatabaseBackup(Backup);
+            }
+        }
+
         private async void LookupResults_DatabaseList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             APCAccount Account = (APCAccount)(sender as ListBox).DataContext;
@@ -533,9 +553,9 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            WindowState WindowStateToSave = CurrentWindowState.Instance.State;
+            WindowState WindowStateToSave = (WindowState)GetValue(MainWindow.WindowStateProperty);
 
-            if (CurrentWindowState.Instance.State == WindowState.Maximized)
+            if (WindowStateToSave == WindowState.Maximized)
             {
                 CurrentWindowState.Instance.State = WindowState.Normal;
             }
@@ -936,6 +956,55 @@ namespace Act__Premium_Cloud_Support_Utility
             }
 
             return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class JenkinsBuildStatusToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool VisibilityBool = false;
+            string Parameters = null;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string).ToLower();
+
+            if (value == null || (value as string) == "")
+                VisibilityBool = false;
+
+            if ((value as string) == JenkinsBuildStatus.NotStarted.ToString())
+                VisibilityBool = false;
+
+            if ((value as string) == JenkinsBuildStatus.InProgress.ToString())
+            {
+                VisibilityBool = true;
+            }
+
+            if ((value as string) == JenkinsBuildStatus.Successful.ToString())
+            {
+                VisibilityBool = true;
+            }
+
+            if ((value as string) == JenkinsBuildStatus.Failed.ToString())
+            {
+                VisibilityBool = true;
+            }
+
+            if (Parameters.Contains("reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)

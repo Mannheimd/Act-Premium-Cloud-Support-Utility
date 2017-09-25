@@ -524,7 +524,7 @@ namespace Jenkins_Tasks
             }
 
             // Get a list of databases from the output
-            account.Databases = ParseForDatabases(lookupData);
+            account.Databases = ParseForDatabases(lookupData, account);
 
             account.LookupTime = DateTime.Now;
 
@@ -681,7 +681,7 @@ namespace Jenkins_Tasks
                 if (!Backup.Contains("{")) // This prevents it throwing an empty user into the list, caused by the 0 value being nothing helpful
                     continue;
 
-                APCDatabaseBackup NewBackup = new APCDatabaseBackup();
+                APCDatabaseBackup NewBackup = new APCDatabaseBackup(database);
 
                 // File name format:
                 // <environment>-<sql server>-<database name>-<datetime>-<full/diff>.bak
@@ -727,7 +727,7 @@ namespace Jenkins_Tasks
                 // If type is Full, add to RestorableBackup
                 if (Backup.Type == "full")
                 {
-                    APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable();
+                    APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable(Backup.Backup_Database);
                     RestorableBackup.BackupFiles.Add(Backup);
                     RestorableBackup.Date = Backup.Date;
                 }
@@ -735,7 +735,7 @@ namespace Jenkins_Tasks
                 // If Diff, check for Full on the same day - if there is one, add to RestorableBackup with both files
                 if (Backup.Type == "diff" && FullBackups.ContainsKey(Backup.Date.Date))
                 {
-                    APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable();
+                    APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable(Backup.Backup_Database);
                     RestorableBackup.BackupFiles.Add(FullBackups[Backup.Date.Date]);
                     RestorableBackup.BackupFiles.Add(Backup);
                     RestorableBackup.Date = Backup.Date;
@@ -751,6 +751,48 @@ namespace Jenkins_Tasks
             });
 
             return RestorableBackups;
+        }
+
+        /// <summary>
+        /// Builds [get job name] to copy backup files
+        /// </summary>
+        /// <param name="database">APCDatabase to get users for</param>
+        /// <param name="server">JenkinsServer to run build on</param>
+        /// <returns>Returns a list of APCDatabaseUsers</returns>
+        public static async Task<bool> RetainDatabaseBackup(APCDatabaseBackupRestorable backup)
+        {
+            backup.RestoreBackupStatus = JenkinsBuildStatus.InProgress;
+
+            // Check the Jenkins login credentials
+            if (UnsecureJenkinsCreds(backup.Backup_APCDatabase.Database_APCAccount.JenkinsServer.id) == null)
+            {
+                backup.RestoreBackupStatus = JenkinsBuildStatus.Failed;
+                return false;
+            }
+
+            foreach (APCDatabaseBackup BackupFile in backup.BackupFiles)
+            {
+                // Post a request to build LookupCustomer and wait for a response
+                string BuildOutput = await runJenkinsBuild(backup.Backup_APCDatabase.Database_APCAccount.JenkinsServer, @"/job/[GetJobName]/buildWithParameters?&DestinationServer="
+                    + backup.Backup_APCDatabase.Server
+                    + "&Backup="
+                    + BackupFile.Filename
+                    + "&delay=0sec");
+
+                // Get the actual data from the output
+                string Data = SearchString(BuildOutput, "[STARTDATA]", "[ENDDATA]");
+
+                // Check if successful
+                string BuildStatus = SearchString(Data, "[CopySuccessful=", "]");
+                if (BuildStatus != "true")
+                {
+                    backup.RestoreBackupStatus = JenkinsBuildStatus.Failed;
+                    return false;
+                }
+            }
+
+            backup.RestoreBackupStatus = JenkinsBuildStatus.Successful;
+            return true;
         }
 
         /// <summary>
@@ -945,7 +987,7 @@ namespace Jenkins_Tasks
             }
         }
 
-        public static List<APCDatabase> ParseForDatabases(string lookupData)
+        public static List<APCDatabase> ParseForDatabases(string lookupData, APCAccount Account)
         {
             // Get the Database information block
             string DatabaseInfo = SearchString(lookupData, "[DATABASEINFOSTART]", "[DATABASEINFOEND]");
@@ -962,7 +1004,7 @@ namespace Jenkins_Tasks
                     if (!Database.Contains("{")) // This prevents it throwing an empty database into the list, caused by the 0 value being nothing helpful
                         continue;
 
-                    APCDatabase NewDatabase = new APCDatabase();
+                    APCDatabase NewDatabase = new APCDatabase(Account);
 
                     NewDatabase.Name = SearchString(Database, "{Name=", "}");
                     NewDatabase.Server = SearchString(Database, "{Server=", "}");
@@ -1051,6 +1093,7 @@ namespace Jenkins_Tasks
         private APCLookupType _lookupType;
         private DateTime _lookupTime;
         private DateTime _lookupCreateTime;
+        private TimeZone _selectedTimeZoneModifier;
         private JenkinsServer _jenkinsServer;
 
         public APCAccountLookupStatus LookupStatus
@@ -1221,6 +1264,12 @@ namespace Jenkins_Tasks
             set { SetPropertyField("LookupCreateTime", ref _lookupCreateTime, value); }
         }
 
+        public TimeZone SelectedTimeZoneModifier
+        {
+            get { return _selectedTimeZoneModifier; }
+            set { SetPropertyField("SelectedTimeZoneModifier", ref _selectedTimeZoneModifier, value); }
+        }
+
         public JenkinsServer JenkinsServer
         {
             get { return _jenkinsServer; }
@@ -1255,6 +1304,12 @@ namespace Jenkins_Tasks
         private List<APCDatabaseBackupRestorable> _restorableBackups;
         private JenkinsBuildStatus _userLoadStatus;
         private JenkinsBuildStatus _backupLoadStatus;
+        public APCAccount Database_APCAccount { get; set; }
+
+        public APCDatabase (APCAccount Account)
+        {
+            Database_APCAccount = Account;
+        }
 
         public string Name
         {
@@ -1368,6 +1423,12 @@ namespace Jenkins_Tasks
         private string _type;
         private string _filename;
         private DateTime _date;
+        public APCDatabase Backup_Database { get; set; }
+
+        public APCDatabaseBackup(APCDatabase Database)
+        {
+            Backup_Database = Database;
+        }
 
         public string Type
         {
@@ -1378,7 +1439,7 @@ namespace Jenkins_Tasks
         public string Filename
         {
             get { return _filename; }
-            set { SetPropertyField("Filename", ref _type, value); }
+            set { SetPropertyField("Filename", ref _filename, value); }
         }
 
         public DateTime Date
@@ -1408,6 +1469,13 @@ namespace Jenkins_Tasks
     {
         private DateTime _date;
         private List<APCDatabaseBackup> _backupFiles = new List<APCDatabaseBackup>();
+        private JenkinsBuildStatus _restoreBackupStatus;
+        public APCDatabase Backup_APCDatabase { get; set; }
+
+        public APCDatabaseBackupRestorable(APCDatabase Database)
+        {
+            Backup_APCDatabase = Database;
+        }
 
         public DateTime Date
         {
@@ -1419,6 +1487,12 @@ namespace Jenkins_Tasks
         {
             get { return _backupFiles; }
             set { SetPropertyField("BackupFiles", ref _backupFiles, value); }
+        }
+
+        public JenkinsBuildStatus RestoreBackupStatus
+        {
+            get { return _restoreBackupStatus; }
+            set { SetPropertyField("RestoreBackupStatus", ref _restoreBackupStatus, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
