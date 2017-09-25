@@ -226,7 +226,7 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
             };
 
-            LookupResults.Add(DebugAccount);
+            //LookupResults.Add(DebugAccount);
         }
 
         private static bool ValidateUserConfigFile()

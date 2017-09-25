@@ -761,7 +761,7 @@
                 <Grid x:Name="LookupResultsActivityPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                       Visibility="{Binding ElementName=LookupResultsActivityButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                     <ListBox x:Name="LookupResults_ActivityList" Margin="0,0,15,15" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                             ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Activities}"
+                             ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountActivity}"
                               HorizontalContentAlignment="Stretch">
                         <ListBox.ItemTemplate>
                             <DataTemplate>

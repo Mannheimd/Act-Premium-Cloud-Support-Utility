@@ -526,6 +526,9 @@ namespace Jenkins_Tasks
             // Get a list of databases from the output
             account.Databases = ParseForDatabases(lookupData, account);
 
+            // Get account activity from the output
+            account.AccountActivity = ParseForActivities(lookupData);
+
             account.LookupTime = DateTime.Now;
 
             // Lookup is now a success, even though we're gonna do some more work
