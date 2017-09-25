@@ -172,6 +172,9 @@ namespace Act__Premium_Cloud_Support_Utility
 
         public MainWindow()
         {
+            if (!ValidateUserConfigFile())
+                CreateDefaultUserConfigFile();
+
             ApplicationSettings.Load();
 
             JenkinsInfo.Instance.AvailableJenkinsServers = JenkinsTasks.getJenkinsServerList();
@@ -224,6 +227,30 @@ namespace Act__Premium_Cloud_Support_Utility
             };
 
             LookupResults.Add(DebugAccount);
+        }
+
+        private static bool ValidateUserConfigFile()
+        {
+            if (!File.Exists(ApplicationVariables.UserConfigFilePath))
+                return false;
+
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (UserConfig.SelectSingleNode(@"userconfig/application") == null)
+                return false;
+
+            if (UserConfig.SelectSingleNode(@"userconfig/configuredservers") == null)
+                return false;
+
+            return true;
         }
 
         private static bool CreateDefaultUserConfigFile()
