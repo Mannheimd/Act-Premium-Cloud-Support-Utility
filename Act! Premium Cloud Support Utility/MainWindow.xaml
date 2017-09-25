@@ -654,7 +654,7 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <StackPanel Margin="15,0,15,0" Grid.Column="1" Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
+                        <StackPanel Margin="15,0,15,0" Grid.Column="1">
                             <Button HorizontalAlignment="Stretch" VerticalAlignment="Top"
                                     Content="Load backups"
                                     Style="{StaticResource darkButtonBordered}"
@@ -665,6 +665,7 @@
                             <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
                                     Content="Retain Backup"
                                     Style="{StaticResource darkButtonBordered}"
+                                    Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}"
                                     Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
                                    Content="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"

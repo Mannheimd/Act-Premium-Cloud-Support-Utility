@@ -491,17 +491,25 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void LookupResults_DatabaseBackups_LoadBackups_Click(object sender, RoutedEventArgs e)
         {
-            APCDatabase Database = (APCDatabase)(sender as Button).DataContext;
+            if (!((APCDatabase)LookupResults_DatabaseList.SelectedItem is APCDatabase))
+                return;
+
+            APCDatabase Database = (APCDatabase)LookupResults_DatabaseList.SelectedItem;
             if (Database.Server != null
                 && Database.Name != null)
             {
                 await JenkinsTasks.getDatabaseBackups(Database, Database.Database_APCAccount.JenkinsServer);
+                await Task.Delay(10000);
             }
         }
 
         private async void LookupResults_DatabaseBackups_RetainBackup_Click(object sender, RoutedEventArgs e)
         {
-            APCDatabaseBackupRestorable Backup = (APCDatabaseBackupRestorable)(sender as Button).DataContext;
+
+            if (!((APCDatabaseBackupRestorable)LookupResults_DatabaseList.SelectedItem is APCDatabaseBackupRestorable))
+                return;
+
+            APCDatabaseBackupRestorable Backup = (APCDatabaseBackupRestorable)LookupResults_DatabaseList.SelectedItem;
             if (Backup != null)
             {
                 await JenkinsTasks.RetainDatabaseBackup(Backup);
@@ -510,11 +518,13 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void LookupResults_DatabaseList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            APCAccount Account = (APCAccount)(sender as ListBox).DataContext;
+            if (e.AddedItems.Count < 1 || e.AddedItems[0] == null || !((e.AddedItems[0] as APCDatabase) is APCDatabase))
+                return;
+
             APCDatabase Database = e.AddedItems[0] as APCDatabase;
 
             if (Database.UserLoadStatus == JenkinsBuildStatus.Failed || Database.UserLoadStatus == JenkinsBuildStatus.NotStarted)
-                Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Account.JenkinsServer);
+                Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Database.Database_APCAccount.JenkinsServer);
         }
 
         private void ValidateTextInputNumbersOnly(object sender, TextCompositionEventArgs e)
