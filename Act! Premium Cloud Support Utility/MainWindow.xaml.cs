@@ -981,22 +981,24 @@ namespace Act__Premium_Cloud_Support_Utility
             if (value == null || (value as string) == "")
                 return null;
 
-            if ((value as string) == JenkinsBuildStatus.NotStarted.ToString())
+            JenkinsBuildStatus Status = (JenkinsBuildStatus)value;
+
+            if (Status == JenkinsBuildStatus.NotStarted)
                 return null;
 
-            if ((value as string) == JenkinsBuildStatus.InProgress.ToString())
+            if (Status == JenkinsBuildStatus.InProgress)
             {
                 return "In progress...";
             }
 
-            if ((value as string) == JenkinsBuildStatus.Successful.ToString())
+            if (Status == JenkinsBuildStatus.Successful)
             {
                 return "Complete";
             }
 
-            if ((value as string) == JenkinsBuildStatus.Failed.ToString())
+            if (Status == JenkinsBuildStatus.Failed)
             {
-                return "Task failed. Account may be suspended.";
+                return "Failed";
             }
 
             return null;
