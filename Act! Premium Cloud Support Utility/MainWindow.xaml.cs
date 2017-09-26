@@ -698,13 +698,14 @@ namespace Act__Premium_Cloud_Support_Utility
             if (value == null)
                 return Visibility.Hidden;
 
-            APCAccount Account = (APCAccount) value;
+            APCAccountLookupStatus Status = (APCAccountLookupStatus)value;
 
             bool IsSuccessful = false;
-            if (Account.LookupStatus == APCAccountLookupStatus.Successful)
+
+            if (Status == APCAccountLookupStatus.Successful)
                 IsSuccessful = true;
 
-            if (Account.DidLookupComplete)
+            if (Status == APCAccountLookupStatus.Refreshing)
                 IsSuccessful = true;
 
             if (parameter != null && parameter.ToString() == "Reverse")
