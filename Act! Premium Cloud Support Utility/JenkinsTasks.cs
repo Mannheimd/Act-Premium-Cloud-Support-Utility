@@ -627,8 +627,19 @@ namespace Jenkins_Tasks
 
                 NewUser.ContactName = SearchString(User, "{fullname=", "}");
                 NewUser.LoginName = SearchString(User, "{userlogin=", "}");
-                NewUser.LastLogin = Convert.ToDateTime(SearchString(User, "{logondate=", "}"));
                 NewUser.Role = SearchString(User, "{displayname=", "}");
+
+                string LastLoginRaw = SearchString(User, "{logondate=", "}");
+                if (LastLoginRaw != null && LastLoginRaw != "")
+                {
+                    int LastLoginYear = Convert.ToInt32(LastLoginRaw.Substring(0, 4));
+                    int LastLoginMonth = Convert.ToInt32(LastLoginRaw.Substring(5, 2));
+                    int LastLoginDay = Convert.ToInt32(LastLoginRaw.Substring(8, 2));
+                    int LastLoginHour = Convert.ToInt32(LastLoginRaw.Substring(11, 2));
+                    int LastLoginMinute = Convert.ToInt32(LastLoginRaw.Substring(14, 2));
+                    int LastLoginSecond = Convert.ToInt32(LastLoginRaw.Substring(17, 2));
+                    NewUser.LastLogin = new DateTime(LastLoginYear, LastLoginMonth, LastLoginDay, LastLoginHour, LastLoginMinute, LastLoginSecond);
+                }
 
                 UserList.Add(NewUser);
             }

@@ -528,10 +528,8 @@ namespace Act__Premium_Cloud_Support_Utility
             if (e.AddedItems.Count < 1 || e.AddedItems[0] == null || !((e.AddedItems[0] as APCDatabase) is APCDatabase))
                 return;
 
-            APCDatabase Database = e.AddedItems[0] as APCDatabase;
-
-            if (Database.UserLoadStatus == JenkinsBuildStatus.Failed || Database.UserLoadStatus == JenkinsBuildStatus.NotStarted)
-                Database.Users = await JenkinsTasks.getDatabaseUsers(Database, Database.Database_APCAccount.JenkinsServer);
+            if ((e.AddedItems[0] as APCDatabase).UserLoadStatus == JenkinsBuildStatus.Failed || (e.AddedItems[0] as APCDatabase).UserLoadStatus == JenkinsBuildStatus.NotStarted)
+                (e.AddedItems[0] as APCDatabase).Users = await JenkinsTasks.getDatabaseUsers((e.AddedItems[0] as APCDatabase), (e.AddedItems[0] as APCDatabase).Database_APCAccount.JenkinsServer);
         }
 
         private void ValidateTextInputNumbersOnly(object sender, TextCompositionEventArgs e)
