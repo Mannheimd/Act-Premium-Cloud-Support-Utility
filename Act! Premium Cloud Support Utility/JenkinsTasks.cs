@@ -630,7 +630,7 @@ namespace Jenkins_Tasks
                 NewUser.Role = SearchString(User, "{displayname=", "}");
 
                 string LastLoginRaw = SearchString(User, "{logondate=", "}");
-                if (LastLoginRaw != null && LastLoginRaw != "")
+                if (LastLoginRaw != null && LastLoginRaw != "" && LastLoginRaw != "NULL")
                 {
                     int LastLoginYear = Convert.ToInt32(LastLoginRaw.Substring(0, 4));
                     int LastLoginMonth = Convert.ToInt32(LastLoginRaw.Substring(5, 2));
