@@ -552,7 +552,7 @@
                     <TextBlock
                            Grid.Column="2" Grid.Row="0"
                            Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                           Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountNumber}"/>
+                           Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ZuoraAccount}"/>
                     <TextBlock
                            Grid.Column="0" Grid.Row="1"
                            Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
