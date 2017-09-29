@@ -7,7 +7,7 @@
         xmlns:jenkinsTasks="clr-namespace:Jenkins_Tasks"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
-        Title="APC Support Utility - Beta v0.1.2" MinHeight="700" MinWidth="868"
+        Title="APC Support Utility - Beta v0.2" MinHeight="700" MinWidth="868"
         Height="{Binding Height, Source={x:Static local:CurrentWindowState.Instance}, Mode=TwoWay}" 
         Width="{Binding Width, Source={x:Static local:CurrentWindowState.Instance}, Mode=TwoWay}" 
         Top="{Binding LocationTop, Source={x:Static local:CurrentWindowState.Instance}, Mode=TwoWay}" 

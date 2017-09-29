@@ -2,14 +2,12 @@ C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Clou
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Release\Act! Premium Cloud Support Utility.exe
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Release\Act! Premium Cloud Support Utility.pdb
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\MainWindow.g.cs
-C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\JenkinsLogin.g.cs
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\ResendWelcomeEmail.g.cs
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\UpdateTimeoutValue.g.cs
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\App.g.cs
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility_MarkupCompile.cache
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility_MarkupCompile.lref
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\MainWindow.baml
-C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\JenkinsLogin.baml
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\ResendWelcomeEmail.baml
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\UpdateTimeoutValue.baml
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility.g.resources
@@ -17,3 +15,9 @@ C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Clou
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility.csproj.GenerateResource.Cache
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility.exe
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility.pdb
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Release\MahApps.Metro.IconPacks.dll
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Release\MahApps.Metro.IconPacks.pdb
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\bin\Release\MahApps.Metro.IconPacks.xml
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility.csprojResolveAssemblyReference.cache
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\GeneratedInternalTypeHelper.g.cs
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Release\Act! Premium Cloud Support Utility.csproj.CoreCompileInputs.cache
