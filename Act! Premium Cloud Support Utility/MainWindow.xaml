@@ -413,8 +413,9 @@
                         VerticalAlignment="Top" HorizontalAlignment="Right"
                         Style="{StaticResource lightButton}"
                         Click="LookupListPane_NewLookup_Click"/>
-                <ListBox Margin="0,55,0,52" Style="{StaticResource listBoxDarkBackgroundStyle}"
+                <ListBox Margin="0,55,0,52"
                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                         Style="{StaticResource listBoxDarkBackgroundStyle}"
                          x:Name="LookupListPane_Lookups_ListBox"
                          ItemsSource="{Binding Path=LookupResults}">
                     <ListBox.ItemTemplate>
@@ -425,7 +426,11 @@
                                         Style="{StaticResource darkButton}"
                                         Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsMouseOver, Converter={StaticResource BooleanToVisibilityConverter}}"
                                         Click="LookupListPane_RemoveLookup_Click"/>
-                                <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding AccountName, Converter={StaticResource LookupListAccountNameConverter}}"/>
+                                <Label Margin="3,1,20,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223">
+                                    <TextBlock Style="{StaticResource textBlockStyle}"
+                                               Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName, Converter={StaticResource LookupListAccountNameConverter}}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </Label>
                                 <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding LookupTime}"/>
                             </Grid>
                         </DataTemplate>

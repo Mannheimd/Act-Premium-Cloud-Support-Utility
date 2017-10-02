@@ -226,7 +226,11 @@ namespace Act__Premium_Cloud_Support_Utility
                 }
             };
 
-            //LookupResults.Add(DebugAccount);
+            for (int i = 0; i < 10; i++)
+            {
+                DebugAccount.AccountName = i.ToString() + "SuperLongNameOfAccountThatWillNotFitOnTheScreen";
+                LookupResults.Add(DebugAccount);
+            }
         }
 
         private static bool ValidateUserConfigFile()
