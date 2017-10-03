@@ -624,7 +624,7 @@
                         </ListBoxItem>
                         <ListBoxItem x:Name="DatabasesTab_BackupsOption"
                                      HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Label Content="{iconPacks:PackIconFontAwesome FolderOutline, Height=24, Width=24}"/>
+                            <Label Content="{iconPacks:PackIconOcticons FileZip, Height=24, Width=24}"/>
                         </ListBoxItem>
                     </ListBox>
                 
