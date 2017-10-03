@@ -690,28 +690,31 @@ namespace Act__Premium_Cloud_Support_Utility
     /// <summary>
     /// Takes a JenkinsTasks.AccountLookupStatus value, returns true if state is "Successful"
     /// </summary>
-    public class AccountLookupSuccess_Converter : IValueConverter
+    public class AccountLookupStatusToVisibility_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            bool VisibilityBool = false;
+            string Parameters = null;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string);
+            else Parameters = "";
+
             if (value == null)
-                return Visibility.Hidden;
+                VisibilityBool = false;
 
-            APCAccountLookupStatus Status = (APCAccountLookupStatus)value;
+            if (Parameters.Contains(((APCAccountLookupStatus)value).ToString()))
+                VisibilityBool = true;
 
-            bool IsSuccessful = false;
+            if (Parameters.Contains("Reverse"))
+                VisibilityBool = !VisibilityBool;
 
-            if (Status == APCAccountLookupStatus.Successful)
-                IsSuccessful = true;
-
-            if (Status == APCAccountLookupStatus.Refreshing)
-                IsSuccessful = true;
-
-            if (parameter != null && parameter.ToString() == "Reverse")
-                IsSuccessful = !IsSuccessful;
-
-            if (IsSuccessful)
+            if (VisibilityBool)
                 return Visibility.Visible;
+
+            if (Parameters.Contains("Collapsible"))
+                return Visibility.Collapsed;
             else
                 return Visibility.Hidden;
         }
@@ -722,21 +725,24 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
-    public class AccountLookupStatus_Converter : IValueConverter
+    public class AccountLookupStatusToString_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value != null && value.ToString() == APCAccountLookupStatus.Successful.ToString())
-                return "Lookup Complete";
+                return "Lookup complete";
 
             if (value != null && value.ToString() == APCAccountLookupStatus.NotStarted.ToString())
-                return "";
+                return "Not started";
 
             if (value != null && value.ToString() == APCAccountLookupStatus.NotFound.ToString())
                 return "Account not found";
 
             if (value != null && value.ToString() == APCAccountLookupStatus.InProgress.ToString())
                 return "Locating account...";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.Refreshing.ToString())
+                return "Refreshing...";
 
             if (value != null && value.ToString() == APCAccountLookupStatus.Failed.ToString())
                 return "Lookup failed";
@@ -1023,19 +1029,19 @@ namespace Act__Premium_Cloud_Support_Utility
                 Parameters = (parameter as string);
             else Parameters = "";
 
-            if (value == null || (value as string) == "")
+            if (value == null)
                 VisibilityBool = false;
 
             if (Parameters.Contains(((JenkinsBuildStatus)value).ToString()))
                 VisibilityBool = true;
 
-            if (Parameters.Contains("reverse"))
+            if (Parameters.Contains("Reverse"))
                 VisibilityBool = !VisibilityBool;
 
             if (VisibilityBool)
                 return Visibility.Visible;
 
-            if (Parameters.Contains("collapsible"))
+            if (Parameters.Contains("Collapsible"))
                 return Visibility.Collapsed;
             else
                 return Visibility.Hidden;
