@@ -625,6 +625,8 @@ namespace Jenkins_Tasks
 
                 APCDatabaseUser NewUser = new APCDatabaseUser();
 
+                NewUser.Database = database;
+
                 NewUser.ContactName = SearchString(User, "{fullname=", "}");
                 NewUser.LoginName = SearchString(User, "{userlogin=", "}");
                 NewUser.Role = SearchString(User, "{displayname=", "}");
@@ -957,23 +959,23 @@ namespace Jenkins_Tasks
             }
         }
 
-        public async Task<bool> resetUserPassword(APCDatabase database, APCDatabaseUser user, JenkinsServer server)
+        public static async Task<bool> resetUserPassword(APCDatabaseUser User)
         {
             // Post a request to build ResetPassword and wait for a response
-            if (UnsecureJenkinsCreds(server.id) != null)
+            if (UnsecureJenkinsCreds(User.Database.Database_APCAccount.JenkinsServer.id) != null)
             {
-                string output = await runJenkinsBuild(server, @"/job/CloudOps1-ResetCustomerLoginPassword/buildWithParameters?&SQLServer="
-                    + database.Server
+                string output = await runJenkinsBuild(User.Database.Database_APCAccount.JenkinsServer, @"/job/CloudOps1-ResetCustomerLoginPassword/buildWithParameters?&SQLServer="
+                    + User.Database.Server
                     + "&DatabaseName="
-                    + database.Name
+                    + User.Database.Name
                     + "&UserName="
-                    + user.LoginName
+                    + User.LoginName
                     + "&delay=0sec");
 
                 string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
                 bool oneRowAffected = output.Contains("(1 rows affected)");
 
-                if (outputDatabaseName == database.Name && oneRowAffected == true)
+                if (outputDatabaseName == User.Database.Name && oneRowAffected == true)
                 {
                     return true;
                 }
@@ -1390,6 +1392,7 @@ namespace Jenkins_Tasks
         private string _loginName;
         private string _role;
         private DateTime _lastLogin;
+        private APCDatabase _database;
         
         public string ContactName
         {
@@ -1413,6 +1416,12 @@ namespace Jenkins_Tasks
         {
             get { return _lastLogin; }
             set { SetPropertyField("LastLogin", ref _lastLogin, value); }
+        }
+
+        public APCDatabase Database
+        {
+            get { return _database; }
+            set { SetPropertyField("Database", ref _database, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)

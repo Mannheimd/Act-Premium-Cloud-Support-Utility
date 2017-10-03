@@ -534,7 +534,6 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void LookupResults_DatabaseBackups_RetainBackup_Click(object sender, RoutedEventArgs e)
         {
-
             if (!((APCDatabaseBackupRestorable)LookupResults_DatabaseList.SelectedItem is APCDatabaseBackupRestorable))
                 return;
 
@@ -542,6 +541,18 @@ namespace Act__Premium_Cloud_Support_Utility
             if (Backup != null)
             {
                 await JenkinsTasks.RetainDatabaseBackup(Backup);
+            }
+        }
+
+        private async void Button_ResetUserPassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabaseUser)LookupResults_UserList.SelectedItem is APCDatabaseUser))
+                return;
+
+            APCDatabaseUser User = (APCDatabaseUser)LookupResults_DatabaseList.SelectedItem;
+            if (User != null)
+            {
+                await JenkinsTasks.resetUserPassword(User);
             }
         }
 

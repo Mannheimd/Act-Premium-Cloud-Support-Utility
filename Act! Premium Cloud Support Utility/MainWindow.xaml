@@ -734,8 +734,10 @@
                                Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=InProgress:Failed}"
                                Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
                                Style="{StaticResource normalFontLabelNoCopy}"/>
-                        <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
-                                 SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
+                        <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                                 ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
+                                 SelectionChanged="LookupResults_DatabaseList_SelectionChanged"
+                                 x:Name="LookupResults_UserList">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -745,6 +747,59 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+                        <StackPanel Margin="15,0,15,15" Grid.Column="1"
+                                    Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
+                            <TextBlock Margin="5,5,0,5"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Full Name:
+                                <LineBreak/>
+                                <TextBlock>
+                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"/>
+                                </TextBlock>
+                            </TextBlock>
+                            <TextBlock Margin="5,5,0,5"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Login Name:
+                                <LineBreak/>
+                                <TextBlock>
+                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LoginName}"/>
+                                </TextBlock>
+                            </TextBlock>
+                            <TextBlock Margin="5,5,0,5"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Role:
+                                <LineBreak/>
+                                <TextBlock>
+                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.Role}"/>
+                                </TextBlock>
+                            </TextBlock>
+                            <TextBlock Margin="5,5,0,5"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Last Login (UTC):
+                                <LineBreak/>
+                                <TextBlock>
+                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LastLogin}"/>
+                                </TextBlock>
+                            </TextBlock>
+                            <Grid>
+                                <ToggleButton x:Name="ResetUserPasswordButton" Margin="5,5,0,5" Content="Reset Password"
+                                          HorizontalAlignment="Left" VerticalAlignment="Top"
+                                          Style="{StaticResource darkToggleButtonBordered}"/>
+                            </Grid>
+                            <Border x:Name="ResetUserPasswordConfirmation" Visibility="{Binding ElementName=ResetUserPasswordButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                                BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                                Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Margin="5,5,0,5"
+                                               Style="{StaticResource textBlockStyleNoCopy}">
+                                        This will reset the password for user '
+                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"/>
+                                        ' to 'Actsoftware'. Are you sure you wish to proceed?
+                                    </TextBlock>
+                                    <Button Margin="5,5,5,0" Content="Reset password" Style="{StaticResource darkButtonBordered}" Click="Button_ResetUserPassword_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </Grid>
                 
                     <!-- Backups List -->
