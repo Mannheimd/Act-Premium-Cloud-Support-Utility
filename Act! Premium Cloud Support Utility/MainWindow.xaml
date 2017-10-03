@@ -376,6 +376,26 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
+        <!-- Animation -->
+        <Storyboard x:Key="showAndFadeAnimation">
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:0" Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Visible</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+            <DoubleAnimation BeginTime="0:0:0.0" Storyboard.TargetProperty="Opacity" From="1" To="1" Duration="0:0:0.5"/>
+            <DoubleAnimation BeginTime="0:0:0.5" Storyboard.TargetProperty="Opacity" From="1" To="0" Duration="0:0:1.5"/>
+            <ObjectAnimationUsingKeyFrames BeginTime="0:0:2" Storyboard.TargetProperty="Visibility">
+                <DiscreteObjectKeyFrame KeyTime="0">
+                    <DiscreteObjectKeyFrame.Value>
+                        <Visibility>Hidden</Visibility>
+                    </DiscreteObjectKeyFrame.Value>
+                </DiscreteObjectKeyFrame>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
     </Window.Resources>
 
     <Grid>
@@ -912,6 +932,15 @@
                     </ListBox>
                 </Grid>
             </Grid>
+        </Grid>
+        
+        <!-- Text copy alert -->
+        <Grid x:Name="textCopiedAlert"
+              VerticalAlignment="Center" HorizontalAlignment="Right"
+              Visibility="Hidden"
+              Background="{StaticResource lightBlue}"
+              Margin="0,0,10,10">
+            <Label Content="Text copied" Style="{StaticResource largeFontLabelNoCopy}"/>
         </Grid>
     </Grid>
 </Window>

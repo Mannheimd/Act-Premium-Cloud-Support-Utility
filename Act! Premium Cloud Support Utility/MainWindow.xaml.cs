@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Xml;
 
@@ -652,7 +653,15 @@ namespace Act__Premium_Cloud_Support_Utility
                 return;
 
             string Text = (sender as Label).Content as string;
-            MessageBox.Show(Text);
+
+            try
+            {
+                Clipboard.SetDataObject(Text);
+
+                ((Storyboard)FindResource("showAndFadeAnimation")).Begin(textCopiedAlert);
+            }
+            catch
+            { }
         }
 
         private void TextBlock_RightClick_Copy(object sender, MouseButtonEventArgs e)
@@ -661,7 +670,15 @@ namespace Act__Premium_Cloud_Support_Utility
                 return;
 
             string Text = (sender as TextBlock).Text as string;
-            MessageBox.Show(Text);
+
+            try
+            {
+                Clipboard.SetDataObject(Text);
+
+                ((Storyboard)FindResource("showAndFadeAnimation")).Begin(textCopiedAlert);
+            }
+            catch
+            { }
         }
     }
 
