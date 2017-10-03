@@ -497,6 +497,26 @@ namespace Act__Premium_Cloud_Support_Utility
             }
         }
 
+        private async void NewLookupPane_LookupValueBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            APCAccount account = (APCAccount)(sender as TextBox).DataContext;
+
+            account.LookupValue = (sender as TextBox).Text; // Force this to apply for every keydown, as the data binding doesn't pass it otherwise until the box is left
+
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                e.Handled = true;
+
+                if (account.JenkinsServer != null
+                    && account.LookupType != null
+                    && account.LookupValue != null
+                    && account.LookupValue.Trim() != "")
+                {
+                    await JenkinsTasks.RunAPCAccountLookup(account);
+                }
+            }
+        }
+
         private async void LookupResults_DatabaseBackups_LoadBackups_Click(object sender, RoutedEventArgs e)
         {
             if (!((APCDatabase)LookupResults_DatabaseList.SelectedItem is APCDatabase))

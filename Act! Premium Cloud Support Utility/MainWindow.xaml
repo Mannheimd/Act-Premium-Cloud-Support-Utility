@@ -514,7 +514,8 @@
                                  Margin="0,30,0,0"
                                  BorderBrush="{StaticResource lightGray}"
                                  Width="500"
-                                 Style="{StaticResource normalFont}" Text="{Binding LookupValue}"/>
+                                 Style="{StaticResource normalFont}" Text="{Binding LookupValue}"
+                                 KeyDown="NewLookupPane_LookupValueBox_KeyDown"/>
                     </Grid>
                     <Grid Margin="0,20.5,0,0" Grid.Row="3">
                         <Button Style="{StaticResource darkButtonBordered}" Content="Lookup"
