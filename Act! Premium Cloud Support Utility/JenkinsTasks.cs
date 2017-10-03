@@ -1355,21 +1355,21 @@ namespace Jenkins_Tasks
             set { SetPropertyField("RestoreableBackups", ref _restorableBackups, value); }
         }
 
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChanged?.Invoke(this, e);
-        }
-
         public JenkinsBuildStatus UserLoadStatus
         {
             get { return _userLoadStatus; }
-            set { SetPropertyField("LookupTime", ref _userLoadStatus, value); }
+            set { SetPropertyField("UserLoadStatus", ref _userLoadStatus, value); }
         }
 
         public JenkinsBuildStatus BackupLoadStatus
         {
             get { return _backupLoadStatus; }
-            set { SetPropertyField("LookupTime", ref _backupLoadStatus, value); }
+            set { SetPropertyField("BackupLoadStatus", ref _backupLoadStatus, value); }
+        }
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
         }
 
         protected void SetPropertyField<T>(string propertyName, ref T field, T newValue)

@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.IconPacks;
-using Jenkins_Tasks;
+﻿using Jenkins_Tasks;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,10 +12,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Xml;
-using System.Runtime.CompilerServices;
 
 namespace Act__Premium_Cloud_Support_Utility
 {
@@ -989,28 +986,22 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null || (value as string) == "")
+            if (value == null)
                 return null;
 
             JenkinsBuildStatus Status = (JenkinsBuildStatus)value;
 
             if (Status == JenkinsBuildStatus.NotStarted)
-                return null;
+                return "Not started";
 
             if (Status == JenkinsBuildStatus.InProgress)
-            {
-                return "In progress...";
-            }
+                return "Working...";
 
             if (Status == JenkinsBuildStatus.Successful)
-            {
-                return "Complete";
-            }
+                return "Successful";
 
             if (Status == JenkinsBuildStatus.Failed)
-            {
                 return "Failed";
-            }
 
             return null;
         }
@@ -1029,28 +1020,14 @@ namespace Act__Premium_Cloud_Support_Utility
             string Parameters = null;
 
             if (parameter != null && parameter is string)
-                Parameters = (parameter as string).ToLower();
+                Parameters = (parameter as string);
+            else Parameters = "";
 
             if (value == null || (value as string) == "")
                 VisibilityBool = false;
 
-            if ((value as string) == JenkinsBuildStatus.NotStarted.ToString())
-                VisibilityBool = false;
-
-            if ((value as string) == JenkinsBuildStatus.InProgress.ToString())
-            {
+            if (Parameters.Contains(((JenkinsBuildStatus)value).ToString()))
                 VisibilityBool = true;
-            }
-
-            if ((value as string) == JenkinsBuildStatus.Successful.ToString())
-            {
-                VisibilityBool = true;
-            }
-
-            if ((value as string) == JenkinsBuildStatus.Failed.ToString())
-            {
-                VisibilityBool = true;
-            }
 
             if (Parameters.Contains("reverse"))
                 VisibilityBool = !VisibilityBool;
