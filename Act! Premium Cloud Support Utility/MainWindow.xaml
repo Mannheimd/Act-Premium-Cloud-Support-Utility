@@ -63,26 +63,6 @@
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
-        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockStyle">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
-        </Style>
-        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockLargeFontStyle">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
-        </Style>
-        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockHyperlinkStyle">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="{StaticResource lightBlue}"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
         <Style TargetType="{x:Type Hyperlink}" x:Key="hyperlinkStyle">
             <Setter Property="TextBlock.TextDecorations"  Value="{x:Null}"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
@@ -93,11 +73,95 @@
             </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource normalFont}"/>
-        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource normalFont}"/>
         <Style TargetType="{x:Type ListView}" BasedOn="{StaticResource normalFont}"/>
-        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource textBlockStyle}"/>
         <Style TargetType="{x:Type Hyperlink}" BasedOn="{StaticResource hyperlinkStyle}"/>
+
+        <!-- Label -->
+        <Style TargetType="{x:Type Control}" x:Key="smallFontLabel">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="Label_RightClick_Copy"/>
+        </Style>
+        <Style TargetType="{x:Type Control}" x:Key="normalFontLabel">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="Label_RightClick_Copy"/>
+        </Style>
+        <Style TargetType="{x:Type Control}" x:Key="largeFontLabel">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="Label_RightClick_Copy"/>
+        </Style>
+
+        <Style TargetType="{x:Type Control}" x:Key="smallFontLabelNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+        <Style TargetType="{x:Type Control}" x:Key="normalFontLabelNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+        <Style TargetType="{x:Type Control}" x:Key="largeFontLabelNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+
+        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource normalFontLabel}"/>
+
+        <!-- TextBlock -->
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockStyle">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockLargeFontStyle">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockHyperlinkStyle">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource lightBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockStyleNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockLargeFontStyleNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockHyperlinkStyleNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource lightBlue}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource textBlockStyle}"/>
 
         <!-- ListBox -->
         <Style TargetType="{x:Type ListBox}" x:Key="listBoxDarkBackgroundStyle">
@@ -334,7 +398,8 @@
                 <!-- Available Jenkins servers -->
                 <StackPanel Grid.Column="0">
                     <Label Margin="0,5,0,0" Content="Available Jenkins servers"
-                           HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                           HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                           Style="{StaticResource normalFontLabelNoCopy}"/>
                     <ListBox x:Name="ConfigPane_AvailableJenkinsServerList"
                          Margin="0,5,5,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                          ItemsSource="{Binding AvailableJenkinsServers, Source={x:Static jenkinsTasks:JenkinsInfo.Instance}}">
@@ -358,15 +423,18 @@
                                 BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
                                 Margin="0,-0.5,0,0" HorizontalAlignment="Stretch">
                         <StackPanel Margin="0,0,0,10" DataContext="{Binding ElementName=ConfigPane_AvailableJenkinsServerList, Path=SelectedItem}">
-                            <TextBlock Margin="10,10,10,0" TextWrapping="Wrap">
+                            <TextBlock Margin="10,10,10,0" TextWrapping="Wrap"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
                                 <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type StackPanel}}, Path=DataContext.url, Converter={StaticResource JenkinsRootUrlToConfigureUrlConverter}}"
                                            RequestNavigate="Hyperlink_RequestNavigate">
                                     Click Here and log in to the webpage to get your Username and API Token
                                 </Hyperlink>
                             </TextBlock>
-                            <Label Content="Username:" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                            <Label Content="Username:" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                             <TextBox x:Name="ConfigPane_AddServer_Username_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
-                            <Label Content="API Token:" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                            <Label Content="API Token:" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                             <TextBox x:Name="ConfigPane_AddServer_Token_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
                             <Button Margin="5,5,5,0" Content="Add" Style="{StaticResource darkButtonBordered}" Click="ConfigPane_AddServer_Go_Click"/>
                         </StackPanel>
@@ -381,7 +449,8 @@
                 <!-- Configured Jenkins servers -->
                 <StackPanel Grid.Column="2">
                     <Label Margin="0,5,0,0" Content="Configured Jenkins servers"
-                           HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                           HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                           Style="{StaticResource normalFontLabelNoCopy}"/>
                     <ListBox x:Name="Config_ConfiguredJenkinsServerList"
                          Margin="5,5,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                          ItemsSource="{Binding ConfiguredJenkinsServers, Source={x:Static jenkinsTasks:JenkinsInfo.Instance}}">
@@ -406,7 +475,7 @@
         
             <!-- "My Lookups" pane on the left -->
             <Grid x:Name="LookupListPane" Grid.Column="0" Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#374650">
-                <Label Content="My Lookups" Style="{StaticResource largeFont}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="{StaticResource lightGray}"/>
+                <Label Content="My Lookups" Style="{StaticResource largeFontLabelNoCopy}" Margin="10,8,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Foreground="{StaticResource lightGray}"/>
                 <Button x:Name="LookupListPane_NewLookup_Button"
                         Content="{iconPacks:PackIconMaterialLight Plus, Height=20, Width=20}"
                         Height="22" Width="22" Margin="0,16,16,0"
@@ -426,8 +495,9 @@
                                         Style="{StaticResource darkButton}"
                                         Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsMouseOver, Converter={StaticResource BooleanToVisibilityConverter}}"
                                         Click="LookupListPane_RemoveLookup_Click"/>
-                                <Label Margin="3,1,20,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223">
-                                    <TextBlock Style="{StaticResource textBlockStyle}"
+                                <Label Margin="3,1,20,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223"
+                                       Style="{StaticResource normalFontLabelNoCopy}">
+                                    <TextBlock Style="{StaticResource textBlockStyleNoCopy}"
                                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName, Converter={StaticResource LookupListAccountNameConverter}}"
                                                TextTrimming="CharacterEllipsis"/>
                                 </Label>
@@ -582,7 +652,8 @@
                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SuspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.ArchiveStatus|DataContext.DeleteStatus}"/>
                     <TextBlock
                            Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
-                           Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                           Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                           Style="{StaticResource textBlockStyleNoCopy}">
                         Login URL: 
                         <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
                             <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
@@ -606,8 +677,8 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Name}"/>
-                                        <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding Server}"/>
+                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding Name}"/>
+                                        <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFontLabel}" Content="{Binding Server}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -621,11 +692,13 @@
                              SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.DatabasesSubItemSelected, Converter={StaticResource DatabasesSubItemSelectedTabConverter}}">
                         <ListBoxItem x:Name="DatabasesTab_UsersOption"
                                      HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Label Content="{iconPacks:PackIconFontAwesome Users, Height=24, Width=24}"/>
+                            <Label Content="{iconPacks:PackIconFontAwesome Users, Height=24, Width=24}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                         </ListBoxItem>
                         <ListBoxItem x:Name="DatabasesTab_BackupsOption"
                                      HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Label Content="{iconPacks:PackIconOcticons FileZip, Height=24, Width=24}"/>
+                            <Label Content="{iconPacks:PackIconOcticons FileZip, Height=24, Width=24}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                         </ListBoxItem>
                     </ListBox>
                 
@@ -639,14 +712,15 @@
                                Margin="0,5,0,0"
                                HorizontalAlignment="Center" VerticalAlignment="Top"
                                Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=InProgress:Failed}"
-                               Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"/>
+                               Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                               Style="{StaticResource normalFontLabelNoCopy}"/>
                         <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
                                  SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding ContactName}"/>
-                                        <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFont}" Content="{Binding Role}"/>
+                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding ContactName}"/>
+                                        <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFontLabel}" Content="{Binding Role}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -665,7 +739,7 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
-                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFont}" Content="{Binding Date}"/>
+                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding Date}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -677,7 +751,8 @@
                                     Click="LookupResults_DatabaseBackups_LoadBackups_Click"/>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
                                    Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"/>
+                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                             <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
                                     Content="Retain Backup"
                                     Style="{StaticResource darkButtonBordered}"
@@ -685,7 +760,8 @@
                                     Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
                                    Content="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"/>
+                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -699,36 +775,48 @@
                     </Grid.RowDefinitions>
                     <!-- Top section -->
                     <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0" ScrollViewer.CanContentScroll="True">
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             Upload URL: 
                             <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" RequestNavigate="Hyperlink_RequestNavigate">
                                 <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
                             </Hyperlink>
                         </TextBlock>
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             Serial Number: 
-                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber}"/>
+                            <TextBlock>
+                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber}"/>
+                            </TextBlock>
                         </TextBlock>
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             Users: 
-                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount}"/>
+                            <TextBlock>
+                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount}"/>
+                            </TextBlock>
                         </TextBlock>
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             Inactivity Timeout: 
-                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
+                            <TextBlock>
+                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
+                            </TextBlock>
                         </TextBlock>
                         <Grid>
                             <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,5,0,0" Content="Resend welcome email" Width="300"
                                           HorizontalAlignment="Left" VerticalAlignment="Top"
                                           Style="{StaticResource darkToggleButtonBordered}"/>
                             <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                                   Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"/>
+                                   Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                         </Grid>
                         <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
                                 BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
                                 Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
                             <StackPanel Margin="0,0,0,10">
-                                <Label Content="Choose an option" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+                                <Label Content="Choose an option" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                       Style="{StaticResource normalFontLabelNoCopy}"/>
                                 <RadioButton x:Name="primaryEmail_RadioButton" GroupName="resendWelcomeEmailRadio"
                                              Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"
                                              Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
@@ -744,7 +832,8 @@
                             <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
                                       Style="{StaticResource darkToggleButtonBordered}"/>
                             <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                                   Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"/>
+                                   Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
                         </Grid>
                         <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
                                 BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
@@ -759,17 +848,26 @@
                     </StackPanel>
                     <!-- Bottom section -->
                     <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             Create Date:
-                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.CreateDate}"/>
+                            <TextBlock>
+                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.CreateDate}"/>
+                            </TextBlock>
                         </TextBlock>
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             IIS Server: 
-                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IISServer}"/>
+                            <TextBlock>
+                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IISServer}"/>
+                            </TextBlock>
                         </TextBlock>
-                        <TextBlock Margin="5,5,0,0">
+                        <TextBlock Margin="5,5,0,0"
+                                   Style="{StaticResource textBlockStyleNoCopy}">
                             IITID: 
-                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IITID}"/>
+                            <TextBlock>
+                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IITID}"/>
+                            </TextBlock>
                         </TextBlock>
                     </StackPanel>
                 </Grid>

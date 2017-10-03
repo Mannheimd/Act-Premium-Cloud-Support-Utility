@@ -645,6 +645,24 @@ namespace Act__Premium_Cloud_Support_Utility
                 await JenkinsTasks.RunAPCAccountLookup(account);
             }
         }
+
+        private void Label_RightClick_Copy(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender as Label).Content == null || !(((sender as Label).Content) is string))
+                return;
+
+            string Text = (sender as Label).Content as string;
+            MessageBox.Show(Text);
+        }
+
+        private void TextBlock_RightClick_Copy(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender as TextBlock).Text == null || !(((sender as TextBlock).Text) is string))
+                return;
+
+            string Text = (sender as TextBlock).Text as string;
+            MessageBox.Show(Text);
+        }
     }
 
     public class ListBoxSelectedToVisibility_Converter : IValueConverter
