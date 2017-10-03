@@ -961,6 +961,8 @@ namespace Jenkins_Tasks
 
         public static async Task<bool> resetUserPassword(APCDatabaseUser User)
         {
+            User.ResetPasswordStatus = JenkinsBuildStatus.InProgress;
+
             // Post a request to build ResetPassword and wait for a response
             if (UnsecureJenkinsCreds(User.Database.Database_APCAccount.JenkinsServer.id) != null)
             {
@@ -977,15 +979,18 @@ namespace Jenkins_Tasks
 
                 if (outputDatabaseName == User.Database.Name && oneRowAffected == true)
                 {
+                    User.ResetPasswordStatus = JenkinsBuildStatus.Successful;
                     return true;
                 }
                 else
                 {
+                    User.ResetPasswordStatus = JenkinsBuildStatus.Failed;
                     return false;
                 }
             }
             else
             {
+                User.ResetPasswordStatus = JenkinsBuildStatus.Failed;
                 return false;
             }
         }
@@ -1393,6 +1398,7 @@ namespace Jenkins_Tasks
         private string _role;
         private DateTime _lastLogin;
         private APCDatabase _database;
+        private JenkinsBuildStatus _resetPasswordStatus;
         
         public string ContactName
         {
@@ -1422,6 +1428,12 @@ namespace Jenkins_Tasks
         {
             get { return _database; }
             set { SetPropertyField("Database", ref _database, value); }
+        }
+
+        public JenkinsBuildStatus ResetPasswordStatus
+        {
+            get { return _resetPasswordStatus; }
+            set { SetPropertyField("ResetPasswordStatus", ref _resetPasswordStatus, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)

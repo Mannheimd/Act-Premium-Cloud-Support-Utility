@@ -799,6 +799,10 @@
                                     <Button Margin="5,5,5,0" Content="Reset password" Style="{StaticResource darkButtonBordered}" Click="Button_ResetUserPassword_Click"/>
                                 </StackPanel>
                             </Border>
+                            <TextBlock Margin="5,5,0,5"
+                                       Style="{StaticResource textBlockStyleNoCopy}"
+                                       Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ResetPasswordStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                       Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ResetPasswordStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Successful:Failed:InProgress}"/>
                         </StackPanel>
                     </Grid>
                 
