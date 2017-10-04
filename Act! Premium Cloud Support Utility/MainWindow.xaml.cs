@@ -545,7 +545,7 @@ namespace Act__Premium_Cloud_Support_Utility
             if (!((APCDatabaseUser)LookupResults_UserList.SelectedItem is APCDatabaseUser))
                 return;
 
-            APCDatabaseUser User = (APCDatabaseUser)LookupResults_DatabaseList.SelectedItem;
+            APCDatabaseUser User = (APCDatabaseUser)LookupResults_UserList.SelectedItem;
             if (User != null)
             {
                 await JenkinsTasks.resetUserPassword(User);

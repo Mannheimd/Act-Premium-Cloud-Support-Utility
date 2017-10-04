@@ -7,7 +7,7 @@
         xmlns:jenkinsTasks="clr-namespace:Jenkins_Tasks"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
-        Title="APC Support Utility - Beta v0.2" MinHeight="700" MinWidth="868"
+        Title="APC Support Utility - Beta v0.2.1" MinHeight="700" MinWidth="868"
         Height="{Binding Height, Source={x:Static local:CurrentWindowState.Instance}, Mode=TwoWay}" 
         Width="{Binding Width, Source={x:Static local:CurrentWindowState.Instance}, Mode=TwoWay}" 
         Top="{Binding LocationTop, Source={x:Static local:CurrentWindowState.Instance}, Mode=TwoWay}" 
@@ -726,7 +726,7 @@
                     <Grid Grid.Column="1" Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Users}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="300"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0"
                                Margin="0,5,0,0"
@@ -781,20 +781,26 @@
                                     <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LastLogin}"/>
                                 </TextBlock>
                             </TextBlock>
-                            <Grid>
-                                <ToggleButton x:Name="ResetUserPasswordButton" Margin="5,5,0,5" Content="Reset Password"
-                                          HorizontalAlignment="Left" VerticalAlignment="Top"
+                            <ToggleButton x:Name="ResetUserPasswordButton" Margin="5,5,5,0" Content="Reset Password"
+                                          HorizontalAlignment="Stretch" VerticalAlignment="Top"
                                           Style="{StaticResource darkToggleButtonBordered}"/>
-                            </Grid>
                             <Border x:Name="ResetUserPasswordConfirmation" Visibility="{Binding ElementName=ResetUserPasswordButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
-                                BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
-                                Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
+                                    BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                                    Margin="5,-0.5,5,0"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Top">
                                 <StackPanel Margin="0,0,0,10">
                                     <TextBlock Margin="5,5,0,5"
+                                               TextWrapping="Wrap"
                                                Style="{StaticResource textBlockStyleNoCopy}">
-                                        This will reset the password for user '
-                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"/>
-                                        ' to 'Actsoftware'. Are you sure you wish to proceed?
+                                        This will reset the password for user
+                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"
+                                             Foreground="{StaticResource lightBlue}"/>
+                                        to
+                                        <Run Text="Actsoftware"
+                                             Foreground="{StaticResource lightBlue}"/>
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        Are you sure you wish to proceed?
                                     </TextBlock>
                                     <Button Margin="5,5,5,0" Content="Reset password" Style="{StaticResource darkButtonBordered}" Click="Button_ResetUserPassword_Click"/>
                                 </StackPanel>
