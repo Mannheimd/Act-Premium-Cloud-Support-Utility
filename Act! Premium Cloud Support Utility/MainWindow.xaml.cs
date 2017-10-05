@@ -189,8 +189,6 @@ namespace Act__Premium_Cloud_Support_Utility
             InitializeComponent();
 
             LookupListPane_Lookups_ListBox.ItemsSource = LookupResults;
-            CollectionView LookupListDisplayOrder = (CollectionView)CollectionViewSource.GetDefaultView(LookupListPane_Lookups_ListBox.ItemsSource);
-            LookupListDisplayOrder.SortDescriptions.Add(new SortDescription("lookupCreateTime", ListSortDirection.Descending));
 
             APCAccount DebugAccount = new APCAccount()
             {
@@ -442,9 +440,9 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void LookupListPane_NewLookup_Click(object sender, RoutedEventArgs e)
         {
-            APCAccount account = new APCAccount();
-            account.LookupCreateTime = DateTime.Now;
-            LookupResults.Add(account);
+            APCAccount Account = new APCAccount();
+            Account.LookupCreateTime = DateTime.Now;
+            LookupResults.Insert(0, Account);
             LookupListPane_Lookups_ListBox.SelectedIndex = 0;
         }
 
