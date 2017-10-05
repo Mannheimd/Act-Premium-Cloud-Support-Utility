@@ -482,6 +482,30 @@ namespace Act__Premium_Cloud_Support_Utility
             await JenkinsTasks.updateTimeout(Account, NewTimeoutValue);
         }
 
+        private async void Button_ResetUserPassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabaseUser)LookupResults_UserList.SelectedItem is APCDatabaseUser))
+                return;
+
+            APCDatabaseUser User = (APCDatabaseUser)LookupResults_UserList.SelectedItem;
+            if (User != null)
+            {
+                await JenkinsTasks.resetUserPassword(User);
+            }
+        }
+
+        private async void Button_UnlockDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabase)LookupResults_DatabaseList.SelectedItem is APCDatabase))
+                return;
+
+            APCDatabase Database = (APCDatabase)LookupResults_DatabaseList.SelectedItem;
+            if (Database != null)
+            {
+                await JenkinsTasks.unlockDatabase(Database);
+            }
+        }
+
         private async void NewLookupPane_LookupButton_Click(object sender, RoutedEventArgs e)
         {
             APCAccount account = (APCAccount)(sender as Button).DataContext;
@@ -537,18 +561,6 @@ namespace Act__Premium_Cloud_Support_Utility
             if (Backup != null)
             {
                 await JenkinsTasks.RetainDatabaseBackup(Backup);
-            }
-        }
-
-        private async void Button_ResetUserPassword_Click(object sender, RoutedEventArgs e)
-        {
-            if (!((APCDatabaseUser)LookupResults_UserList.SelectedItem is APCDatabaseUser))
-                return;
-
-            APCDatabaseUser User = (APCDatabaseUser)LookupResults_UserList.SelectedItem;
-            if (User != null)
-            {
-                await JenkinsTasks.resetUserPassword(User);
             }
         }
 
@@ -947,40 +959,6 @@ namespace Act__Premium_Cloud_Support_Utility
         }
     }
 
-    /// <summary>
-    /// Converts APCAccountSelectedTab to a ListBox SelectedItem integer
-    /// </summary>
-    public class DatabasesSubItemSelectedTab_Converter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-                return 0;
-
-            if (value.ToString() == APCDatabasesSubItemSelectedTab.Users.ToString())
-                return 0;
-
-            if (value.ToString() == APCDatabasesSubItemSelectedTab.Backups.ToString())
-                return 1;
-
-            return -1;
-        }
-
-        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
-        {
-            if (value.ToString() == "-1")
-                return APCDatabasesSubItemSelectedTab.Users;
-
-            if (value.ToString() == "0")
-                return APCDatabasesSubItemSelectedTab.Users;
-
-            if (value.ToString() == "1")
-                return APCDatabasesSubItemSelectedTab.Backups;
-
-            return APCDatabasesSubItemSelectedTab.Users;
-        }
-    }
-
     public class AccountTrialOrPaid_Converter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -1156,6 +1134,46 @@ namespace Act__Premium_Cloud_Support_Utility
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
             throw new Exception("This method is not implemented.");
+        }
+    }
+
+    /// <summary>
+    /// Converts APCAccountSelectedTab to a ListBox SelectedItem integer
+    /// </summary>
+    public class DatabasesSubItemSelectedTab_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return 0;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Info.ToString())
+                return 0;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Users.ToString())
+                return 1;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Backups.ToString())
+                return 2;
+
+            return -1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            if (value.ToString() == "-1")
+                return APCDatabasesSubItemSelectedTab.Info;
+
+            if (value.ToString() == "0")
+                return APCDatabasesSubItemSelectedTab.Info;
+
+            if (value.ToString() == "1")
+                return APCDatabasesSubItemSelectedTab.Users;
+
+            if (value.ToString() == "2")
+                return APCDatabasesSubItemSelectedTab.Backups;
+
+            return APCDatabasesSubItemSelectedTab.Info;
         }
     }
 

@@ -541,15 +541,17 @@ namespace Jenkins_Tasks
             account.TimeoutValue = await getTimeout(account);
         }
 
-        public async Task<bool> unlockDatabase(string databaseName, string sqlServer, JenkinsServer server)
+        public static async Task<bool> unlockDatabase(APCDatabase Database)
         {
+            Database.UnlockDatabaseStatus = JenkinsBuildStatus.InProgress;
+
             // Post a request to build LookupCustomer and wait for a response
-            if (UnsecureJenkinsCreds(server.id) != null)
+            if (UnsecureJenkinsCreds(Database.Database_APCAccount.JenkinsServer.id) != null)
             {
-                string output = await runJenkinsBuild(server, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
-                    + sqlServer
+                string output = await runJenkinsBuild(Database.Database_APCAccount.JenkinsServer, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
+                    + Database.Server
                     + "&DatabaseName="
-                    + databaseName
+                    + Database.Name
                     + "&delay=0sec");
 
                 // Pulling strings out of output (lines end with return, null value doesn't do the trick)
@@ -558,17 +560,20 @@ namespace Jenkins_Tasks
                 string outputDatabaseName = SearchString(output, "Unlocking database: ", @"
 ");
 
-                if (outputSqlServer == sqlServer && outputDatabaseName == databaseName)
+                if (outputSqlServer == Database.Server && outputDatabaseName == Database.Name)
                 {
+                    Database.UnlockDatabaseStatus = JenkinsBuildStatus.Successful;
                     return true;
                 }
                 else
                 {
+                    Database.UnlockDatabaseStatus = JenkinsBuildStatus.Failed;
                     return false;
                 }
             }
             else
             {
+                Database.UnlockDatabaseStatus = JenkinsBuildStatus.Failed;
                 return false;
             }
         }
@@ -1088,7 +1093,6 @@ namespace Jenkins_Tasks
     {
         private APCAccountLookupStatus _lookupStatus;
         private APCAccountSelectedTab _selectedTab;
-        private APCDatabasesSubItemSelectedTab _databasesSubItemSelected = APCDatabasesSubItemSelectedTab.Users;
         private JenkinsBuildStatus _resendWelcomeEmailStatus;
         private JenkinsBuildStatus _changeInactivityTimeoutStatus;
         private string _iitid;
@@ -1127,12 +1131,6 @@ namespace Jenkins_Tasks
         {
             get { return _selectedTab; }
             set { SetPropertyField("SelectedTab", ref _selectedTab, value); }
-        }
-
-        public APCDatabasesSubItemSelectedTab DatabasesSubItemSelected
-        {
-            get { return _databasesSubItemSelected; }
-            set { SetPropertyField("SelectedTab", ref _databasesSubItemSelected, value); }
         }
 
         public JenkinsBuildStatus ResendWelcomeEmailStatus
@@ -1325,6 +1323,8 @@ namespace Jenkins_Tasks
         private List<APCDatabaseBackupRestorable> _restorableBackups;
         private JenkinsBuildStatus _userLoadStatus;
         private JenkinsBuildStatus _backupLoadStatus;
+        private JenkinsBuildStatus _unlockDatabaseStatus;
+        private APCDatabasesSubItemSelectedTab _databasesSubItemSelected = APCDatabasesSubItemSelectedTab.Info;
         public APCAccount Database_APCAccount { get; set; }
 
         public APCDatabase (APCAccount Account)
@@ -1372,6 +1372,18 @@ namespace Jenkins_Tasks
         {
             get { return _backupLoadStatus; }
             set { SetPropertyField("BackupLoadStatus", ref _backupLoadStatus, value); }
+        }
+
+        public JenkinsBuildStatus UnlockDatabaseStatus
+        {
+            get { return _unlockDatabaseStatus; }
+            set { SetPropertyField("UnlockDatabaseStatus", ref _unlockDatabaseStatus, value); }
+        }
+
+        public APCDatabasesSubItemSelectedTab DatabasesSubItemSelected
+        {
+            get { return _databasesSubItemSelected; }
+            set { SetPropertyField("SelectedTab", ref _databasesSubItemSelected, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -1635,6 +1647,7 @@ namespace Jenkins_Tasks
 
     public enum APCDatabasesSubItemSelectedTab
     {
+        Info,
         Users,
         Backups
     };

@@ -709,7 +709,10 @@
                 
                     <!-- Database list -->
                     <Grid Grid.Column="0">
-                        <ListBox x:Name="LookupResults_DatabaseList" Margin="0,0,0,15" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                        <ListBox x:Name="LookupResults_DatabaseList"
+                                 Margin="0,0,0,15"
+                                 Width="200"
+                                 HorizontalAlignment="Left" VerticalAlignment="Stretch"
                                  ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}"
                                  SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
                             <ListBox.ItemTemplate>
@@ -722,116 +725,174 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
-                    
-                    <!-- Users/Backup switch -->
-                    <ListBox x:Name="LookupResults_DatabaseSubItemSwitch" Grid.Column="1" Margin="20,0,0,0" Width="40" Height="auto"
-                             HorizontalAlignment="Left" VerticalAlignment="Top"
-                             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                             SelectedIndex="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.DatabasesSubItemSelected, Converter={StaticResource DatabasesSubItemSelectedTabConverter}}">
-                        <ListBoxItem x:Name="DatabasesTab_UsersOption"
-                                     HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Label Content="{iconPacks:PackIconFontAwesome Users, Height=24, Width=24}"
-                                   Style="{StaticResource normalFontLabelNoCopy}"/>
-                        </ListBoxItem>
-                        <ListBoxItem x:Name="DatabasesTab_BackupsOption"
-                                     HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Label Content="{iconPacks:PackIconOcticons FileZip, Height=24, Width=24}"
-                                   Style="{StaticResource normalFontLabelNoCopy}"/>
-                        </ListBoxItem>
-                    </ListBox>
-                
-                    <!-- Users List -->
-                    <Grid Grid.Column="1" Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Users}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="300"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0"
-                               Margin="0,5,0,0"
-                               HorizontalAlignment="Center" VerticalAlignment="Top"
-                               Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=InProgress:Failed}"
-                               Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                               Style="{StaticResource normalFontLabelNoCopy}"/>
-                        <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                                 ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
-                                 SelectionChanged="LookupResults_DatabaseList_SelectionChanged"
-                                 x:Name="LookupResults_UserList">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding ContactName}"/>
-                                        <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFontLabel}" Content="{Binding Role}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
+
+                    <Grid Grid.Column="1"
+                          Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
+                        <!-- Batbase Mode switch -->
+                        <ListBox x:Name="LookupResults_DatabaseSubItemSwitch" Margin="20,0,0,0" Width="40" Height="auto"
+                                 HorizontalAlignment="Left" VerticalAlignment="Top"
+                                 HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                 SelectedIndex="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.DatabasesSubItemSelected, Converter={StaticResource DatabasesSubItemSelectedTabConverter}}">
+                            <ListBoxItem x:Name="DatabasesTab_InfoOption"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Label Content="{iconPacks:PackIconFontAwesome Info, Height=24, Width=24}"
+                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                            </ListBoxItem>
+                            <ListBoxItem x:Name="DatabasesTab_UsersOption"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Label Content="{iconPacks:PackIconFontAwesome Users, Height=24, Width=24}"
+                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                            </ListBoxItem>
+                            <ListBoxItem x:Name="DatabasesTab_BackupsOption"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Label Content="{iconPacks:PackIconOcticons FileZip, Height=24, Width=24}"
+                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                            </ListBoxItem>
                         </ListBox>
-                        <StackPanel Margin="15,0,15,15" Grid.Column="1"
-                                    Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
-                            <TextBlock Margin="5,5,0,5"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
-                                Full Name:
-                                <LineBreak/>
-                                <TextBlock>
-                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"/>
-                                </TextBlock>
-                            </TextBlock>
-                            <TextBlock Margin="5,5,0,5"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
-                                Login Name:
-                                <LineBreak/>
-                                <TextBlock>
-                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LoginName}"/>
-                                </TextBlock>
-                            </TextBlock>
-                            <TextBlock Margin="5,5,0,5"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
-                                Role:
-                                <LineBreak/>
-                                <TextBlock>
-                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.Role}"/>
-                                </TextBlock>
-                            </TextBlock>
-                            <TextBlock Margin="5,5,0,5"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
-                                Last Login (UTC):
-                                <LineBreak/>
-                                <TextBlock>
-                                    <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LastLogin}"/>
-                                </TextBlock>
-                            </TextBlock>
-                            <ToggleButton x:Name="ResetUserPasswordButton" Margin="5,5,5,0" Content="Reset Password"
-                                          HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                                          Style="{StaticResource darkToggleButtonBordered}"/>
-                            <Border x:Name="ResetUserPasswordConfirmation" Visibility="{Binding ElementName=ResetUserPasswordButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
-                                    BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
-                                    Margin="5,-0.5,5,0"
-                                    HorizontalAlignment="Stretch" VerticalAlignment="Top">
-                                <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Margin="5,5,0,5"
-                                               TextWrapping="Wrap"
-                                               Style="{StaticResource textBlockStyleNoCopy}">
-                                        This will reset the password for user
-                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"
-                                             Foreground="{StaticResource lightBlue}"/>
-                                        to
-                                        <Run Text="Actsoftware"
-                                             Foreground="{StaticResource lightBlue}"/>
-                                        <LineBreak/>
-                                        <LineBreak/>
-                                        Are you sure you wish to proceed?
+
+                        <!-- Database Info -->
+                        <Grid Margin="59,0,15,15"
+                                Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Info}">
+                            <StackPanel Margin="5,0,15,15" Grid.Column="1">
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                    Database Name:
+                                    <LineBreak/>
+                                    <TextBlock>
+                                        <Run Text="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Name}"/>
                                     </TextBlock>
-                                    <Button Margin="5,5,5,0" Content="Reset password" Style="{StaticResource darkButtonBordered}" Click="Button_ResetUserPassword_Click"/>
-                                </StackPanel>
-                            </Border>
-                            <TextBlock Margin="5,5,0,5"
-                                       Style="{StaticResource textBlockStyleNoCopy}"
-                                       Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ResetPasswordStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                       Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ResetPasswordStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Successful:Failed:InProgress}"/>
-                        </StackPanel>
-                    </Grid>
+                                </TextBlock>
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                    SQL Server:
+                                    <LineBreak/>
+                                    <TextBlock>
+                                        <Run Text="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Server}"/>
+                                    </TextBlock>
+                                </TextBlock>
+                                <ToggleButton x:Name="UnlockDatabaseButton" Margin="5,10,5,0" Content="Unlock Database"
+                                              HorizontalAlignment="Left" VerticalAlignment="Top"
+                                              Style="{StaticResource darkToggleButtonBordered}"
+                                              Width="300"/>
+                                <Border x:Name="UnlockDatabaseConfirmation" Visibility="{Binding ElementName=UnlockDatabaseButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                                        BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                                        Margin="5,-0.5,5,0"
+                                        HorizontalAlignment="Left" VerticalAlignment="Top"
+                                        Width="300">
+                                    <StackPanel Margin="0,0,0,0">
+                                        <TextBlock Margin="5,5,5,5"
+                                                   TextWrapping="Wrap"
+                                                   Style="{StaticResource textBlockStyleNoCopy}">
+                                            This will unlock the database
+                                            <LineBreak/>
+                                            <Run Text="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Name}"
+                                                 Foreground="{StaticResource lightBlue}"/>
+                                            <LineBreak/>
+                                            <LineBreak/>
+                                            Are you sure you wish to proceed?
+                                        </TextBlock>
+                                        <Button Margin="5,5,5,10" Content="Unlock" Style="{StaticResource darkButtonBordered}" Click="Button_UnlockDatabase_Click"/>
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}"
+                                           Text="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UnlockDatabaseStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                           Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UnlockDatabaseStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Successful:Failed:InProgress}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Users List -->
+                        <Grid Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Users}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="300"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0"
+                                   Margin="0,5,0,0"
+                                   HorizontalAlignment="Center" VerticalAlignment="Top"
+                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=InProgress:Failed}"
+                                   Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.UserLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Style="{StaticResource normalFontLabelNoCopy}"/>
+                            <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                                     ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
+                                     SelectionChanged="LookupResults_DatabaseList_SelectionChanged"
+                                     x:Name="LookupResults_UserList">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding ContactName}"/>
+                                            <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFontLabel}" Content="{Binding Role}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Margin="15,0,15,15" Grid.Column="1"
+                                        Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                    Full Name:
+                                    <LineBreak/>
+                                    <TextBlock>
+                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"/>
+                                    </TextBlock>
+                                </TextBlock>
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                    Login Name:
+                                    <LineBreak/>
+                                    <TextBlock>
+                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LoginName}"/>
+                                    </TextBlock>
+                                </TextBlock>
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                    Role:
+                                    <LineBreak/>
+                                    <TextBlock>
+                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.Role}"/>
+                                    </TextBlock>
+                                </TextBlock>
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                    Last Login (UTC):
+                                    <LineBreak/>
+                                    <TextBlock>
+                                        <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.LastLogin}"/>
+                                    </TextBlock>
+                                </TextBlock>
+                                <ToggleButton x:Name="ResetUserPasswordButton" Margin="5,5,5,0" Content="Reset Password"
+                                              HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                                              Style="{StaticResource darkToggleButtonBordered}"/>
+                                <Border x:Name="ResetUserPasswordConfirmation" Visibility="{Binding ElementName=ResetUserPasswordButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                                        BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                                        Margin="5,-0.5,5,0"
+                                        HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                    <StackPanel Margin="0,0,0,10">
+                                        <TextBlock Margin="5,5,0,5"
+                                                   TextWrapping="Wrap"
+                                                   Style="{StaticResource textBlockStyleNoCopy}">
+                                            This will reset the password for user
+                                            <Run Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ContactName}"
+                                                 Foreground="{StaticResource lightBlue}"/>
+                                            to
+                                            <Run Text="Actsoftware"
+                                                 Foreground="{StaticResource lightBlue}"/>
+                                            <LineBreak/>
+                                            <LineBreak/>
+                                            Are you sure you wish to proceed?
+                                        </TextBlock>
+                                        <Button Margin="5,5,5,0" Content="Reset password" Style="{StaticResource darkButtonBordered}" Click="Button_ResetUserPassword_Click"/>
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Margin="5,5,0,5"
+                                           Style="{StaticResource textBlockStyleNoCopy}"
+                                           Text="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ResetPasswordStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                           Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem.ResetPasswordStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Successful:Failed:InProgress}"/>
+                            </StackPanel>
+                        </Grid>
                 
-                    <!-- Backups List -->
-                    <Grid Grid.Column="1" Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Backups}">
+                        <!-- Backups List -->
+                        <Grid Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Backups}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="200"/>
@@ -866,6 +927,7 @@
                                    Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
                                    Style="{StaticResource normalFontLabelNoCopy}"/>
                         </StackPanel>
+                    </Grid>
                     </Grid>
                 </Grid>
 
