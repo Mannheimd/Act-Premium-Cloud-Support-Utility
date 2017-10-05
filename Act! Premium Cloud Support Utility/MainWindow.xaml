@@ -912,6 +912,7 @@
                                           Style="{StaticResource darkToggleButtonBordered}"/>
                             <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
                                    Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
                                    Style="{StaticResource normalFontLabelNoCopy}"/>
                         </Grid>
                         <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
@@ -936,6 +937,7 @@
                                       Style="{StaticResource darkToggleButtonBordered}"/>
                             <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
                                    Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
                                    Style="{StaticResource normalFontLabelNoCopy}"/>
                         </Grid>
                         <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
