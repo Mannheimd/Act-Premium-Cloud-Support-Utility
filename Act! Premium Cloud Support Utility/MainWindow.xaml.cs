@@ -603,6 +603,11 @@ namespace Act__Premium_Cloud_Support_Utility
 
             // For some reason the ConfiguredServers thing won't bind properly, so we have to update it each time we change it
             Config_ConfiguredJenkinsServerList.ItemsSource = JenkinsInfo.Instance.ConfiguredJenkinsServers;
+
+            // Deselect the available server, and empty the text boxes
+            ConfigPane_AvailableJenkinsServerList.SelectedIndex = -1;
+            ConfigPane_AddServer_Username_TextBox.Text = null;
+            ConfigPane_AddServer_Token_TextBox.Text = null;
         }
 
         private void ConfigPane_RemoveServer_Click(object sender, RoutedEventArgs e)
