@@ -937,84 +937,91 @@
                 <Grid x:Name="LookupResultsDetailsPane" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="15,5,0,0"
                       Visibility="{Binding ElementName=LookupResultsDetailsButton, Path=IsSelected, Converter={StaticResource ListBoxItemSelectedStateConverter}}">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <!-- Top section -->
-                    <StackPanel Height="auto" VerticalAlignment="Top" Grid.Row="0" ScrollViewer.CanContentScroll="True">
-                        <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
-                            Upload URL: 
-                            <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" RequestNavigate="Hyperlink_RequestNavigate">
-                                <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
-                            </Hyperlink>
-                        </TextBlock>
-                        <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
-                            Serial Number: 
-                            <TextBlock>
-                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber}"/>
+                    <ScrollViewer Grid.Row="0"
+                                  VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Height="auto"
+                                  VerticalAlignment="Stretch"
+                                  CanContentScroll="True">
+                        <StackPanel Height="auto" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True">
+                            <TextBlock Margin="5,5,0,0"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Upload URL: 
+                                <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" RequestNavigate="Hyperlink_RequestNavigate">
+                                    <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
+                                </Hyperlink>
                             </TextBlock>
-                        </TextBlock>
-                        <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
-                            Users: 
-                            <TextBlock>
-                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount}"/>
+                            <TextBlock Margin="5,5,0,0"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Serial Number: 
+                                <TextBlock>
+                                    <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber}"/>
+                                </TextBlock>
                             </TextBlock>
-                        </TextBlock>
-                        <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
-                            Inactivity Timeout: 
-                            <TextBlock>
-                                <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
+                            <TextBlock Margin="5,5,0,0"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Users: 
+                                <TextBlock>
+                                    <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount}"/>
+                                </TextBlock>
                             </TextBlock>
-                        </TextBlock>
-                        <Grid>
-                            <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,5,0,0" Content="Resend welcome email" Width="300"
-                                          HorizontalAlignment="Left" VerticalAlignment="Top"
+                            <TextBlock Margin="5,5,0,0"
+                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                Inactivity Timeout: 
+                                <TextBlock>
+                                    <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
+                                </TextBlock>
+                            </TextBlock>
+                            <Grid>
+                                <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,15,0,0" Content="Resend welcome email" Width="300"
+                                              HorizontalAlignment="Left" VerticalAlignment="Top"
+                                              Style="{StaticResource darkToggleButtonBordered}"/>
+                                <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                       Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
+                                       Style="{StaticResource smallFontLabelNoCopy}"/>
+                            </Grid>
+                            <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                                    BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                                    Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
+                                <StackPanel Margin="0,0,0,10">
+                                    <Label Content="Choose an option" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                           Style="{StaticResource normalFontLabelNoCopy}"/>
+                                    <RadioButton x:Name="primaryEmail_RadioButton" GroupName="resendWelcomeEmailRadio"
+                                                 Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"
+                                                 Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                                 Style="{StaticResource smallFont}"/>
+                                    <RadioButton x:Name="specifyEmail_RadioButton" GroupName="resendWelcomeEmailRadio" Content="Specify different email address"
+                                                 Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                                 Style="{StaticResource smallFont}"/>
+                                    <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
+                                    <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}" Click="Button_ResendWelcomeEmail_Click"/>
+                                </StackPanel>
+                            </Border>
+                            <Grid>
+                                <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,15,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
                                           Style="{StaticResource darkToggleButtonBordered}"/>
-                            <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                                   Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
-                                   Style="{StaticResource normalFontLabelNoCopy}"/>
-                        </Grid>
-                        <Border x:Name="ResendWelcomeEmailOptions" Visibility="{Binding ElementName=ResendWelcomeEmailButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
-                                BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
-                                Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
-                            <StackPanel Margin="0,0,0,10">
-                                <Label Content="Choose an option" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                       Style="{StaticResource normalFontLabelNoCopy}"/>
-                                <RadioButton x:Name="primaryEmail_RadioButton" GroupName="resendWelcomeEmailRadio"
-                                             Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"
-                                             Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                             Style="{StaticResource smallFont}"/>
-                                <RadioButton x:Name="specifyEmail_RadioButton" GroupName="resendWelcomeEmailRadio" Content="Specify different email address"
-                                             Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                             Style="{StaticResource smallFont}"/>
-                                <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
-                                <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}" Click="Button_ResendWelcomeEmail_Click"/>
-                            </StackPanel>
-                        </Border>
-                        <Grid>
-                            <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,5,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
-                                      Style="{StaticResource darkToggleButtonBordered}"/>
-                            <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                                   Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
-                                   Style="{StaticResource normalFontLabelNoCopy}"/>
-                        </Grid>
-                        <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
-                                BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
-                                Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
-                            <StackPanel Margin="0,0,0,10">
-                                <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Style="{StaticResource smallFont}"/>
-                                <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                         PreviewTextInput="ValidateTextInputNumbersOnly"/>
-                                <Button Margin="5,5,5,0" Content="Change" Style="{StaticResource darkButtonBordered}" Click="Button_ChangeInactivityTimeout_Click"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                                <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                       Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                       Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
+                                       Style="{StaticResource smallFontLabelNoCopy}"/>
+                            </Grid>
+                            <Border x:Name="ChangeInactivityTimeoutOptions" Visibility="{Binding ElementName=ChangeInactivityTimeoutButton, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsible}"
+                                    BorderBrush="{StaticResource lightGray}" BorderThickness="0.5"
+                                    Margin="5,-0.5,0,0" Width="300" HorizontalAlignment="Left">
+                                <StackPanel Margin="0,0,0,10">
+                                    <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Style="{StaticResource smallFont}"/>
+                                    <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                             PreviewTextInput="ValidateTextInputNumbersOnly"/>
+                                    <Button Margin="5,5,5,0" Content="Change" Style="{StaticResource darkButtonBordered}" Click="Button_ChangeInactivityTimeout_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                    
                     <!-- Bottom section -->
                     <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
                         <TextBlock Margin="5,5,0,0"
