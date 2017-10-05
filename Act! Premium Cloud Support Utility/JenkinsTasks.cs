@@ -1325,6 +1325,8 @@ namespace Jenkins_Tasks
         private JenkinsBuildStatus _backupLoadStatus;
         private JenkinsBuildStatus _unlockDatabaseStatus;
         private APCDatabasesSubItemSelectedTab _databasesSubItemSelected = APCDatabasesSubItemSelectedTab.Info;
+        private int _selectedUser;
+
         public APCAccount Database_APCAccount { get; set; }
 
         public APCDatabase (APCAccount Account)
@@ -1383,7 +1385,13 @@ namespace Jenkins_Tasks
         public APCDatabasesSubItemSelectedTab DatabasesSubItemSelected
         {
             get { return _databasesSubItemSelected; }
-            set { SetPropertyField("SelectedTab", ref _databasesSubItemSelected, value); }
+            set { SetPropertyField("DatabasesSubItemSelected", ref _databasesSubItemSelected, value); }
+        }
+
+        public int SelectedUser
+        {
+            get { return _selectedUser; }
+            set { SetPropertyField("SelectedUser", ref _selectedUser, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)

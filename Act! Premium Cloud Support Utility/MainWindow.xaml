@@ -816,6 +816,7 @@
                             <ListBox Grid.Column="0" Margin="0,0,0,0" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch"
                                      ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.Users}"
                                      SelectionChanged="LookupResults_DatabaseList_SelectionChanged"
+                                     SelectedIndex="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.SelectedUser}"
                                      x:Name="LookupResults_UserList">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
