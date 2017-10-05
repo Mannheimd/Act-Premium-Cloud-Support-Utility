@@ -714,7 +714,8 @@
                                  Width="200"
                                  HorizontalAlignment="Left" VerticalAlignment="Stretch"
                                  ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Databases}"
-                                 SelectionChanged="LookupResults_DatabaseList_SelectionChanged">
+                                 SelectionChanged="LookupResults_DatabaseList_SelectionChanged"
+                                 SelectedIndex="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.SelectedDatabase}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>

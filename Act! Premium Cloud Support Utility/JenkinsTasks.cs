@@ -1120,6 +1120,7 @@ namespace Jenkins_Tasks
         private DateTime _lookupCreateTime;
         private TimeZone _selectedTimeZoneModifier;
         private JenkinsServer _jenkinsServer;
+        private int _selectedDatabase = -1;
 
         public APCAccountLookupStatus LookupStatus
         {
@@ -1295,6 +1296,12 @@ namespace Jenkins_Tasks
             set { SetPropertyField("JenkinsServer", ref _jenkinsServer, value); }
         }
 
+        public int SelectedDatabase
+        {
+            get { return _selectedDatabase; }
+            set { SetPropertyField("SelectedDatabase", ref _selectedDatabase, value); }
+        }
+
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, e);
@@ -1325,7 +1332,7 @@ namespace Jenkins_Tasks
         private JenkinsBuildStatus _backupLoadStatus;
         private JenkinsBuildStatus _unlockDatabaseStatus;
         private APCDatabasesSubItemSelectedTab _databasesSubItemSelected = APCDatabasesSubItemSelectedTab.Info;
-        private int _selectedUser;
+        private int _selectedUser = -1;
 
         public APCAccount Database_APCAccount { get; set; }
 
