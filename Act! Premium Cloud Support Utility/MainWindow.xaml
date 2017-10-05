@@ -978,7 +978,8 @@
                             <Grid>
                                 <ToggleButton x:Name="ResendWelcomeEmailButton" Margin="5,15,0,0" Content="Resend welcome email" Width="300"
                                               HorizontalAlignment="Left" VerticalAlignment="Top"
-                                              Style="{StaticResource darkToggleButtonBordered}"/>
+                                              Style="{StaticResource darkToggleButtonBordered}"
+                                              IsChecked="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ResendWelcomeEmailIsExpanded}"/>
                                 <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
                                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
@@ -993,17 +994,22 @@
                                     <RadioButton x:Name="primaryEmail_RadioButton" GroupName="resendWelcomeEmailRadio"
                                                  Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"
                                                  Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                                 Style="{StaticResource smallFont}"/>
+                                                 Style="{StaticResource smallFont}"
+                                                 IsChecked="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ResendWelcomeEmailPrimaryEmailRadio}"/>
                                     <RadioButton x:Name="specifyEmail_RadioButton" GroupName="resendWelcomeEmailRadio" Content="Specify different email address"
                                                  Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                                 Style="{StaticResource smallFont}"/>
-                                    <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"/>
+                                                 Style="{StaticResource smallFont}"
+                                                 IsChecked="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ResendWelcomeEmailSpecifyEmailRadio}"/>
+                                    <TextBox x:Name="specifyEmail_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                             IsEnabled="{Binding ElementName=specifyEmail_RadioButton, Path=IsChecked}"
+                                             Text="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ResendWelcomeEmailSpecifyEmailAddress}"/>
                                     <Button Margin="5,5,5,0" Content="Send" Style="{StaticResource darkButtonBordered}" Click="Button_ResendWelcomeEmail_Click"/>
                                 </StackPanel>
                             </Border>
                             <Grid>
                                 <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,15,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
-                                          Style="{StaticResource darkToggleButtonBordered}"/>
+                                              Style="{StaticResource darkToggleButtonBordered}"
+                                              IsChecked="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ChangeInactivityTimeoutIsExpanded}"/>
                                 <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
                                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
@@ -1015,7 +1021,8 @@
                                 <StackPanel Margin="0,0,0,10">
                                     <Label Content="Choose a new timeout value, in minutes" Margin="5,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" Style="{StaticResource smallFont}"/>
                                     <TextBox x:Name="newTimeoutValue_TextBox" Margin="5,5,5,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                             PreviewTextInput="ValidateTextInputNumbersOnly"/>
+                                             PreviewTextInput="ValidateTextInputNumbersOnly"
+                                             Text="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ChangeInactivityTimeoutNewValue}"/>
                                     <Button Margin="5,5,5,0" Content="Change" Style="{StaticResource darkButtonBordered}" Click="Button_ChangeInactivityTimeout_Click"/>
                                 </StackPanel>
                             </Border>

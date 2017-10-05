@@ -1121,6 +1121,12 @@ namespace Jenkins_Tasks
         private TimeZone _selectedTimeZoneModifier;
         private JenkinsServer _jenkinsServer;
         private int _selectedDatabase = -1;
+        private bool _resendWelcomeEmailIsExpanded;
+        private bool _resendWelcomeEmailPrimaryEmailRadio;
+        private bool _resendWelcomeEmailSpecifyEmailRadio;
+        private string _resendWelcomeEmailSpecifyEmailAddress;
+        private bool _changeInactivityTimeoutIsExpanded;
+        private string _changeInactivityTimeoutNewValue;
 
         public APCAccountLookupStatus LookupStatus
         {
@@ -1300,6 +1306,42 @@ namespace Jenkins_Tasks
         {
             get { return _selectedDatabase; }
             set { SetPropertyField("SelectedDatabase", ref _selectedDatabase, value); }
+        }
+
+        public bool ResendWelcomeEmailIsExpanded
+        {
+            get { return _resendWelcomeEmailIsExpanded; }
+            set { SetPropertyField("ResendWelcomeEmailIsExpanded", ref _resendWelcomeEmailIsExpanded, value); }
+        }
+
+        public bool ResendWelcomeEmailPrimaryEmailRadio
+        {
+            get { return _resendWelcomeEmailPrimaryEmailRadio; }
+            set { SetPropertyField("ResendWelcomeEmailPrimaryEmailRadio", ref _resendWelcomeEmailPrimaryEmailRadio, value); }
+        }
+
+        public bool ResendWelcomeEmailSpecifyEmailRadio
+        {
+            get { return _resendWelcomeEmailSpecifyEmailRadio; }
+            set { SetPropertyField("ResendWelcomeEmailSpecifyEmailRadio", ref _resendWelcomeEmailSpecifyEmailRadio, value); }
+        }
+
+        public string ResendWelcomeEmailSpecifyEmailAddress
+        {
+            get { return _resendWelcomeEmailSpecifyEmailAddress; }
+            set { SetPropertyField("ResendWelcomeEmailSpecifyEmailAddress", ref _resendWelcomeEmailSpecifyEmailAddress, value); }
+        }
+
+        public bool ChangeInactivityTimeoutIsExpanded
+        {
+            get { return _changeInactivityTimeoutIsExpanded; }
+            set { SetPropertyField("ChangeInactivityTimeoutIsExpanded", ref _changeInactivityTimeoutIsExpanded, value); }
+        }
+
+        public string ChangeInactivityTimeoutNewValue
+        {
+            get { return _changeInactivityTimeoutNewValue; }
+            set { SetPropertyField("ChangeInactivityTimeoutNewValue", ref _changeInactivityTimeoutNewValue, value); }
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
