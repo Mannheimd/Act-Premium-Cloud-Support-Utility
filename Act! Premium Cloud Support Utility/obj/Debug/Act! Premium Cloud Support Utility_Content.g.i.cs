@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("01_refresh.gif")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("glacier.ico")]
 
 
