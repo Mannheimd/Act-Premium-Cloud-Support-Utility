@@ -643,7 +643,9 @@
                                 Click="NewLookupPane_LookupButton_Click"/>
                     </Grid>
                     <Grid Margin="0,5,0,0" Grid.Row="4">
-                        <Label Style="{StaticResource normalFont}" Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupStatusToStringConverter}}"
+                        <Label Style="{StaticResource normalFont}"
+                               Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupStatusToStringConverter}}"
+                               Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupStatusToVisibilityConverter}, ConverterParameter=NotStarted:Reverse}"
                                HorizontalAlignment="Left" VerticalAlignment="Top"/>
                     </Grid>
                 </Grid>
