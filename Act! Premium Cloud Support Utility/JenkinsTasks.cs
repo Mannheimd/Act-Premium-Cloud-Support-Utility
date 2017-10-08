@@ -656,9 +656,9 @@ namespace Jenkins_Tasks
         }
 
         /// <summary>
-        /// Builds [job not yet made] to get list of database backups
+        /// Builds CloudOps1-ListCustomerDatabaseBackups-M to get list of database backups
         /// </summary>
-        /// <param name="database">APCDatabase to get users for</param>
+        /// <param name="database">APCDatabase to find backups for</param>
         /// <param name="server">JenkinsServer to run build on</param>
         /// <returns>Returns a list of APCDatabaseUsers</returns>
         public static async Task<List<APCDatabaseBackup>> getDatabaseBackups(APCDatabase database, JenkinsServer server)
@@ -673,7 +673,7 @@ namespace Jenkins_Tasks
             }
 
             // Post a request to build LookupCustomer and wait for a response
-            string BuildOutput = await runJenkinsBuild(server, @"/job/[GetTheJobLink]/buildWithParameters?&SQLServer="
+            string BuildOutput = await runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseBackups-M/buildWithParameters?&SQLServer="
                 + database.Server
                 + "&DatabaseName="
                 + database.Name
@@ -778,9 +778,9 @@ namespace Jenkins_Tasks
         }
 
         /// <summary>
-        /// Builds [get job name] to copy backup files
+        /// Builds CloudOps1-CopyCustomerDatabaseBackup-M to copy backup files
         /// </summary>
-        /// <param name="database">APCDatabase to get users for</param>
+        /// <param name="database">APCDatabase to retain backups for</param>
         /// <param name="server">JenkinsServer to run build on</param>
         /// <returns>Returns a list of APCDatabaseUsers</returns>
         public static async Task<bool> RetainDatabaseBackup(APCDatabaseBackupRestorable backup)
@@ -797,22 +797,14 @@ namespace Jenkins_Tasks
             foreach (APCDatabaseBackup BackupFile in backup.BackupFiles)
             {
                 // Post a request to build LookupCustomer and wait for a response
-                string BuildOutput = await runJenkinsBuild(backup.Backup_APCDatabase.Database_APCAccount.JenkinsServer, @"/job/[GetJobName]/buildWithParameters?&DestinationServer="
+                string BuildOutput = await runJenkinsBuild(backup.Backup_APCDatabase.Database_APCAccount.JenkinsServer, @"/job/CloudOps1-CopyCustomerDatabaseBackup-M/buildWithParameters?&DestinationServer="
                     + backup.Backup_APCDatabase.Server
                     + "&Backup="
                     + BackupFile.Filename
                     + "&delay=0sec");
 
-                // Get the actual data from the output
-                string Data = SearchString(BuildOutput, "[STARTDATA]", "[ENDDATA]");
-
-                // Check if successful
-                string BuildStatus = SearchString(Data, "[CopySuccessful=", "]");
-                if (BuildStatus != "true")
-                {
-                    backup.RestoreBackupStatus = JenkinsBuildStatus.Failed;
-                    return false;
-                }
+                // We don't check the output of this job for verification as it's tough to build something into the Jenkins job which does that.
+                // Basically if the 'gsutil cp' command in the Jenkins job fails, the Jenkins build fails and we'll see a failure.
             }
 
             backup.RestoreBackupStatus = JenkinsBuildStatus.Successful;

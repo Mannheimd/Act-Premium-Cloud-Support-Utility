@@ -545,8 +545,8 @@ namespace Act__Premium_Cloud_Support_Utility
             if (Database.Server != null
                 && Database.Name != null)
             {
-                await JenkinsTasks.getDatabaseBackups(Database, Database.Database_APCAccount.JenkinsServer);
-                await Task.Delay(10000);
+                Database.Backups =  await JenkinsTasks.getDatabaseBackups(Database, Database.Database_APCAccount.JenkinsServer);
+                Database.RestoreableBackups = JenkinsTasks.GetRestorableBackupsFromFiles(Database.Backups);
             }
         }
 
