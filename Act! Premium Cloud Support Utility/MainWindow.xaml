@@ -997,7 +997,7 @@
                                               HorizontalAlignment="Left" VerticalAlignment="Top"
                                               Style="{StaticResource darkToggleButtonBordered}"
                                               IsChecked="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ResendWelcomeEmailIsExpanded}"/>
-                                <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                <Label Margin="310,14,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ResendWelcomeEmailStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
                                        Style="{StaticResource smallFontLabelNoCopy}"/>
@@ -1027,7 +1027,7 @@
                                 <ToggleButton x:Name="ChangeInactivityTimeoutButton" Margin="5,15,0,0" Content="Change inactivity timeout" Width="300" HorizontalAlignment="Left"
                                               Style="{StaticResource darkToggleButtonBordered}"
                                               IsChecked="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem.ChangeInactivityTimeoutIsExpanded}"/>
-                                <Label Margin="310,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                <Label Margin="310,14,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
                                        Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.ChangeInactivityTimeoutStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Failed:InProgress:Successful}"
                                        Style="{StaticResource smallFontLabelNoCopy}"/>
