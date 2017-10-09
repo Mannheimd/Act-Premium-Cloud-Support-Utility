@@ -693,11 +693,11 @@ namespace Jenkins_Tasks
             // Create a new list
             List<APCDatabaseBackup> BackupList = new List<APCDatabaseBackup>();
 
-            // Get BackupInfo block
-            string BackupInfo = SearchString(Data, "[BACKUPINFOSTART]", "[BACKUPINFOEND]");
+            // Get BackupInfo block - the job doesn't actually contain this, so let's forget it existed.
+            //string BackupInfo = SearchString(Data, "[BACKUPINFOSTART]", "[BACKUPINFOEND]");
 
-            // Get Backup lines
-            string[] Backups = BackupInfo.Split(new string[] { "[Backup=" }, StringSplitOptions.None);
+            // Get Backup lines - last line will contain '[BackupInfoFound=true]' due to the above... uh... Feature
+            string[] Backups = Data.Split(new string[] { "[Backup=" }, StringSplitOptions.None);
 
             // For each line, build a user object
             foreach (string Backup in Backups)
@@ -727,7 +727,7 @@ namespace Jenkins_Tasks
                 BackupList.Add(NewBackup);
             }
 
-            database.UserLoadStatus = JenkinsBuildStatus.Successful;
+            database.BackupLoadStatus = JenkinsBuildStatus.Successful;
             return BackupList;
         }
 
@@ -754,6 +754,7 @@ namespace Jenkins_Tasks
                     APCDatabaseBackupRestorable RestorableBackup = new APCDatabaseBackupRestorable(Backup.Backup_Database);
                     RestorableBackup.BackupFiles.Add(Backup);
                     RestorableBackup.Date = Backup.Date;
+                    RestorableBackups.Add(RestorableBackup);
                 }
 
                 // If Diff, check for Full on the same day - if there is one, add to RestorableBackup with both files
@@ -763,6 +764,7 @@ namespace Jenkins_Tasks
                     RestorableBackup.BackupFiles.Add(FullBackups[Backup.Date.Date]);
                     RestorableBackup.BackupFiles.Add(Backup);
                     RestorableBackup.Date = Backup.Date;
+                    RestorableBackups.Add(RestorableBackup);
                 }
             }
 

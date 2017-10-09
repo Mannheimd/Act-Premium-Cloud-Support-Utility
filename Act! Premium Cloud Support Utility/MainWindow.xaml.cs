@@ -552,10 +552,10 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private async void LookupResults_DatabaseBackups_RetainBackup_Click(object sender, RoutedEventArgs e)
         {
-            if (!((APCDatabaseBackupRestorable)LookupResults_DatabaseList.SelectedItem is APCDatabaseBackupRestorable))
+            if (!((APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem is APCDatabaseBackupRestorable))
                 return;
 
-            APCDatabaseBackupRestorable Backup = (APCDatabaseBackupRestorable)LookupResults_DatabaseList.SelectedItem;
+            APCDatabaseBackupRestorable Backup = (APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem;
             if (Backup != null)
             {
                 await JenkinsTasks.RetainDatabaseBackup(Backup);

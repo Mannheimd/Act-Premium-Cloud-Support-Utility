@@ -1,4 +1,4 @@
-﻿Act! Premium Cloud Support Utility
+﻿Glacier
 
 
 winexe
@@ -12,9 +12,9 @@ DEBUG;TRACE
 C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\App.xaml
 3-290339818
 
-9-648911385
+13134183738
 15-928506211
 MainWindow.xaml;ResendWelcomeEmail.xaml;UpdateTimeoutValue.xaml;
 
-False
+True
 
