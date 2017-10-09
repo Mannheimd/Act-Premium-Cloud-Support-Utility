@@ -546,7 +546,6 @@
                                        Style="{StaticResource normalFontLabelNoCopy}">
                                     <TextBlock Style="{StaticResource textBlockStyleNoCopy}"
                                                FontWeight="DemiBold"
-                                               Foreground="{StaticResource mediumGray}"
                                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName, Converter={StaticResource LookupListAccountNameConverter}}"
                                                TextTrimming="CharacterEllipsis"/>
                                 </Label>
@@ -664,6 +663,7 @@
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="20"/><!-- Just a spacer, no data should be in here -->
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -673,17 +673,26 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="LookupResults_Reset_Button" Grid.Column="2" Grid.RowSpan="9000"
-                            Content="{iconPacks:PackIconMaterialLight Refresh, Height=20, Width=20}"
-                            Height="22" Width="22" Margin="0,16,16,0"
-                            VerticalAlignment="Top" HorizontalAlignment="Right"
-                            Style="{StaticResource darkButton}"
-                            Click="LookupResults_Reset_Button_Click"/>
-                    <Label Grid.Column="2" Grid.RowSpan="9000"
-                               Margin="0,50,12,0"
-                               HorizontalAlignment="Right" VerticalAlignment="Top"
+                    <StackPanel Grid.Column="3" Grid.RowSpan="9000" Margin="0,16,16,0">
+                        <StackPanel Orientation="Horizontal"
+                                    VerticalAlignment="Top" HorizontalAlignment="Right" >
+                            <Button Content="{iconPacks:PackIconMaterialLight Plus, Height=22, Width=22, Rotation=45}"
+                                    Height="22" Width="22"
+                                    VerticalAlignment="Top" HorizontalAlignment="Right"
+                                    Style="{StaticResource darkButton}"
+                                    Click="LookupListPane_RemoveLookup_Click"/>
+                            <Button x:Name="LookupResults_Reset_Button" 
+                                    Content="{iconPacks:PackIconMaterialLight Refresh, Height=20, Width=20}"
+                                    Margin="22,0,0,0"
+                                    Height="22" Width="22"
+                                    VerticalAlignment="Top" HorizontalAlignment="Right"
+                                    Style="{StaticResource darkButton}"
+                                    Click="LookupResults_Reset_Button_Click"/>
+                        </StackPanel>
+                        <Label HorizontalAlignment="Right" VerticalAlignment="Top"
                                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupStatusToVisibilityConverter}, ConverterParameter=Refreshing}"
                                Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LookupStatus, Converter={StaticResource AccountLookupStatusToStringConverter}}"/>
+                    </StackPanel>
                     <TextBlock Style="{StaticResource textBlockLargeFontStyle}"
                            Grid.Column="0" Grid.Row="0"
                            Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
