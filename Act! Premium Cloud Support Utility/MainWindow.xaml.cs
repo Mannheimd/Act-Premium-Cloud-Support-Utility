@@ -442,6 +442,12 @@ namespace Act__Premium_Cloud_Support_Utility
         {
             APCAccount Account = new APCAccount();
             Account.LookupCreateTime = DateTime.Now;
+
+            if (JenkinsInfo.Instance.ConfiguredJenkinsServers.Count == 1)
+            {
+                Account.JenkinsServer = JenkinsInfo.Instance.ConfiguredJenkinsServers[0];
+            }
+
             LookupResults.Insert(0, Account);
             LookupListPane_Lookups_ListBox.SelectedIndex = 0;
         }
