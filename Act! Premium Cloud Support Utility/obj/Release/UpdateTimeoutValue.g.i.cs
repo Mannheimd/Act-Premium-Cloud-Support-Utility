@@ -60,7 +60,7 @@ namespace Act__Premium_Cloud_Support_Utility {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Act! Premium Cloud Support Utility;component/updatetimeoutvalue.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Glacier;component/updatetimeoutvalue.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\UpdateTimeoutValue.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
