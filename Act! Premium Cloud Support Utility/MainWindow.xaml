@@ -16,6 +16,9 @@
         Closing="MainWindow_Closing"
         Loaded="Window_Loaded">
     <Window.Resources>
+        <!-- Images -->
+        <BitmapImage x:Key="glacierLarge" UriSource="/Images/GlacierLarge.png"/>
+
         <!-- Converters -->
         <local:ListBoxSelectedToVisibility_Converter x:Key="ListBoxSelectedToVisibilityConverter"/>
         <local:ListBoxSelectedToBool_Converter x:Key="ListBoxSelectedToBoolConverter"/>
@@ -566,8 +569,10 @@
             <!-- Blank pane showing "No account selected", displays when no lookup is selected -->
             <Grid Grid.Column="1" Margin="0,0,0,0"
                   Visibility="{Binding ElementName=LookupListPane_Lookups_ListBox, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}, ConverterParameter=Reverse}">
-                <Label Content="No account selected" Style="{StaticResource largeFont}"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Image Source="{StaticResource glacierLarge}" Height="300" Width="300" HorizontalAlignment="Center"/>
+                    <Label Content="No account selected" Style="{StaticResource largeFont}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </StackPanel>
             </Grid>
         
             <!-- Lookup Results -->
