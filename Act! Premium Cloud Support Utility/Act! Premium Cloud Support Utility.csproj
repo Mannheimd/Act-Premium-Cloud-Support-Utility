@@ -124,9 +124,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Iceberg.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Glacier.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
