@@ -494,14 +494,15 @@ namespace Jenkins_Tasks
                 return;
             }
 
-            // Check if customer couldn't be found
-            if (SearchString(lookupData, "[LookupResult=", "]") == "NotFound")
+            // Check if customer couldn't be found, or if the account doesn't have any information
+            if (SearchString(lookupData, "[LookupResult=", "]") == "NotFound"
+                || SearchString(lookupData, "[AccountInfoFound=", "]") != "true")
             {
                 account.LookupStatus = APCAccountLookupStatus.NotFound;
 
                 return;
             }
-
+            
             // Pulling strings out of output (lines end with return, null value doesn't do the trick. Stupid humans.)
             account.IITID = SearchString(lookupData, "[IITID=", "]").Trim();
             account.AccountName = SearchString(lookupData, "[AccountName=", "]").Trim();
