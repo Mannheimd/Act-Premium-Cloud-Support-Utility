@@ -545,6 +545,8 @@
                                 <Label Margin="3,1,20,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223"
                                        Style="{StaticResource normalFontLabelNoCopy}">
                                     <TextBlock Style="{StaticResource textBlockStyleNoCopy}"
+                                               FontWeight="DemiBold"
+                                               Foreground="{StaticResource mediumGray}"
                                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName, Converter={StaticResource LookupListAccountNameConverter}}"
                                                TextTrimming="CharacterEllipsis"/>
                                 </Label>
@@ -699,17 +701,27 @@
                            Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
                            Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Email}"/>
                     <TextBlock
-                           Grid.Column="0" Grid.Row="3"
-                           Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                           Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TrialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
+                        Grid.Column="0" Grid.Row="3"
+                        Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                        Style="{StaticResource textBlockStyleNoCopy}">
+                        Account Type: 
+                        <TextBlock>
+                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TrialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
+                        </TextBlock>
+                    </TextBlock>
                     <TextBlock
-                           Grid.Column="0" Grid.Row="4"
-                           Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                           Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SuspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.ArchiveStatus|DataContext.DeleteStatus}"/>
+                        Grid.Column="0" Grid.Row="4"
+                        Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                        Style="{StaticResource textBlockStyleNoCopy}">
+                        Account Status: 
+                        <TextBlock>
+                            <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SuspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.ArchiveStatus|DataContext.DeleteStatus}"/>
+                        </TextBlock>
+                    </TextBlock>
                     <TextBlock
-                           Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
-                           Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                           Style="{StaticResource textBlockStyleNoCopy}">
+                        Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
+                        Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                        Style="{StaticResource textBlockStyleNoCopy}">
                         Login URL: 
                         <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
                             <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
@@ -741,6 +753,7 @@
                                                Width="191"
                                                Style="{StaticResource normalFontLabelNoCopy}">
                                             <TextBlock Style="{StaticResource textBlockStyleNoCopy}"
+                                                       FontWeight="DemiBold"
                                                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Name, Converter={StaticResource LookupListAccountNameConverter}}"
                                                        TextTrimming="CharacterEllipsis"/>
                                         </Label>
@@ -846,7 +859,10 @@
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <Grid>
-                                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding ContactName}"/>
+                                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"
+                                                   FontWeight="DemiBold"
+                                                   Style="{StaticResource normalFontLabel}"
+                                                   Content="{Binding ContactName}"/>
                                             <Label Margin="3,25,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource smallFontLabel}" Content="{Binding Role}"/>
                                         </Grid>
                                     </DataTemplate>
