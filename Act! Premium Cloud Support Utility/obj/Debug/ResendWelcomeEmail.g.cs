@@ -76,7 +76,7 @@ namespace Act__Premium_Cloud_Support_Utility {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Act! Premium Cloud Support Utility;component/resendwelcomeemail.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Glacier;component/resendwelcomeemail.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\ResendWelcomeEmail.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

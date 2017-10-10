@@ -1,603 +1,407 @@
-﻿using System;
+﻿using Jenkins_Tasks;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media.Animation;
+using System.Windows.Navigation;
 using System.Xml;
 
 namespace Act__Premium_Cloud_Support_Utility
 {
+    public class CurrentWindowState : DependencyObject
+    {
+        public static readonly CurrentWindowState Instance = new CurrentWindowState();
+        private CurrentWindowState() { }
+
+        public static string LocationTop { get; set; }
+        public static string LocationLeft { get; set; }
+        public static string Height { get; set; }
+        public static string Width { get; set; }
+        public static WindowState WindowStateStaging { get; set; }
+
+        public WindowDisplayMode DisplayMode
+        {
+            get
+            {
+                return (WindowDisplayMode)GetValue(DisplayModeProperty);
+            }
+            set
+            {
+                SetValue(DisplayModeProperty, value);
+            }
+        }
+
+        public WindowState State
+        {
+            get
+            {
+                return (WindowState)GetValue(StateProperty);
+            }
+            set
+            {
+                SetValue(StateProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty DisplayModeProperty = DependencyProperty.Register("DisplayMode", typeof(WindowDisplayMode), typeof(CurrentWindowState), new UIPropertyMetadata());
+        public static readonly DependencyProperty StateProperty = DependencyProperty.Register("State", typeof(WindowState), typeof(CurrentWindowState), new UIPropertyMetadata());
+    }
+
+    public static class ApplicationVariables
+    {
+        public static string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Glacier";
+        public static string UserConfigFilePath = AppDataPath + @"\userconfig.xml";
+        public static ReadOnlyCollection<TimeZoneInfo> TimeZones = TimeZoneInfo.GetSystemTimeZones();
+    }
+
+    static class ApplicationSettings
+    {
+        public static void Load()
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+
+                CurrentWindowState.Height = UserConfig.SelectSingleNode(@"/userconfig/application/height").InnerText;
+                CurrentWindowState.Width = UserConfig.SelectSingleNode(@"/userconfig/application/width").InnerText;
+                CurrentWindowState.LocationTop = UserConfig.SelectSingleNode(@"/userconfig/application/locationtop").InnerText;
+                CurrentWindowState.LocationLeft = UserConfig.SelectSingleNode(@"/userconfig/application/locationleft").InnerText;
+
+                // This has to be after Top and Left, otherwise the maximisation doesn't work to maximum correctness
+                WindowState State;
+                Enum.TryParse(UserConfig.SelectSingleNode(@"/userconfig/application/windowstate").InnerText, out State);
+                CurrentWindowState.WindowStateStaging = State;
+            }
+            catch
+            {
+
+            }
+        }
+
+        public static void Save(WindowState WindowStateEnum)
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+
+                XmlNode ApplicationSettings = UserConfig.SelectSingleNode(@"userconfig/application");
+
+                if (ApplicationSettings.SelectSingleNode(@"height") != null)
+                    ApplicationSettings.SelectSingleNode(@"height").InnerText = CurrentWindowState.Height;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("height");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.Height);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"width") != null)
+                    ApplicationSettings.SelectSingleNode(@"width").InnerText = CurrentWindowState.Width;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("width");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.Width);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"locationtop") != null)
+                    ApplicationSettings.SelectSingleNode(@"locationtop").InnerText = CurrentWindowState.LocationTop;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("locationtop");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.LocationTop);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"locationleft") != null)
+                    ApplicationSettings.SelectSingleNode(@"locationleft").InnerText = CurrentWindowState.LocationLeft;
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("locationleft");
+                    XmlText NewText = UserConfig.CreateTextNode(CurrentWindowState.LocationLeft);
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+
+                if (ApplicationSettings.SelectSingleNode(@"windowstate") != null)
+                    ApplicationSettings.SelectSingleNode(@"windowstate").InnerText = WindowStateEnum.ToString();
+                else
+                {
+                    XmlElement NewNode = UserConfig.CreateElement("windowstate");
+                    XmlText NewText = UserConfig.CreateTextNode(WindowStateEnum.ToString());
+                    NewNode.AppendChild(NewText);
+                    ApplicationSettings.AppendChild(NewNode);
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                UserConfig.Save(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return;
+            }
+        }
+    }
+
     public partial class MainWindow : Window
     {
-        public static XmlDocument jenkinsServerXml = new XmlDocument();
+        public static ObservableCollection<APCAccount> LookupResults = new ObservableCollection<APCAccount>();
 
         public MainWindow()
         {
+            if (!ValidateUserConfigFile())
+                CreateDefaultUserConfigFile();
+
+            ApplicationSettings.Load();
+
+            JenkinsInfo.Instance.AvailableJenkinsServers = JenkinsTasks.getJenkinsServerList();
+            JenkinsInfo.Instance.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
+            JenkinsInfo.Instance.LookupTypeList = JenkinsTasks.buildAPCLookupTypeList();
+
+            if (JenkinsInfo.Instance.ConfiguredJenkinsServers.Count < 1)
+                CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Config;
+            else
+                CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Lookup;
+
+            LoadConfiguredServersFromUserConfig();
+
             InitializeComponent();
 
-            PopulateDropDowns();
-        }
+            LookupListPane_Lookups_ListBox.ItemsSource = LookupResults;
 
-        private void button_RunLookupCustomer_Click(object sender, RoutedEventArgs e)
-        {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
-            runLookupCustomer();
-        }
-
-        private void button_Unlock_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_Databases_ListView.SelectedIndex > -1)
+            APCAccount DebugAccount = new APCAccount()
             {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
-
-                unlockDatabase(database.name, database.server);
-            }
-        }
-
-        private void button_GetUsers_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_Databases_ListView.SelectedIndex > -1)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
-
-                getDatabaseUsers(database);
-            }
-        }
-
-        private void button_GetTimeout_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                getTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
-            }
-        }
-
-        private void button_UpdateTimeout_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_SiteName_TextBox.Text != "" && lookupResults_IISServer_TextBox.Text != "")
-            {
-                updateTimeout(lookupResults_SiteName_TextBox.Text, lookupResults_IISServer_TextBox.Text);
-            }
-        }
-
-        private void button_WelcomeEmail_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_PrimaryEmail_TextBox.Text != "" && lookupResults_IITID_TextBox.Text != "")
-            {
-                resendWelcomeEmail(lookupResults_IITID_TextBox.Text, lookupResults_PrimaryEmail_TextBox.Text);
-            }
-        }
-
-        private void button_ResetPassword_Click(object sender, RoutedEventArgs e)
-        {
-            if (lookupResults_Databases_ListView.SelectedIndex > -1
-                && lookupResults_DatabaseUsers_ListView.SelectedIndex > -1
-                && jenkinsServerSelect_ComboBox.SelectedIndex > -1)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-                Database database = lookupResults_Databases_ListView.SelectedItem as Database;
-                DatabaseUser user = lookupResults_DatabaseUsers_ListView.SelectedItem as DatabaseUser;
-
-                resetUserPassword(database.name, database.server, user.loginName, server);
-            }
-        }
-
-        private async void runLookupCustomer()
-        {
-            // Disable the server select, search and lookup results sections
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
-            string searchString = textBox_LookupValue.Text.Trim();
-
-            // Check that search criteria have been entered
-            if (searchString == "" || jenkinsServerSelect_ComboBox.Text == "")
-            {
-                lookupAccount_LookupStatus_TextBox.Content = "Enter search criteria";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
-
-                return;
-            }
-
-            // Get the currently selected server and confirm there are some stored credentials
-            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-
-            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) == null)
-            {
-                lookupAccount_LookupStatus_TextBox.Content = "Login error";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
-
-                return;
-            }
-
-            lookupAccount_LookupStatus_TextBox.Content = "Lookup running...";
-
-            // Post a request to build LookupCustomer and wait for a response
-            string lookupCustomerOutput = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-LookupCustomer/buildWithParameters?LookupCustomerBy="
-                + comboBox_LookupBy.SelectedValue.ToString()
-                + "&LookupValue="
-                + searchString
-                + "&delay=0sec");
-
-            // Check that the output is valid
-            if (SearchString(lookupCustomerOutput, "Searching " + comboBox_LookupBy.SelectedValue.ToString() + " for ", "...") != searchString)
-            {
-                lookupAccount_LookupStatus_TextBox.Content = "Invalid results, try again";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
-
-                return;
-            }
-
-            // Check if customer couldn't be found
-            if (lookupCustomerOutput.Contains("Unable to find customer by"))
-            {
-                lookupAccount_LookupStatus_TextBox.Content = "Unable to locate account";
-
-                setServerSelectEnabledState(true);
-                setLookupAccountEnabledState(true);
-
-                return;
-            }
-
-            // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-            string iitid = SearchString(lookupCustomerOutput, "IITID: ", @"
-");
-            string accountName = SearchString(lookupCustomerOutput, "Account Name: ", @"
-");
-            string email = SearchString(lookupCustomerOutput, "Email: ", @"
-");
-            string createDate = SearchString(lookupCustomerOutput, "Create Date: ", @"
-");
-            string trialOrPaid = SearchString(lookupCustomerOutput, "Trial or Paid: ", @"
-");
-            string serialNumber = SearchString(lookupCustomerOutput, "Serial Number: ", @"
-");
-            string seatCount = SearchString(lookupCustomerOutput, "Seat Count: ", @"
-");
-            string suspendStatus = SearchString(lookupCustomerOutput, "Suspend status: ", @"
-");
-            string archiveStatus = SearchString(lookupCustomerOutput, "Archive status: ", @"
-");
-            string siteName = SearchString(lookupCustomerOutput, "Site Name: ", @"
-");
-            string iisServer = SearchString(lookupCustomerOutput, "IIS Server: ", @"
-");
-            string loginUrl = SearchString(lookupCustomerOutput, "URL: ", @"
-");
-            string uploadUrl = SearchString(lookupCustomerOutput, "Upload: ", @"
-");
-            string zuoraAccount = SearchString(lookupCustomerOutput, "Zuora Account: ", @"
-");
-            string deleteStatus = SearchString(lookupCustomerOutput, "Delete archive status: ", @"
-");
-
-            // Get a list of databases from the output
-            List<Database> databaseList = ParseForDatabases(lookupCustomerOutput);
-
-            // Fill in the UI with data
-            lookupResults_AccountName_TextBox.Text = accountName;
-            lookupResults_SiteName_TextBox.Text = siteName;
-            lookupResults_AccountNumber_TextBox.Text = zuoraAccount;
-            lookupResults_LoginUrl_TextBox.Text = loginUrl;
-            lookupResults_UploadUrl_TextBox.Text = uploadUrl;
-            lookupResults_CreateDate_TextBox.Text = createDate;
-            lookupResults_PrimaryEmail_TextBox.Text = email;
-            lookupResults_TrialPaid_TextBox.Text = trialOrPaid;
-            lookupResults_SeatCount_TextBox.Text = seatCount;
-            lookupResults_SerialNumber_TextBox.Text = serialNumber;
-            lookupResults_SuspendStatus_TextBox.Text = suspendStatus;
-            lookupResults_ArchiveStatus_TextBox.Text = archiveStatus;
-            lookupResults_DeleteStatus_TextBox.Text = deleteStatus;
-            lookupResults_IISServer_TextBox.Text = iisServer;
-            lookupResults_IITID_TextBox.Text = iitid;
-
-            // Populate the Database list
-            lookupResults_Databases_ListView.ItemsSource = databaseList;
-
-            lookupAccount_LookupStatus_TextBox.Content = "Lookup complete";
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
-        }
-
-        private async void unlockDatabase(string databaseName, string sqlServer)
-        {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
-            databaseTasks_UnlockStatus_Label.Content = "Unlocking...";
-
-            // Get the currently selected server
-            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-
-            // Post a request to build LookupCustomer and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-            {
-                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UnlockDatabase/buildWithParameters?&SQLServer="
-                    + sqlServer
-                    + "&DatabaseName="
-                    + databaseName
-                    + "&delay=0sec");
-
-                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                string outputSqlServer = SearchString(output, "Found SQL Server: ", @"
-");
-                string outputDatabaseName = SearchString(output, "Unlocking database: ", @"
-");
-
-                if (outputSqlServer == sqlServer && outputDatabaseName == databaseName)
+                LookupStatus = APCAccountLookupStatus.Successful,
+                ResendWelcomeEmailStatus = JenkinsBuildStatus.Failed,
+                ChangeInactivityTimeoutStatus = JenkinsBuildStatus.Successful,
+                IITID = "12345",
+                AccountName = "DebugTest",
+                Email = "debugtest@invalid.com",
+                CreateDate = "2000BC",
+                TrialOrPaid = "Trial",
+                SerialNumber = "12345-ABCDE-67890-FGHIJ",
+                SeatCount = "3",
+                SuspendStatus = "NotSuspended",
+                ArchiveStatus = "NotArchived",
+                SiteName = "DebugSite",
+                IISServer = "DBG1-DBGIIS-01",
+                LoginUrl = "http://localhost/",
+                UploadUrl = "http://localhost",
+                ZuoraAccount = "A00123456",
+                DeleteStatus = "NotDeleted",
+                AccountType = "ActPremiumCloudPlus",
+                TimeoutValue = "60",
+                LookupTime = DateTime.Now,
+                LookupCreateTime = DateTime.Now,
+                JenkinsServer = new JenkinsServer()
                 {
-                    databaseTasks_UnlockStatus_Label.Content = "Database unlocked";
+                    id = "DBG1",
+                    name = "Debug 1",
+                    url = "http://localhost/"
                 }
-                else
-                {
-                    databaseTasks_UnlockStatus_Label.Content = "Unlock failed";
-                }
-            }
-            else
-            {
-                databaseTasks_UnlockStatus_Label.Content = "Login error";
-            }
+            };
 
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
+            //LookupResults.Add(DebugAccount);
         }
 
-        private async void getDatabaseUsers(Database database)
+        private static bool ValidateUserConfigFile()
         {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
+            if (!File.Exists(ApplicationVariables.UserConfigFilePath))
+                return false;
 
-            databaseTasks_GetUsersStatus_Label.Content = "Working...";
-
-            // Clear the current database user list
-            database.users.Clear();
-
-            // Get the currently selected server
-            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-
-            // Post a request to build LookupCustomer and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-            {
-                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListCustomerDatabaseUsers-Machine/buildWithParameters?&SQLServer="
-                    + database.server
-                    + "&DatabaseName="
-                    + database.name
-                    + "&delay=0sec");
-
-                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
-
-                if (outputDatabaseName.ToLower() == database.name.ToLower())
-                {
-                    database.users = ParseForDatabaseUsers(output);
-
-                    lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
-
-                    databaseTasks_GetUsersStatus_Label.Content = "Loaded users";
-                }
-                else
-                {
-                    databaseTasks_GetUsersStatus_Label.Content = "Request failed";
-                }
-            }
-            else
-            {
-                databaseTasks_GetUsersStatus_Label.Content = "Login error";
-            }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
-        }
-
-        private async void resendWelcomeEmail(string accountIITID, string accountEmail)
-        {
-            bool sendType = false; // true is alt email, false is default email
-            string sendTo = null; // alt email address
-            bool send = false; // output from send or cancel
-
-            ResendWelcomeEmail resendWelcomeEmail = new ResendWelcomeEmail(accountEmail);
-            resendWelcomeEmail.resultBool += value => sendType = value;
-            resendWelcomeEmail.resultString += value => sendTo = value;
-            resendWelcomeEmail.resultSend += value => send = value;
-            resendWelcomeEmail.ShowDialog();
-
-            if (send)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                accountTasks_WelcomeEmailStatus_Label.Content = "Sending...";
-
-                // set accountEmail to null if not needed, else set it to specified address
-                if (sendType)
-                {
-                    accountEmail = sendTo;
-                }
-                else
-                {
-                    accountEmail = null;
-                }
-
-                // Get the currently selected server
-                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-
-                // Post a request to build LookupCustomer and wait for a response
-                if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-                {
-                    string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ResendWelcomeEmail/buildWithParameters?&IITID="
-                        + accountIITID
-                        + "&AltEmailAddress="
-                        + accountEmail
-                        + "&delay=0sec");
-
-                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                    string outputIITID = SearchString(output, "IITID: ", @"
-");
-                    string outputEmail = SearchString(output, "Email Address: ", @"
-");
-
-                    if (outputIITID == accountIITID && outputEmail == accountEmail)
-                    {
-                        accountTasks_WelcomeEmailStatus_Label.Content = "Send complete";
-                    }
-                    else if (outputIITID == accountIITID && !sendType)
-                    {
-                        accountTasks_WelcomeEmailStatus_Label.Content = "Send complete";
-                    }
-                    else
-                    {
-                        accountTasks_WelcomeEmailStatus_Label.Content = "Send failed";
-                    }
-                }
-                else
-                {
-                    accountTasks_WelcomeEmailStatus_Label.Content = "Login error";
-                }
-            }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
-        }
-
-        private async void getTimeout(string siteName, string iisServer)
-        {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
-            accountTasks_GetTimeoutStatus_Label.Content = "Working...";
-
-            // Get the currently selected server
-            JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-
-            // Post a request to build LookupCustomer and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-            {
-                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ListExistingClientTimeout/buildWithParameters?&SiteName="
-                    + siteName
-                    + "&IISServer="
-                    + iisServer
-                    + "&delay=0sec");
-
-                // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                string outputSiteName = SearchString(output, "Site ", " on server");
-                string outputIISServer = SearchString(output, "on server ", @"
-");
-                string outputCurrentTimeout = SearchString(output, "Current Timeout: ", @"
-");
-
-                if (outputSiteName == siteName && outputIISServer == iisServer)
-                {
-                    accountTasks_GetTimeoutStatus_Label.Content = outputCurrentTimeout + " minutes(s)";
-                }
-                else
-                {
-                    accountTasks_GetTimeoutStatus_Label.Content = "Query error";
-                }
-            }
-            else
-            {
-                accountTasks_GetTimeoutStatus_Label.Content = "Login error";
-            }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
-        }
-
-        private async void updateTimeout(string siteName, string iisServer)
-        {
-            string newValue = null; // new timeout value to set
-            bool proceed = false; // output from send or cancel
-
-            UpdateTimeoutValue updateTimeoutValue = new UpdateTimeoutValue();
-            updateTimeoutValue.resultValue += value => newValue = value;
-            updateTimeoutValue.resultProceed += value => proceed = value;
-            updateTimeoutValue.ShowDialog();
-
-            if (proceed)
-            {
-                setServerSelectEnabledState(false);
-                setLookupAccountEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                accountTasks_UpdateTimeoutStatus_Label.Content = "Updating...";
-
-                // Get the currently selected server
-                JenkinsServer server = jenkinsServerSelect_ComboBox.SelectedItem as JenkinsServer;
-
-                // Post a request to build LookupCustomer and wait for a response
-                if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-                {
-                    string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-UpdateExistingClientTimeout/buildWithParameters?&SiteName="
-                        + siteName
-                        + "&IISServer="
-                        + iisServer
-                        + "&Timeout="
-                        + newValue
-                        + "&delay=0sec");
-
-                    // Pulling strings out of output (lines end with return, null value doesn't do the trick)
-                    string outputSiteName = SearchString(output, "Updating customer ", " on server ");
-                    string outputIISServer = SearchString(output, "on server ", @" 
-");
-                    string outputTimeout = SearchString(output, "Changing Timeout to: ", @"
- ");
-
-                    if (outputSiteName == siteName && outputIISServer == iisServer && outputTimeout == newValue)
-                    {
-                        accountTasks_UpdateTimeoutStatus_Label.Content = "Updated";
-                    }
-                    else
-                    {
-                        accountTasks_UpdateTimeoutStatus_Label.Content = "Query error";
-                    }
-                }
-                else
-                {
-                    accountTasks_UpdateTimeoutStatus_Label.Content = "Login error";
-                }
-            }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
-        }
-
-        private async void resetUserPassword(string databaseName, string databaseServer, string userName, JenkinsServer server)
-        {
-            setServerSelectEnabledState(false);
-            setLookupAccountEnabledState(false);
-            setLookupResultsEnabledState(false);
-
-            userTasks_ResetPasswordStatus_Label.Content = "Resetting...";
-
-            // Post a request to build ResetPassword and wait for a response
-            if (JenkinsTasks.UnsecureJenkinsCreds(server.id) != null)
-            {
-                string output = await JenkinsTasks.runJenkinsBuild(server, @"/job/CloudOps1-ResetCustomerLoginPassword/buildWithParameters?&SQLServer="
-                    + databaseServer
-                    + "&DatabaseName="
-                    + databaseName
-                    + "&UserName="
-                    + userName
-                    + "&delay=0sec");
-
-                string outputDatabaseName = SearchString(output, "Changed database context to '", "'.");
-                bool oneRowAffected = output.Contains("(1 rows affected)");
-
-                if (outputDatabaseName == databaseName && oneRowAffected == true)
-                {
-                    userTasks_ResetPasswordStatus_Label.Content = "Reset to 'Actsoftware'";
-                }
-                else
-                {
-                    userTasks_ResetPasswordStatus_Label.Content = "Error resetting password";
-                }
-            }
-            else
-            {
-                userTasks_ResetPasswordStatus_Label.Content = "Login error";
-            }
-
-            setServerSelectEnabledState(true);
-            setLookupAccountEnabledState(true);
-            setLookupResultsEnabledState(true);
-        }
-
-        private void PopulateDropDowns()
-        {
-            // Load the Jenkins servers
-            if (loadJenkinsServersXml())
-            {
-                List<JenkinsServer> serverList = new List<JenkinsServer>();
-                XmlNodeList serverNodeList = jenkinsServerXml.SelectNodes("servers/server");
-                foreach (XmlNode serverNode in serverNodeList)
-                {
-                    JenkinsServer mew = new JenkinsServer(); //JenkinsServer server = mew JenkinsServer();
-                    mew.id = serverNode.Attributes["id"].Value;
-                    mew.name = serverNode.Attributes["name"].Value;
-                    mew.url = serverNode.InnerText;
-
-                    serverList.Add(mew);
-                }
-
-                jenkinsServerSelect_ComboBox.ItemsSource = serverList;
-            }
-
-            // Populating LookupCustomer drop-downs with Key/Value pairs, then setting the selected index to 0
-            comboBox_LookupBy.DisplayMemberPath = "Key";
-            comboBox_LookupBy.SelectedValuePath = "Value";
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Account Number", "ZuoraAccount"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Email Address", "EmailAddress"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Subscription Number", "ZuoraSubscription"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("Site Name", "SiteName"));
-            comboBox_LookupBy.Items.Add(new KeyValuePair<string, string>("IIT ID", "IITID"));
-            comboBox_LookupBy.SelectedIndex = 0;
-        }
-
-        public bool loadJenkinsServersXml()
-        {
-            // Loads the configuration XML from embedded resources. Later update will also store this locally and check a server for an updated version.
+            XmlDocument UserConfig = new XmlDocument();
             try
             {
-                string xmlString = null;
-
-                // Open the XML file from embedded resources
-                using (Stream stream = GetType().Assembly.GetManifestResourceStream("Act__Premium_Cloud_Support_Utility.JenkinsServers.xml"))
-                {
-                    using (StreamReader sr = new StreamReader(stream))
-                    {
-                        xmlString = sr.ReadToEnd();
-                    }
-                }
-
-                // Add the text to the Jenkins Servers XmlDocument
-                jenkinsServerXml.LoadXml(xmlString);
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
             }
-            catch (Exception error)
+            catch
             {
-                MessageBox.Show("Unable to load Jenkins servers - failure in loadJenkinsServersXml().\n\n" + error.Message);
-
                 return false;
             }
+
+            if (UserConfig.SelectSingleNode(@"userconfig/application") == null)
+                return false;
+
+            if (UserConfig.SelectSingleNode(@"userconfig/configuredservers") == null)
+                return false;
+
             return true;
+        }
+
+        private static bool CreateDefaultUserConfigFile()
+        {
+            try
+            {
+                if (!Directory.Exists(ApplicationVariables.AppDataPath))
+                    Directory.CreateDirectory(ApplicationVariables.AppDataPath);
+
+                File.Create(ApplicationVariables.UserConfigFilePath).Close();
+            }
+            catch
+            {
+                return false;
+            }
+
+            XmlDocument DefaultConfig = new XmlDocument();
+            XmlDeclaration DeclarationOfIndependence = DefaultConfig.CreateXmlDeclaration("1.0", "UTF-8", null);
+            XmlElement Root = DefaultConfig.DocumentElement;
+            DefaultConfig.InsertBefore(DeclarationOfIndependence, Root);
+
+            XmlElement UserConfig = DefaultConfig.CreateElement("userconfig");
+            DefaultConfig.AppendChild(UserConfig);
+
+            XmlElement Application = DefaultConfig.CreateElement("application");
+            UserConfig.AppendChild(Application);
+
+            XmlElement ConfiguredServers = DefaultConfig.CreateElement("configuredservers");
+            UserConfig.AppendChild(ConfiguredServers);
+
+            try
+            {
+                DefaultConfig.Save(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static List<JenkinsServer> LoadConfiguredServersFromUserConfig()
+        {
+            List<JenkinsServer> Servers = new List<JenkinsServer>();
+
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return Servers;
+            }
+
+            XmlNodeList ServerNodes = UserConfig.SelectNodes(@"userconfig/configuredservers/server");
+
+            if (ServerNodes == null || ServerNodes.Count == 0)
+                return Servers;
+
+            foreach (XmlNode ServerNode in ServerNodes)
+            {
+                JenkinsServer Server = new JenkinsServer()
+                {
+                    id = ServerNode.Attributes["id"].Value,
+                    name = ServerNode.Attributes["name"].Value,
+                    url = ServerNode.Attributes["url"].Value
+                };
+
+                Servers.Add(Server);
+            }
+
+            return Servers;
+        }
+
+        private static bool AddServerToUserConfig(JenkinsServer Server)
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            XmlElement ServerElement = UserConfig.CreateElement("server");
+            XmlAttribute IdAttribute = UserConfig.CreateAttribute("id");
+            IdAttribute.Value = Server.id;
+            XmlAttribute NameAttribute = UserConfig.CreateAttribute("name");
+            NameAttribute.Value = Server.name;
+            XmlAttribute UrlAttribute = UserConfig.CreateAttribute("url");
+            UrlAttribute.Value = Server.url;
+
+            ServerElement.Attributes.Append(IdAttribute);
+            ServerElement.Attributes.Append(NameAttribute);
+            ServerElement.Attributes.Append(UrlAttribute);
+
+            XmlNode ConfiguredServers = UserConfig.SelectSingleNode(@"userconfig/configuredservers");
+            ConfiguredServers.AppendChild(ServerElement);
+
+            try
+            {
+                UserConfig.Save(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool RemoveServerFromUserConfig(JenkinsServer Server)
+        {
+            XmlDocument UserConfig = new XmlDocument();
+            try
+            {
+                UserConfig.Load(ApplicationVariables.UserConfigFilePath);
+            }
+            catch
+            {
+                return false;
+            }
+
+            XmlNodeList ServerNodes = UserConfig.SelectNodes(@"userconfig/configuredservers/server");
+
+            if (ServerNodes == null || ServerNodes.Count == 0)
+                return false;
+
+            foreach (XmlNode ServerNode in ServerNodes)
+            {
+                if (ServerNode.Attributes["id"].Value == Server.id
+                    && ServerNode.Attributes["name"].Value == Server.name
+                    && ServerNode.Attributes["url"].Value == Server.url)
+                {
+                    XmlNode ConfiguredServers = UserConfig.SelectSingleNode(@"userconfig/configuredservers");
+                    ConfiguredServers.RemoveChild(ServerNode);
+
+                    try
+                    {
+                        UserConfig.Save(ApplicationVariables.UserConfigFilePath);
+
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public static List<string> getValuesFromXml(XmlDocument xmlDoc, string path)
@@ -628,181 +432,822 @@ namespace Act__Premium_Cloud_Support_Utility
             return resultList;
         }
 
-        private string SearchString(string mainText, string startString, string endString)
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
+
+        private void LookupListPane_NewLookup_Click(object sender, RoutedEventArgs e)
+        {
+            if (LookupResults.Count >= 10)
+            {
+                MessageBox.Show("Too many lookups");
+                return;
+            }
+
+            APCAccount Account = new APCAccount();
+            Account.LookupCreateTime = DateTime.Now;
+
+            if (JenkinsInfo.Instance.ConfiguredJenkinsServers.Count == 1)
+            {
+                Account.JenkinsServer = JenkinsInfo.Instance.ConfiguredJenkinsServers[0];
+            }
+
+            LookupResults.Insert(0, Account);
+            LookupListPane_Lookups_ListBox.SelectedIndex = 0;
+        }
+
+        private void LookupListPane_RemoveLookup_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount Account = (APCAccount)(sender as Button).DataContext;
+            LookupResults.Remove(Account);
+        }
+
+        private async void Button_ResendWelcomeEmail_Click(object sender, RoutedEventArgs e)
+        {
+            string SpecifiedEmail = specifyEmail_TextBox.Text.Trim();
+
+            APCAccount Account = (APCAccount)(sender as Button).DataContext;
+            WelcomeEmailSendTo SendTo = WelcomeEmailSendTo.PrimaryAccountEmail;
+            if (specifyEmail_RadioButton.IsChecked == true)
+            {
+                SendTo = WelcomeEmailSendTo.SpecifiedEmail;
+
+                if (SpecifiedEmail == null || SpecifiedEmail == "")
+                    return;
+            }
+
+            await JenkinsTasks.resendWelcomeEmail(Account, SendTo, SpecifiedEmail);
+        }
+
+        private async void Button_ChangeInactivityTimeout_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount Account = (APCAccount)(sender as Button).DataContext;
+            string NewTimeoutValue = newTimeoutValue_TextBox.Text.Trim();
+
+            if (NewTimeoutValue == null || NewTimeoutValue == "")
+                return;
+
+            await JenkinsTasks.updateTimeout(Account, NewTimeoutValue);
+        }
+
+        private async void Button_ResetUserPassword_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabaseUser)LookupResults_UserList.SelectedItem is APCDatabaseUser))
+                return;
+
+            APCDatabaseUser User = (APCDatabaseUser)LookupResults_UserList.SelectedItem;
+            if (User != null)
+            {
+                await JenkinsTasks.resetUserPassword(User);
+            }
+        }
+
+        private async void Button_UnlockDatabase_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabase)LookupResults_DatabaseList.SelectedItem is APCDatabase))
+                return;
+
+            APCDatabase Database = (APCDatabase)LookupResults_DatabaseList.SelectedItem;
+            if (Database != null)
+            {
+                await JenkinsTasks.unlockDatabase(Database);
+            }
+        }
+
+        private async void NewLookupPane_LookupButton_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount account = (APCAccount)(sender as Button).DataContext;
+            if (account.JenkinsServer != null
+                && account.LookupType != null
+                && account.LookupValue != null
+                && account.LookupValue.Trim() != "")
+            {
+                await JenkinsTasks.RunAPCAccountLookup(account);
+            }
+        }
+
+        private async void NewLookupPane_LookupValueBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            APCAccount account = (APCAccount)(sender as TextBox).DataContext;
+
+            account.LookupValue = (sender as TextBox).Text; // Force this to apply for every keydown, as the data binding doesn't pass it otherwise until the box is left
+
+            if (e.Key == Key.Enter || e.Key == Key.Return)
+            {
+                e.Handled = true;
+
+                if (account.JenkinsServer != null
+                    && account.LookupType != null
+                    && account.LookupValue != null
+                    && account.LookupValue.Trim() != "")
+                {
+                    await JenkinsTasks.RunAPCAccountLookup(account);
+                }
+            }
+        }
+
+        private async void LookupResults_DatabaseBackups_LoadBackups_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabase)LookupResults_DatabaseList.SelectedItem is APCDatabase))
+                return;
+
+            APCDatabase Database = (APCDatabase)LookupResults_DatabaseList.SelectedItem;
+            if (Database.Server != null
+                && Database.Name != null)
+            {
+                Database.Backups =  await JenkinsTasks.getDatabaseBackups(Database, Database.Database_APCAccount.JenkinsServer);
+                Database.RestoreableBackups = JenkinsTasks.GetRestorableBackupsFromFiles(Database.Backups);
+            }
+        }
+
+        private async void LookupResults_DatabaseBackups_RetainBackup_Click(object sender, RoutedEventArgs e)
+        {
+            if (!((APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem is APCDatabaseBackupRestorable))
+                return;
+
+            APCDatabaseBackupRestorable RestorableBackup = (APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem;
+            if (RestorableBackup != null)
+            {
+                await JenkinsTasks.RetainDatabaseBackup(RestorableBackup);
+            }
+        }
+
+        private async void LookupResults_DatabaseList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count < 1 || e.AddedItems[0] == null || !((e.AddedItems[0] as APCDatabase) is APCDatabase))
+                return;
+
+            if ((e.AddedItems[0] as APCDatabase).UserLoadStatus == JenkinsBuildStatus.Failed || (e.AddedItems[0] as APCDatabase).UserLoadStatus == JenkinsBuildStatus.NotStarted)
+                (e.AddedItems[0] as APCDatabase).Users = await JenkinsTasks.getDatabaseUsers((e.AddedItems[0] as APCDatabase), (e.AddedItems[0] as APCDatabase).Database_APCAccount.JenkinsServer);
+        }
+
+        private void ValidateTextInputNumbersOnly(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void ConfigPane_Back_Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (JenkinsInfo.Instance.ConfiguredJenkinsServers.Count < 1)
+            {
+                if (MessageBox.Show("You have no configured servers. Are you sure you want to leave?", "No Configured Servers", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return;
+            }
+
+            CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Lookup;
+        }
+
+        private async void ConfigPane_AddServer_Go_Click(object sender, RoutedEventArgs e)
+        {
+            if (ConfigPane_AvailableJenkinsServerList.SelectedItem == null || !(ConfigPane_AvailableJenkinsServerList.SelectedItem is JenkinsServer))
+                return;
+
+            // Secure and store the new login credentials
+            JenkinsTasks.SecureJenkinsCreds(
+                ConfigPane_AddServer_Username_TextBox.Text,
+                ConfigPane_AddServer_Token_TextBox.Text,
+                (ConfigPane_AvailableJenkinsServerList.SelectedItem as JenkinsServer).id
+                );
+
+            // Test login
+            if (!await JenkinsTasks.checkServerLogin(ConfigPane_AvailableJenkinsServerList.SelectedItem as JenkinsServer))
+            {
+                MessageBox.Show("Login failed. Verify you are using the correct user name and API token.", "Login Failed");
+                return;
+            }
+
+            // Add the server to the config
+            AddServerToUserConfig(ConfigPane_AvailableJenkinsServerList.SelectedItem as JenkinsServer);
+            JenkinsInfo.Instance.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
+
+            // For some reason the ConfiguredServers thing won't bind properly, so we have to update it each time we change it
+            Config_ConfiguredJenkinsServerList.ItemsSource = JenkinsInfo.Instance.ConfiguredJenkinsServers;
+
+            // Deselect the available server, and empty the text boxes
+            ConfigPane_AvailableJenkinsServerList.SelectedIndex = -1;
+            ConfigPane_AddServer_Username_TextBox.Text = null;
+            ConfigPane_AddServer_Token_TextBox.Text = null;
+        }
+
+        private void ConfigPane_RemoveServer_Click(object sender, RoutedEventArgs e)
+        {
+            if (Config_ConfiguredJenkinsServerList.SelectedItem == null || !(Config_ConfiguredJenkinsServerList.SelectedItem is JenkinsServer))
+                return;
+
+            RemoveServerFromUserConfig(Config_ConfiguredJenkinsServerList.SelectedItem as JenkinsServer);
+            JenkinsInfo.Instance.ConfiguredJenkinsServers = LoadConfiguredServersFromUserConfig();
+
+            // For some reason the ConfiguredServers thing won't bind properly, so we have to update it each time we change it
+            Config_ConfiguredJenkinsServerList.ItemsSource = JenkinsInfo.Instance.ConfiguredJenkinsServers;
+        }
+
+        private void LookupListPane_Configure_Button_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentWindowState.Instance.DisplayMode = WindowDisplayMode.Config;
+        }
+
+        private void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            WindowState WindowStateToSave = (WindowState)GetValue(MainWindow.WindowStateProperty);
+
+            if (WindowStateToSave == WindowState.Maximized)
+            {
+                CurrentWindowState.Instance.State = WindowState.Normal;
+            }
+
+            ApplicationSettings.Save(WindowStateToSave);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            CurrentWindowState.Instance.State = CurrentWindowState.WindowStateStaging;
+
+            // The binding doesn't work properly and I don't have time to fix it, so here.
+            SetValue(MainWindow.WindowStateProperty, CurrentWindowState.WindowStateStaging);
+        }
+
+        private async void LookupResults_Reset_Button_Click(object sender, RoutedEventArgs e)
+        {
+            APCAccount account = (APCAccount)(sender as Button).DataContext;
+            if (account.JenkinsServer != null
+                && account.LookupType != null
+                && account.LookupValue != null
+                && account.LookupValue.Trim() != "")
+            {
+                await JenkinsTasks.RunAPCAccountLookup(account);
+            }
+        }
+
+        private void Label_RightClick_Copy(object sender, MouseButtonEventArgs e)
+        {
+            if ((sender as Label).Content == null || !(((sender as Label).Content) is string))
+                return;
+
+            string Text = (sender as Label).Content as string;
+
             try
             {
-                string split1 = mainText.Split(new string[] { startString }, StringSplitOptions.None)[1];
-                return split1.Split( new string[] { endString }, StringSplitOptions.None)[0];
+                Clipboard.SetDataObject(Text);
+
+                ((Storyboard)FindResource("showAndFadeAnimation")).Begin(textCopiedAlert);
             }
             catch
-            {
-                return null;
-            }
+            { }
         }
 
-        private List<Database> ParseForDatabases(string mainText)
+        private void TextBlock_RightClick_Copy(object sender, MouseButtonEventArgs e)
         {
-            string workingText = mainText;
-            List<Database> list = new List<Database>();
+            if ((sender as TextBlock).Text == null || !(((sender as TextBlock).Text) is string))
+                return;
+
+            string Text = (sender as TextBlock).Text as string;
+
             try
             {
-                // Get lines with databases on
-                string[] lines = workingText.Split(new string[] { "Database: " }, StringSplitOptions.None);
+                Clipboard.SetDataObject(Text);
 
-                // For each line, separate the name and server
-                // Loop starts at line 1 rather than 0
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    Database database = new Database();
-
-                    database.name = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[0]).Split(null)[0];
-                    database.server = (lines[i].Split(new string[] { " | Server: " }, StringSplitOptions.None)[1]).Split(null)[0];
-
-                    list.Add(database);
-                }
+                ((Storyboard)FindResource("showAndFadeAnimation")).Begin(textCopiedAlert);
             }
-            catch (Exception error)
-            {
-                MessageBox.Show("Error occurred whilst getting database list:\n\n" + error.Message);
-            }
-
-            return list;
+            catch
+            { }
         }
+    }
 
-        private List<DatabaseUser> ParseForDatabaseUsers(string mainText)
+    public class ListBoxSelectedToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string workingText = mainText;
-            List<DatabaseUser> list = new List<DatabaseUser>();
-            try
+            if (parameter != null && parameter.ToString() == "Reverse")
             {
-                // Cut data to after the line of ----¦----¦----¦---- nonsense
-                workingText = workingText.Split(new string[] { @"----------¦----------¦----------¦-------------¦-------------¦----------------¦---------¦----------------¦-----------¦--------------¦---------------
-" }, StringSplitOptions.None)[1];
-
-                // Cut data to before "<linebreak><linebreak>(1 rows affected)"
-                workingText = workingText.Split(new string[] { @"
-
-(1 rows affected)" }, StringSplitOptions.None)[0];
-
-                // Get all lines
-                string[] lines = workingText.Split(new string[] { @"
-" }, StringSplitOptions.None);
-
-                // For each line, get the user information
-                // Loop starts at line 2 rather than 0
-                foreach (string line in lines)
-                {
-                    DatabaseUser user = new DatabaseUser();
-
-                    // Split the line up into individual values
-                    string[] lineSplit = line.Split('¦');
-
-                    // Grab the needed information
-                    user.loginName = lineSplit[0];
-                    user.lastLogin = lineSplit[9];
-                    user.role = lineSplit[6];
-
-                    list.Add(user);
-                }
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show("Error occurred whilst getting database users:\n\n" + error.Message);
-            }
-
-            return list;
-        }
-
-        async Task Delay(int time)
-        {
-            await Task.Delay(time);
-        }
-
-        private async void jenkinsServerSelect_ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.AddedItems.Count > 0)
-            {
-                setServerSelectEnabledState(false);
-                setLookupResultsEnabledState(false);
-
-                // Get server ID of selected server from jenkinsServerXml
-                JenkinsServer server = e.AddedItems[0] as JenkinsServer;
-
-                // Trigger update on UI with login status
-                jenkinsServerSelect_LoginStatus_Label.Content = "Checking login...";
-                jenkinsServerSelect_Grid.ClearValue(BackgroundProperty);
-
-                // Run a GET request to retrieve the user's login data
-                bool loginStatus = await JenkinsTasks.checkServerLogin(server);
-                if (loginStatus)
-                {
-                    jenkinsServerSelect_LoginStatus_Label.Content = "Login succeeded.";
-                    
-                    setLookupAccountEnabledState(true);
-                }
+                if (value == null)
+                    return Visibility.Visible;
                 else
-                {
-                    jenkinsServerSelect_LoginStatus_Label.Content = "Login failed.";
-                    jenkinsServerSelect_Grid.SetValue(BackgroundProperty, new SolidColorBrush(Color.FromRgb(254, 80, 0)));
-                    
-                    setLookupAccountEnabledState(false);
-                }
-
-                setServerSelectEnabledState(true);
+                    return Visibility.Hidden;
             }
+            if (value == null)
+                return Visibility.Hidden;
+            else
+                return Visibility.Visible;
         }
 
-        private void jenkinsServerSelect_Configure_Button_Click(object sender, RoutedEventArgs e)
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
-            JenkinsLogin jenkinsLogin = new JenkinsLogin();
-            jenkinsLogin.Show();
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class ListBoxSelectedToBool_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool Output = false;
+
+            if (value != null)
+                Output = true;
+
+            if (parameter != null && parameter.ToString() == "Reverse")
+                Output = !Output;
+
+            return Output;
         }
 
-        private void lookupResults_Databases_ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
-            if (e.AddedItems.Count == 1)
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class ListBoxItemSelectedState_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value.ToString() == "False")
+                return Visibility.Hidden;
+            else
+                return Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    /// <summary>
+    /// Takes a JenkinsTasks.AccountLookupStatus value, returns true if state is "Successful"
+    /// </summary>
+    public class AccountLookupStatusToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool VisibilityBool = false;
+            string Parameters = null;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string);
+            else Parameters = "";
+
+            if (value == null)
+                VisibilityBool = false;
+
+            if (Parameters.Contains(((APCAccountLookupStatus)value).ToString()))
+                VisibilityBool = true;
+
+            if (Parameters.Contains("Reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("Collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class AccountLookupStatusToString_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && value.ToString() == APCAccountLookupStatus.Successful.ToString())
+                return "Lookup complete";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.NotStarted.ToString())
+                return "Not started";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.NotFound.ToString())
+                return "Account not found";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.InProgress.ToString())
+                return "Locating account...";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.Refreshing.ToString())
+                return "Refreshing...";
+
+            if (value != null && value.ToString() == APCAccountLookupStatus.Failed.ToString())
+                return "Lookup failed";
+
+            return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Returns friendly version of APC Account Type (Act! Premium Cloud or APC+)
+    /// </summary>
+    public class AccountType_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string)
             {
-                Database database = e.AddedItems[0] as Database;
+                if (value as string == "ActPremiumCloudPlus")
+                    return "APC+";
+                if (value as string == "ActPremiumCloud")
+                    return "Act! Premium Cloud";
+                return value;
+            }
+            else return "";
+        }
 
-                lookupResults_DatabaseUsers_ListView.ItemsSource = database.users;
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+    
+    /// <summary>
+    /// Converts 1 to Visible, 0 to either Hidden by default or Collapsed is parameter contains "Collapsible". Reverses this result if parameter contains "Reverse"
+    /// </summary>
+    public class BooleanToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool BooleanOfAwesome = false;
+            if (value != null && value.ToString() == "True")
+                BooleanOfAwesome = true;
+
+            if (parameter != null && parameter.ToString().Contains("Reverse"))
+                BooleanOfAwesome = !BooleanOfAwesome;
+
+            if (BooleanOfAwesome)
+                return Visibility.Visible;
+            else
+            {
+                if (parameter != null && parameter.ToString().Contains("Collapsible"))
+                    return Visibility.Collapsed;
+
+                return Visibility.Hidden;
             }
         }
 
-        private void setServerSelectEnabledState(bool state)
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
-            jenkinsServerSelect_Grid.IsEnabled = state;
-        }
-
-        private void setLookupAccountEnabledState(bool state)
-        {
-            lookupAccount_Grid.IsEnabled = state;
-        }
-
-        private void setLookupResultsEnabledState(bool state)
-        {
-            lookupResults_Grid.IsEnabled = state;
+            throw new Exception("This method is not implemented.");
         }
     }
 
-    public class Database
+    /// <summary>
+    /// Takes APCAccount. If lookupStatus isn't Successful, account name reflects lookup status
+    /// </summary>
+    public class LookupListAccountName_Converter : IValueConverter
     {
-        public string name { get; set; }
-        public string server { get; set; }
-        public List<DatabaseUser> users = new List<DatabaseUser>();
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && value is string)
+            {
+                return value;
+            }
+            return "New Lookup";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
     }
 
-    public class DatabaseUser
+    /// <summary>
+    /// Converts APCAccountSelectedTab to a ListBox SelectedItem integer
+    /// </summary>
+    public class LookupResultSelectedTab_Converter : IValueConverter
     {
-        public string loginName { get; set; }
-        public string role { get; set; }
-        public string lastLogin { get; set; }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return -1;
+
+            if (value.ToString() == APCAccountSelectedTab.None.ToString())
+                return -1;
+
+            if (value.ToString() == APCAccountSelectedTab.Databases.ToString())
+                return 0;
+
+            if (value.ToString() == APCAccountSelectedTab.Details.ToString())
+                return 1;
+
+            if (value.ToString() == APCAccountSelectedTab.Activity.ToString())
+                return 2;
+
+            return -1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return APCAccountSelectedTab.None;
+
+            if (!(value is int))
+                return APCAccountSelectedTab.None;
+
+            if (value.ToString() == "-1")
+                return APCAccountSelectedTab.None;
+
+            if (value.ToString() == "0")
+                return APCAccountSelectedTab.Databases;
+
+            if (value.ToString() == "1")
+                return APCAccountSelectedTab.Details;
+
+            if (value.ToString() == "2")
+                return APCAccountSelectedTab.Activity;
+
+            return APCAccountSelectedTab.None;
+        }
     }
 
-    public class JenkinsServer
+    public class AccountTrialOrPaid_Converter : IValueConverter
     {
-        public string id { get; set; }
-        public string url { get; set; }
-        public string name { get; set; }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string)
+            {
+                if (value as string == "TRIAL")
+                    return "Trial";
+                if (value as string == "PAID")
+                    return "Paid";
+                return value;
+            }
+            else return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class AccountStatus_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return null;
+
+            APCAccount Account = (APCAccount)value;
+
+            // Work through options in order of severity
+            if (Account.DeleteStatus == "Deleted")
+                return "Deleted";
+
+            if (Account.ArchiveStatus == "Archived")
+                return "Archived";
+
+            if (Account.SuspendStatus == "Suspended")
+                return "Suspended";
+
+            return "Active";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }// Deprecated
+
+    public class AccountTimeout_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && value is string)
+            {
+                if ((value as string) == "undetermined")
+                    return "Unable to obtain. Account may be suspended.";
+
+                return (value as string) + " minutes";
+            }
+            else return "Fetching...";
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    /// <summary>
+    /// Intended to convert to a progress icon, but I couldn't get that to work in reasonable time. Converts to a text representation of the status instead.
+    /// </summary>
+    public class JenkinsBuildStatusToProgressIndicatorIcon_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return null;
+
+            JenkinsBuildStatus Status = (JenkinsBuildStatus)value;
+
+            if (Status == JenkinsBuildStatus.NotStarted)
+                return "Not started";
+
+            if (Status == JenkinsBuildStatus.InProgress)
+                return "Working...";
+
+            if (Status == JenkinsBuildStatus.Successful)
+                return "Successful";
+
+            if (Status == JenkinsBuildStatus.Failed)
+                return "Failed";
+
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class JenkinsBuildStatusToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool VisibilityBool = false;
+            string Parameters = null;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string);
+            else Parameters = "";
+
+            if (value == null)
+                VisibilityBool = false;
+
+            if (Parameters.Contains(((JenkinsBuildStatus)value).ToString()))
+                VisibilityBool = true;
+
+            if (Parameters.Contains("Reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("Collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    /// <summary>
+    /// Returns a Visibility state for the pane.
+    /// Parameter must contain the WindowDisplayModes that the pane wants to display in.
+    /// "reverse" in parameter will reverse the option.
+    /// "collapsible" in parameter will return "Collapsed" instead of "Hidden".
+    /// Uses String.Contains() to find args, so don't need to delimit values but it's a good idea to anyway.
+    /// Parameters and DisplayModes are made ToLower() to prevent caps from causing any issues.
+    /// </summary>
+    public class WindowDisplayModeToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string Parameters = null;
+            bool VisibilityBool = false;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string).ToLower();
+
+            if (Parameters.Contains(CurrentWindowState.Instance.DisplayMode.ToString().ToLower()))
+                VisibilityBool = true;
+
+            if (Parameters.Contains("reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    /// <summary>
+    /// Converts APCAccountSelectedTab to a ListBox SelectedItem integer
+    /// </summary>
+    public class DatabasesSubItemSelectedTab_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+                return 0;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Info.ToString())
+                return 0;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Users.ToString())
+                return 1;
+
+            if (value.ToString() == APCDatabasesSubItemSelectedTab.Backups.ToString())
+                return 2;
+
+            return -1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            if (value.ToString() == "-1")
+                return APCDatabasesSubItemSelectedTab.Info;
+
+            if (value.ToString() == "0")
+                return APCDatabasesSubItemSelectedTab.Info;
+
+            if (value.ToString() == "1")
+                return APCDatabasesSubItemSelectedTab.Users;
+
+            if (value.ToString() == "2")
+                return APCDatabasesSubItemSelectedTab.Backups;
+
+            return APCDatabasesSubItemSelectedTab.Info;
+        }
+    }
+
+    public class DatabasesSubItemSelectedToVisibility_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string Parameters = null;
+            bool VisibilityBool = false;
+
+            if (parameter != null && parameter is string)
+                Parameters = (parameter as string).ToLower();
+
+            if (value != null)
+            {
+                DatabasesSubItemSelectedTab_Converter Converter = new DatabasesSubItemSelectedTab_Converter();
+                APCDatabasesSubItemSelectedTab SelectedTab = (APCDatabasesSubItemSelectedTab)Converter.ConvertBack(value, targetType, parameter, culture);
+
+                if (Parameters.Contains(SelectedTab.ToString().ToLower()))
+                    VisibilityBool = true;
+            }
+
+            if (Parameters.Contains("reverse"))
+                VisibilityBool = !VisibilityBool;
+
+            if (VisibilityBool)
+                return Visibility.Visible;
+
+            if (Parameters.Contains("collapsible"))
+                return Visibility.Collapsed;
+            else
+                return Visibility.Hidden;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public class JenkinsRootUrlToConfigureUrl_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string && value != null)
+            {
+                string RootUrl = (value as string);
+
+                if (RootUrl.EndsWith(@"/"))
+                    return new System.Uri(RootUrl + "me/configure");
+                else
+                    return new System.Uri(RootUrl + "/me/configure");
+            }
+
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
+        {
+            throw new Exception("This method is not implemented.");
+        }
+    }
+
+    public enum WindowDisplayMode
+    {
+        Lookup,
+        Config
     }
 }
