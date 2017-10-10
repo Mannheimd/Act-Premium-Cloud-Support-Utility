@@ -1,0 +1,16 @@
+﻿<Window x:Class="Act__Premium_Cloud_Support_Utility.UpdateTimeoutValue"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Act__Premium_Cloud_Support_Utility"
+        mc:Ignorable="d"
+        Title="Update Timeout Value" Height="130" Width="308" WindowStartupLocation="CenterOwner" Topmost="True" WindowStyle="ToolWindow">
+    <Grid>
+        <Label Content="Enter a new timeout value in minutes:" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <TextBox x:Name="newValue_TextBox" Margin="219,14,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" PreviewTextInput="verifyNumbersOnly_TypedText" DataObject.Pasting="verifyNumbersOnly_PastedText"/>
+
+        <Button Content="Cancel" Margin="0,0,85,10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Click="buttonCancel_Click"/>
+        <Button Content="Send" Margin="0,0,10,10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="70" Click="buttonSend_Click"/>
+    </Grid>
+</Window>

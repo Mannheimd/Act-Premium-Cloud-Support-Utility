@@ -1,0 +1,4 @@
+<servers>
+  <server name="North America" id="USP1">https://cloudops-jenkins-usp1.hosted1.act.com:8443</server>
+  <server name="Europe" id="EUP1">https://cloudops-jenkins-eup1.eu.hosted.act.com:8443</server>
+</servers>

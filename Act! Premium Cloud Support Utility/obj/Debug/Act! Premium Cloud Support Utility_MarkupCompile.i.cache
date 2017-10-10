@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-G:\Development\Github\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Debug\
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\obj\Debug\
 Act__Premium_Cloud_Support_Utility
 none
 false
 DEBUG;TRACE
-G:\Development\Github\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\App.xaml
-2-784249852
+C:\Users\christopher.manders\Documents\Development\Github Repos\Act-Premium-Cloud-Support-Utility\Act! Premium Cloud Support Utility\App.xaml
+3-290339818
 
-111368789461
-141048885960
-MainWindow.xaml;JenkinsLogin.xaml;
+13134183738
+15-928506211
+MainWindow.xaml;ResendWelcomeEmail.xaml;UpdateTimeoutValue.xaml;
 
-True
+False
 
