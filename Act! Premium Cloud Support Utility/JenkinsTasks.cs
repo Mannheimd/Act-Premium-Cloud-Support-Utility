@@ -1588,6 +1588,28 @@ namespace Jenkins_Tasks
             set { SetPropertyField("BackupFiles", ref _backupFiles, value); }
         }
 
+        public string BackupsFilesText
+        {
+            get
+            {
+                string Text = null;
+
+                Text = Text + "[Database=" + Backup_APCDatabase.Name + "]\n";
+                Text = Text + "[Server=" + Backup_APCDatabase.Server + "]\n";
+                Text = Text + "[Files=";
+
+                foreach (APCDatabaseBackup Backup in BackupFiles)
+                {
+                    Text = Text + Backup.Filename + ",";
+                }
+                
+                Text = Text.TrimEnd(',');
+                Text = Text + "]";
+
+                return Text;
+            }
+        }
+
         public JenkinsBuildStatus RestoreBackupStatus
         {
             get { return _restoreBackupStatus; }

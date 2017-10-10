@@ -988,25 +988,41 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
                             <StackPanel Margin="15,0,15,0" Grid.Column="1">
-                                <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
-                                       Content="Backups shown in Server Time (UTC)"/>
+                                <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,5,0"
+                                           Text="Backups shown in Server Time (UTC)"
+                                           Style="{StaticResource textBlockStyleNoCopy}"/>
                                 <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
                                         Content="Load backups"
                                         Style="{StaticResource darkButtonBordered}"
                                         Click="LookupResults_DatabaseBackups_LoadBackups_Click"/>
-                                <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
-                                       Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                       Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
-                                       Style="{StaticResource normalFontLabelNoCopy}"/>
-                                <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
-                                        Content="Retain Backup"
-                                        Style="{StaticResource darkButtonBordered}"
-                                        Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}"
-                                        Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
-                                <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
-                                       Content="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                       Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
-                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                                <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,5,0"
+                                           Text="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                           Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
+                                           Style="{StaticResource textBlockStyleNoCopy}"/>
+                                <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,0,0,0"
+                                    Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}, ConverterParameter=Collapsible}">
+                                    <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
+                                            Content="Retain Backup"
+                                            Style="{StaticResource darkButtonBordered}"
+                                            Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
+                                    <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,5,0"
+                                           Text="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                           Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
+                                           Style="{StaticResource textBlockStyleNoCopy}"/>
+                                    <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="5,5,5,0"
+                                               Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:Successful}"
+                                               Style="{StaticResource textBlockStyleNoCopy}"
+                                               TextWrapping="Wrap">
+                                        Backup retained.
+                                        <LineBreak/>
+                                        Include the following text when requesting a restore:
+                                        <LineBreak/>
+                                        <LineBreak/>
+                                        <TextBlock Text="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.BackupsFilesText}"
+                                                   TextWrapping="Wrap"
+                                                   Style="{StaticResource textBlockSmallFontStyle}"/>
+                                    </TextBlock>
+                                </StackPanel>
                             </StackPanel>
                         </Grid>
                     </Grid>
