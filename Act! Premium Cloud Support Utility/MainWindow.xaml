@@ -809,17 +809,20 @@
                             <ListBoxItem x:Name="DatabasesTab_InfoOption"
                                          HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Label Content="{iconPacks:PackIconFontAwesome Info, Height=24, Width=24}"
-                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                                       Style="{StaticResource normalFontLabelNoCopy}"
+                                       ToolTip="Info"/>
                             </ListBoxItem>
                             <ListBoxItem x:Name="DatabasesTab_UsersOption"
                                          HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Label Content="{iconPacks:PackIconFontAwesome Users, Height=24, Width=24}"
-                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                                       Style="{StaticResource normalFontLabelNoCopy}"
+                                       ToolTip="Users"/>
                             </ListBoxItem>
                             <ListBoxItem x:Name="DatabasesTab_BackupsOption"
                                          HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <Label Content="{iconPacks:PackIconOcticons FileZip, Height=24, Width=24}"
-                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                                       Style="{StaticResource normalFontLabelNoCopy}"
+                                       ToolTip="Backups"/>
                             </ListBoxItem>
                         </ListBox>
 
