@@ -440,6 +440,12 @@ namespace Act__Premium_Cloud_Support_Utility
 
         private void LookupListPane_NewLookup_Click(object sender, RoutedEventArgs e)
         {
+            if (LookupResults.Count >= 10)
+            {
+                MessageBox.Show("Too many lookups");
+                return;
+            }
+
             APCAccount Account = new APCAccount();
             Account.LookupCreateTime = DateTime.Now;
 
