@@ -54,20 +54,24 @@
         <Style TargetType="{x:Type Control}" x:Key="smallFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="normalFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="largeFont">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Hyperlink}" x:Key="hyperlinkStyle">
             <Setter Property="TextBlock.TextDecorations"  Value="{x:Null}"/>
+            <Setter Property="FontWeight"  Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -84,18 +88,21 @@
         <Style TargetType="{x:Type Control}" x:Key="smallFontLabel">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="Label_RightClick_Copy"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="normalFontLabel">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="Label_RightClick_Copy"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="largeFontLabel">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="Label_RightClick_Copy"/>
         </Style>
@@ -103,16 +110,19 @@
         <Style TargetType="{x:Type Control}" x:Key="smallFontLabelNoCopy">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="normalFontLabelNoCopy">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type Control}" x:Key="largeFontLabelNoCopy">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
 
@@ -122,24 +132,35 @@
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockStyle">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+            <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockBoldStyle">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="DemiBold"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockLargeFontStyle">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockSmallFontStyle">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockHyperlinkStyle">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <EventSetter Event="MouseRightButtonDown" Handler="TextBlock_RightClick_Copy"/>
             <Style.Triggers>
@@ -152,16 +173,25 @@
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockStyleNoCopy">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="textBlockBoldStyleNoCopy">
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="DemiBold"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockLargeFontStyleNoCopy">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="textBlockHyperlinkStyleNoCopy">
             <Setter Property="FontFamily" Value="Segoe UI"/>
             <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="Foreground" Value="{StaticResource darkBlue}"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -169,7 +199,7 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource textBlockStyle}"/>
 
         <!-- ListBox -->
@@ -544,8 +574,7 @@
                                         Click="LookupListPane_RemoveLookup_Click"/>
                                 <Label Margin="3,1,20,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223"
                                        Style="{StaticResource normalFontLabelNoCopy}">
-                                    <TextBlock Style="{StaticResource textBlockStyleNoCopy}"
-                                               FontWeight="DemiBold"
+                                    <TextBlock Style="{StaticResource textBlockBoldStyleNoCopy}"
                                                Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.AccountName, Converter={StaticResource LookupListAccountNameConverter}}"
                                                TextTrimming="CharacterEllipsis"/>
                                 </Label>
@@ -712,7 +741,7 @@
                     <TextBlock
                         Grid.Column="0" Grid.Row="3"
                         Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Style="{StaticResource textBlockStyleNoCopy}">
+                        Style="{StaticResource textBlockBoldStyleNoCopy}">
                         Account Type: 
                         <TextBlock>
                             <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TrialOrPaid, Converter={StaticResource AccountTrialOrPaidConverter}}"/>
@@ -721,7 +750,7 @@
                     <TextBlock
                         Grid.Column="0" Grid.Row="4"
                         Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Style="{StaticResource textBlockStyleNoCopy}">
+                        Style="{StaticResource textBlockBoldStyleNoCopy}">
                         Account Status: 
                         <TextBlock>
                             <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SuspendStatus, Converter={StaticResource AccountStatusConverter}, ConverterParameter=DataContext.ArchiveStatus|DataContext.DeleteStatus}"/>
@@ -730,7 +759,7 @@
                     <TextBlock
                         Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="5"
                         Margin="5,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Bottom"
-                        Style="{StaticResource textBlockStyleNoCopy}">
+                        Style="{StaticResource textBlockBoldStyleNoCopy}">
                         Login URL: 
                         <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" RequestNavigate="Hyperlink_RequestNavigate">
                             <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.LoginUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
@@ -761,8 +790,7 @@
                                         <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
                                                Width="191"
                                                Style="{StaticResource normalFontLabelNoCopy}">
-                                            <TextBlock Style="{StaticResource textBlockStyleNoCopy}"
-                                                       FontWeight="DemiBold"
+                                            <TextBlock Style="{StaticResource textBlockBoldStyleNoCopy}"
                                                        Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.Name, Converter={StaticResource LookupListAccountNameConverter}}"
                                                        TextTrimming="CharacterEllipsis"/>
                                         </Label>
@@ -802,7 +830,7 @@
                                 Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Info}">
                             <StackPanel Margin="5,0,15,15" Grid.Column="1">
                                 <TextBlock Margin="5,5,0,5"
-                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                           Style="{StaticResource textBlockBoldStyleNoCopy}">
                                     Database Name:
                                     <LineBreak/>
                                     <TextBlock>
@@ -810,7 +838,7 @@
                                     </TextBlock>
                                 </TextBlock>
                                 <TextBlock Margin="5,5,0,5"
-                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                           Style="{StaticResource textBlockBoldStyleNoCopy}">
                                     SQL Server:
                                     <LineBreak/>
                                     <TextBlock>
@@ -880,7 +908,7 @@
                             <StackPanel Margin="15,0,15,15" Grid.Column="1"
                                         Visibility="{Binding ElementName=LookupResults_UserList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}">
                                 <TextBlock Margin="5,5,0,5"
-                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                           Style="{StaticResource textBlockBoldStyleNoCopy}">
                                     Full Name:
                                     <LineBreak/>
                                     <TextBlock>
@@ -888,7 +916,7 @@
                                     </TextBlock>
                                 </TextBlock>
                                 <TextBlock Margin="5,5,0,5"
-                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                           Style="{StaticResource textBlockBoldStyleNoCopy}">
                                     Login Name:
                                     <LineBreak/>
                                     <TextBlock>
@@ -896,7 +924,7 @@
                                     </TextBlock>
                                 </TextBlock>
                                 <TextBlock Margin="5,5,0,5"
-                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                           Style="{StaticResource textBlockBoldStyleNoCopy}">
                                     Role:
                                     <LineBreak/>
                                     <TextBlock>
@@ -904,7 +932,7 @@
                                     </TextBlock>
                                 </TextBlock>
                                 <TextBlock Margin="5,5,0,5"
-                                           Style="{StaticResource textBlockStyleNoCopy}">
+                                           Style="{StaticResource textBlockBoldStyleNoCopy}">
                                     Last Login (UTC):
                                     <LineBreak/>
                                     <TextBlock>
@@ -997,28 +1025,28 @@
                                   CanContentScroll="True">
                         <StackPanel Height="auto" VerticalAlignment="Stretch" ScrollViewer.CanContentScroll="True">
                             <TextBlock Margin="5,5,0,0"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                       Style="{StaticResource textBlockBoldStyleNoCopy}">
                                 Upload URL: 
                                 <Hyperlink NavigateUri="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" RequestNavigate="Hyperlink_RequestNavigate">
                                     <TextBlock Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.UploadUrl}" Style="{StaticResource textBlockHyperlinkStyle}"/>
                                 </Hyperlink>
                             </TextBlock>
                             <TextBlock Margin="5,5,0,0"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                       Style="{StaticResource textBlockBoldStyleNoCopy}">
                                 Serial Number: 
                                 <TextBlock>
                                     <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SerialNumber}"/>
                                 </TextBlock>
                             </TextBlock>
                             <TextBlock Margin="5,5,0,0"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                       Style="{StaticResource textBlockBoldStyleNoCopy}">
                                 Users: 
                                 <TextBlock>
                                     <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.SeatCount}"/>
                                 </TextBlock>
                             </TextBlock>
                             <TextBlock Margin="5,5,0,0"
-                                       Style="{StaticResource textBlockStyleNoCopy}">
+                                       Style="{StaticResource textBlockBoldStyleNoCopy}">
                                 Inactivity Timeout: 
                                 <TextBlock>
                                     <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.TimeoutValue, Converter={StaticResource AccountTimeoutConverter}}"/>
@@ -1081,21 +1109,21 @@
                     <!-- Bottom section -->
                     <StackPanel Height="auto" VerticalAlignment="Bottom" Grid.Row="1" Margin="0,0,0,20">
                         <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
+                                   Style="{StaticResource textBlockBoldStyleNoCopy}">
                             Create Date:
                             <TextBlock>
                                 <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.CreateDate}"/>
                             </TextBlock>
                         </TextBlock>
                         <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
+                                   Style="{StaticResource textBlockBoldStyleNoCopy}">
                             IIS Server: 
                             <TextBlock>
                                 <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IISServer}"/>
                             </TextBlock>
                         </TextBlock>
                         <TextBlock Margin="5,5,0,0"
-                                   Style="{StaticResource textBlockStyleNoCopy}">
+                                   Style="{StaticResource textBlockBoldStyleNoCopy}">
                             IITID: 
                             <TextBlock>
                                 <Run Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=DataContext.IITID}"/>
