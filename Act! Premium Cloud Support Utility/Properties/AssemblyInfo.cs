@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("Glacier")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Swiftpage")]
 [assembly: AssemblyProduct("Glacier")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
