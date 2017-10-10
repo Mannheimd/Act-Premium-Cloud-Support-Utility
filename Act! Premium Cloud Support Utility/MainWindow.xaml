@@ -974,39 +974,41 @@
                         <Grid Margin="58.5,0,0,15" Visibility="{Binding ElementName=LookupResults_DatabaseSubItemSwitch, Path=SelectedIndex, Converter={StaticResource DatabasesSubItemSelectedToVisibilityConverter}, ConverterParameter=Backups}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="300"/>
                         </Grid.ColumnDefinitions>
-                        <ListBox Grid.Column="0" x:Name="LookupResults_BackupList"
+                            <ListBox Grid.Column="0" x:Name="LookupResults_BackupList"
                                  Margin="0,0,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                  ItemsSource="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreableBackups}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding Date}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                        <StackPanel Margin="15,0,15,0" Grid.Column="1">
-                            <Button HorizontalAlignment="Stretch" VerticalAlignment="Top"
-                                    Content="Load backups"
-                                    Style="{StaticResource darkButtonBordered}"
-                                    Click="LookupResults_DatabaseBackups_LoadBackups_Click"/>
-                            <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
-                                   Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
-                                   Style="{StaticResource normalFontLabelNoCopy}"/>
-                            <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
-                                    Content="Retain Backup"
-                                    Style="{StaticResource darkButtonBordered}"
-                                    Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}"
-                                    Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
-                            <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
-                                   Content="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
-                                   Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
-                                   Style="{StaticResource normalFontLabelNoCopy}"/>
-                        </StackPanel>
-                    </Grid>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Label Margin="3,1,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Style="{StaticResource normalFontLabel}" Content="{Binding Date}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Margin="15,0,15,0" Grid.Column="1">
+                                <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
+                                       Content="Backups shown in Server Time (UTC)"/>
+                                <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
+                                        Content="Load backups"
+                                        Style="{StaticResource darkButtonBordered}"
+                                        Click="LookupResults_DatabaseBackups_LoadBackups_Click"/>
+                                <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
+                                       Content="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                       Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.BackupLoadStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
+                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                                <Button HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,5"
+                                        Content="Retain Backup"
+                                        Style="{StaticResource darkButtonBordered}"
+                                        Visibility="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem, Converter={StaticResource ListBoxSelectedToVisibilityConverter}}"
+                                        Click="LookupResults_DatabaseBackups_RetainBackup_Click"/>
+                                <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,5,0,0"
+                                       Content="{Binding ElementName=LookupResults_BackupList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToProgressIndicatorIconConverter}}"
+                                       Visibility="{Binding ElementName=LookupResults_DatabaseList, Path=SelectedItem.RestoreBackupStatus, Converter={StaticResource JenkinsBuildStatusToVisibilityConverter}, ConverterParameter=Collapsible:InProgress:Failed}"
+                                       Style="{StaticResource normalFontLabelNoCopy}"/>
+                            </StackPanel>
+                        </Grid>
                     </Grid>
                 </Grid>
 
