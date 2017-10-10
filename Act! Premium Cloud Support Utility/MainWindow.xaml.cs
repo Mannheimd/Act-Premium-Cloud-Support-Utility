@@ -567,10 +567,10 @@ namespace Act__Premium_Cloud_Support_Utility
             if (!((APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem is APCDatabaseBackupRestorable))
                 return;
 
-            APCDatabaseBackupRestorable Backup = (APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem;
-            if (Backup != null)
+            APCDatabaseBackupRestorable RestorableBackup = (APCDatabaseBackupRestorable)LookupResults_BackupList.SelectedItem;
+            if (RestorableBackup != null)
             {
-                await JenkinsTasks.RetainDatabaseBackup(Backup);
+                await JenkinsTasks.RetainDatabaseBackup(RestorableBackup);
             }
         }
 
@@ -994,31 +994,29 @@ namespace Act__Premium_Cloud_Support_Utility
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is string & parameter is string)
-            {
-                string archiveStatus = (parameter as string).Split('|')[0];
-                string deleteStatus = (parameter as string).Split('|')[1];
+            if (value == null)
+                return null;
 
-                // Assume account is active, then run through options from bad to worse. Don't need to display multiple; if account is Archived, knowing it's also Suspended is redundant.
-                string currentStatus = "Active";
+            APCAccount Account = (APCAccount)value;
 
-                if (value as string == "Suspended")
-                    currentStatus = "Suspended";
-                if (archiveStatus == "Archived")
-                    currentStatus = "Archived";
-                if (deleteStatus == "Deleted")
-                    currentStatus = "Deleted";
+            // Work through options in order of severity
+            if (Account.DeleteStatus == "Deleted")
+                return "Deleted";
 
-                return currentStatus;
-            }
-            else return "";
+            if (Account.ArchiveStatus == "Archived")
+                return "Archived";
+
+            if (Account.SuspendStatus == "Suspended")
+                return "Suspended";
+
+            return "Active";
         }
 
         public object ConvertBack(object value, Type targetType, object Parameter, CultureInfo culture)
         {
             throw new Exception("This method is not implemented.");
         }
-    }
+    }// Deprecated
 
     public class AccountTimeout_Converter : IValueConverter
     {

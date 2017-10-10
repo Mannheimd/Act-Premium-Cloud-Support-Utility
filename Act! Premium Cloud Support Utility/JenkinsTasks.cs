@@ -786,32 +786,52 @@ namespace Jenkins_Tasks
         /// <param name="database">APCDatabase to retain backups for</param>
         /// <param name="server">JenkinsServer to run build on</param>
         /// <returns>Returns a list of APCDatabaseUsers</returns>
-        public static async Task<bool> RetainDatabaseBackup(APCDatabaseBackupRestorable backup)
+        public static async Task<bool> RetainDatabaseBackup(APCDatabaseBackupRestorable RestorableBackup)
         {
-            backup.RestoreBackupStatus = JenkinsBuildStatus.InProgress;
+            RestorableBackup.RestoreBackupStatus = JenkinsBuildStatus.InProgress;
 
             // Check the Jenkins login credentials
-            if (UnsecureJenkinsCreds(backup.Backup_APCDatabase.Database_APCAccount.JenkinsServer.id) == null)
+            if (UnsecureJenkinsCreds(RestorableBackup.Backup_APCDatabase.Database_APCAccount.JenkinsServer.id) == null)
             {
-                backup.RestoreBackupStatus = JenkinsBuildStatus.Failed;
+                RestorableBackup.RestoreBackupStatus = JenkinsBuildStatus.Failed;
                 return false;
             }
 
-            foreach (APCDatabaseBackup BackupFile in backup.BackupFiles)
+            // Run copy jobs
+            foreach (APCDatabaseBackup BackupFile in RestorableBackup.BackupFiles)
             {
                 // Post a request to build LookupCustomer and wait for a response
-                string BuildOutput = await runJenkinsBuild(backup.Backup_APCDatabase.Database_APCAccount.JenkinsServer, @"/job/CloudOps1-CopyCustomerDatabaseBackup-M/buildWithParameters?&DestinationServer="
-                    + backup.Backup_APCDatabase.Server
+                string BuildOutput = await runJenkinsBuild(RestorableBackup.Backup_APCDatabase.Database_APCAccount.JenkinsServer, @"/job/CloudOps1-CopyCustomerDatabaseBackup-M/buildWithParameters?&DestinationServer="
+                    + RestorableBackup.Backup_APCDatabase.Server
                     + "&Backup="
                     + BackupFile.Filename
                     + "&delay=0sec");
 
-                // We don't check the output of this job for verification as it's tough to build something into the Jenkins job which does that.
-                // Basically if the 'gsutil cp' command in the Jenkins job fails, the Jenkins build fails and we'll see a failure.
+                // No in-depth error checking here. If the copy fails then the Jenkins build will fail, and BuildOutput will be null.
+                if (BuildOutput != null)
+                    BackupFile.RestoreSuccess = true;
+                else
+                    BackupFile.RestoreSuccess = false;
             }
 
-            backup.RestoreBackupStatus = JenkinsBuildStatus.Successful;
-            return true;
+            // Check if any restores failed
+            bool FailFlag = false;
+            foreach (APCDatabaseBackup BackupFile in RestorableBackup.BackupFiles)
+            {
+                if (BackupFile.RestoreSuccess == false)
+                    FailFlag = true;
+            }
+
+            if (FailFlag)
+            {
+                RestorableBackup.RestoreBackupStatus = JenkinsBuildStatus.Failed;
+                return false;
+            }
+            else
+            {
+                RestorableBackup.RestoreBackupStatus = JenkinsBuildStatus.Successful;
+                return true;
+            }
         }
 
         /// <summary>
@@ -1108,6 +1128,7 @@ namespace Jenkins_Tasks
         private string _accountType;
         private string _lookupValue;
         private string _timeoutValue;
+        private string _accountStatus;
         private List<APCDatabase> _databases;
         private List<APCAccountActivity> _accountActivity;
         private APCLookupType _lookupType;
@@ -1192,13 +1213,21 @@ namespace Jenkins_Tasks
         public string SuspendStatus
         {
             get { return _suspendStatus; }
-            set { SetPropertyField("SuspendStatus", ref _suspendStatus, value); }
+            set
+            {
+                SetPropertyField("SuspendStatus", ref _suspendStatus, value);
+                CalculateAccountStatus();
+            }
         }
 
         public string ArchiveStatus
         {
             get { return _archiveStatus; }
-            set { SetPropertyField("ArchiveStatus", ref _archiveStatus, value); }
+            set
+            {
+                SetPropertyField("ArchiveStatus", ref _archiveStatus, value);
+                CalculateAccountStatus();
+            }
         }
 
         public string SiteName
@@ -1234,7 +1263,11 @@ namespace Jenkins_Tasks
         public string DeleteStatus
         {
             get { return _deleteStatus; }
-            set { SetPropertyField("DeleteStatus", ref _deleteStatus, value); }
+            set
+            {
+                SetPropertyField("DeleteStatus", ref _deleteStatus, value);
+                CalculateAccountStatus();
+            }
         }
 
         public string AccountType
@@ -1253,6 +1286,12 @@ namespace Jenkins_Tasks
         {
             get { return _timeoutValue; }
             set { SetPropertyField("TimeoutValue", ref _timeoutValue, value); }
+        }
+
+        public string AccountStatus
+        {
+            get { return _accountStatus; }
+            set { SetPropertyField("AccountStatus", ref _accountStatus, value); }
         }
 
         public List<APCDatabase> Databases
@@ -1337,6 +1376,21 @@ namespace Jenkins_Tasks
         {
             get { return _changeInactivityTimeoutNewValue; }
             set { SetPropertyField("ChangeInactivityTimeoutNewValue", ref _changeInactivityTimeoutNewValue, value); }
+        }
+
+        public void CalculateAccountStatus()
+        {
+            if (DeleteStatus == "Deleted")
+                AccountStatus = "Deleted";
+
+            else if (ArchiveStatus == "Archived")
+                AccountStatus = "Archived";
+
+            else if (SuspendStatus == "Suspended")
+                AccountStatus = "Suspended";
+
+            else
+                AccountStatus = "Active";
         }
 
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -1523,6 +1577,7 @@ namespace Jenkins_Tasks
         private string _filename;
         private DateTime _date;
         public APCDatabase Backup_Database { get; set; }
+        public bool RestoreSuccess { get; set; } = false;
 
         public APCDatabaseBackup(APCDatabase Database)
         {
